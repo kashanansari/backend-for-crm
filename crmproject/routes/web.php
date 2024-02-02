@@ -60,7 +60,7 @@ Route::get('/removalform', [userController::class, 'removalForm'])->name('remova
 Route::get('/logout', [userController::class, 'logout'])->name('logout');
 // Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
 // Route::post('/storetechnical', [userController::class,  'technical_details'])->name('storetechnical');
-Route::post('/storesecurity', [userController::class,  'securitydetails']);
+// Route::post('/storesecurity', [userController::class,  'securitydetails']);
 Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 Route::any('/complain_actions', [userController::class,  'action_complain'])->name('complain.actions');
 Route::post('/redoactions', [userController::class,  'create_redo']);
@@ -200,3 +200,4 @@ Route::get('/download_renewals', [userController::class, 'download_renewals'])->
 Route::get('/view_forget', [userController::class, 'get_forgetpassword'])->name('view_forget');
 
 
+Route::get('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');

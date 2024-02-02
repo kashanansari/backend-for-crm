@@ -74,6 +74,8 @@ Route::post('/technical_create', [userController::class,  'technical_create'])->
 Route::get('securityalert', [userController::class, 'securityalert'])->name('securityalert');
 Route::post('/security_create', [userController::class,  'security_create'])->name('security_create');
 
+Route::post('/device_certificate', [userController::class,  'device_certificate'])->name('device_certificate');
+// Route::get('/view_certifiacte', [userController::class, 'view_certifiacte'])->name('view_certifiacte');
 
 
 

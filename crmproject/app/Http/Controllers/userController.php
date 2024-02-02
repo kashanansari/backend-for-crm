@@ -1005,7 +1005,7 @@ public function removal_search(Request $request){
     $regNo = $request->search_term;
 
      $user = User::where('registeration_no', $regNo)
-     ->orWhere('customer_name','LIKE',"%$regNo%")
+    //  ->orWhere('customer_name','LIKE',"%$regNo%")
      ->orWhere('mobileno_1','LIKE',"%$regNo%")
      ->orWhere('cnic','LIKE',"%$regNo%")
      ->OrderBy('created_at','desc')
@@ -3369,7 +3369,7 @@ else{
         }
         $input=$request->search_term;
         $user=User::where('registeration_no',$input)
-        ->orWhere('customer_name','LIKE','%'.$input.'%')
+        // ->orWhere('customer_name','LIKE','%'.$input.'%')
         ->orWhere('engine_no',$input)
         ->orWhere('chasis_no',$input)
         ->orderBy('created_at','desc')
@@ -3389,5 +3389,81 @@ else{
             'data'=>null
         ], 200, );
        }
+}
+public function device_certificate(Request $request){
+    $validator=Validator::make($request->all(),[
+       'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $data=User::where('registeration_no',$request->search_term)
+    ->orWhere('engine_no',$request->search_term)
+    ->orWhere('chasis_no',$request->search_term)
+    ->orderBy('created_at','desc')
+    ->first();
+    if(!$data){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+                ], 200, );
+    }
+  
+       $value=[
+        'model'=>$data->model,
+        'make'=>$data->make,
+        'year'=>$data->year,
+        'date_of_installation'=>$data->date_of_installation,
+        'engine_no'=>$data->engine_no,
+        'chasis_no'=>$data->chasis_no,
+        'validaty'=>"1 Yaer",
+        'segement'=>$data->segment
+       ];
+       return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$value
+    ], 200, );
+   
+}
+public function view_certificate(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'search_term' => '111'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => $validator->errors()
+        ], 200);
+    }
+
+    $data = User::where('registeration_no', $request->search_term)
+        ->orWhere('customer_name', 'LIKE', '%' . $request->search_term . '%')
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+    $value = [
+        'customer_name' => $data ? $data->customer_name : 'nil',
+        'registration_number' => $data ? $data->registeration_no : 'nil',
+        'engine_number' => $data ? $data->engine_no : 'nil',
+        'chassis_number' => $data ? $data->chasis_no : 'nil',
+        'make' => $data ? $data->make : 'nil',
+        'model' => $data ? $data->model : 'nil',
+        'year' => $data ? $data->year : 'nil',
+        'installation_date' => $data ? $data->date_of_installation : 'nil',
+        'validity' => '12 Months', // You may adjust this based on actual data or logic
+        'segment' => $data ? $data->segment : 'nil'
+    ];
+    $pdf = PDF::loadView('pdf.certificate',compact('value'))->setPaper('a4','landscape');
+    return $pdf->stream();
+    // return view('pdf.certificate', compact('value'));
+// }
+
 }
 }
