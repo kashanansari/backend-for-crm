@@ -73,3 +73,8 @@ Route::get('technical_alert', [userController::class, 'technical_alert'])->name(
 Route::post('/technical_create', [userController::class,  'technical_create'])->name('technical_create');
 Route::get('securityalert', [userController::class, 'securityalert'])->name('securityalert');
 Route::post('/security_create', [userController::class,  'security_create'])->name('security_create');
+
+
+
+
+
