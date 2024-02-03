@@ -114,7 +114,7 @@ class userController extends Controller
     public function storedata(Request $request)
     {
         
-        $validator = Vlaidator::mnake($request->all(),[
+        $validator = Validator::mnake($request->all(),[
             'id' => 'required',
             'customer_name' => 'required',
             'father_name' => 'required',
