@@ -164,12 +164,12 @@ class userController extends Controller
             'segment'=>'required'
 
         ]);
-        if($validatedData->fails()){
-            return response()->json([
-                'success'=>false,
-                'message'=>$validatedData->errors()
-            ], 400, );
-        }
+        // if($validatedData->fails()){
+        //     return response()->json([
+        //         'success'=>false,
+        //         'message'=>$validatedData->errors()
+        //     ], 400, );
+        // }
     
         try {
             DB::beginTransaction();
