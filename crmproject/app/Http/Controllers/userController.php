@@ -164,7 +164,7 @@ class userController extends Controller
             'segment'=>'required'
 
         ]);
-        if($validatedData->fails()){
+        if($request->fails()){
             return response()->json([
                 'success'=>false,
                 'message'=>$validatedData->errors()
