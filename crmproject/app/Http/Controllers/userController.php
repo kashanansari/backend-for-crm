@@ -3445,7 +3445,7 @@ public function device_certificate(Request $request){
 public function view_certificate(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'search_term' => '111'
+        'search_term' => 'required'
     ]);
 
     if ($validator->fails()) {
