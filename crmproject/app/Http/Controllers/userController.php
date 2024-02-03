@@ -114,7 +114,7 @@ class userController extends Controller
     public function storedata(Request $request)
     {
         
-        $validatedData = $request->validate([
+        $validator = Vlaidator::mnake($request->all(),[
             'id' => 'required',
             'customer_name' => 'required',
             'father_name' => 'required',
@@ -164,10 +164,10 @@ class userController extends Controller
             'segment'=>'required'
 
         ]);
-        if($request->fails()){
+        if($validator->fails()){
             return response()->json([
                 'success'=>false,
-                'message'=>$validatedData->errors()
+                'message'=>$validator->errors()
             ], 400, );
         }
     
