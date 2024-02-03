@@ -3483,4 +3483,40 @@ return response()->json([
 ], 200, );
 
 }
+public function search_for_all(Request $request){
+$validator=Validator::make($request->all(),[
+    'search_term'=>'required'
+]);
+if($validator->fails()){
+    return response()->json([
+        'success'=>false,
+        'message'=>$validator->errors()
+    ], 200, );
+}
+    $user=User::where('registeration_no',$request->search_term,)
+    ->first();
+    $removal=Removal::where('reg_no',$request->search_term)
+    ->first();
+     $complain=complain::where('reg_no',$request->search_term)
+    ->get();
+    $redo=Redo::where('reg_no',$request->search_term)
+    ->get();
+    if($user){
+        return response()->json([
+            'success'=>true,
+            'messsage'=>'Data found successfully',
+            'user'=>$user,
+            'removal'=>$removal,
+            'complain'=>$complain,
+            'redo'=>$redo
+        ], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'messsage'=>'Data not found',
+            'data'=>null
+        ], 200, );
+    }
+}
 }

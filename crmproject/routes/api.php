@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\BackupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,7 +77,9 @@ Route::post('/security_create', [userController::class,  'security_create'])->na
 
 Route::post('/device_certificate', [userController::class,  'device_certificate'])->name('device_certificate');
 Route::post('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');
+//backup sql database
+Route::post('/createAndDownloadBackup', [BackupController::class, 'createAndDownloadBackup']);
 
 
-
+Route::post('/search_for_all', [userController::class, 'search_for_all'])->name('search_for_all');
 

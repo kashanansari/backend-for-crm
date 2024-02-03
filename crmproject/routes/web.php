@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\BackupController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -199,5 +201,6 @@ Route::get('/download_renewals', [userController::class, 'download_renewals'])->
 
 Route::get('/view_forget', [userController::class, 'get_forgetpassword'])->name('view_forget');
 
+// Route::get('/backup', [BackupController::class, 'createAndDownloadBackup'])->name('backup');
 
-Route::post('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');
+// Route::post('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');
