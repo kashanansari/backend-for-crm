@@ -3472,10 +3472,15 @@ public function view_certificate(Request $request)
         'validity' => '12 Months', // You may adjust this based on actual data or logic
         'segment' => $data ? $data->segment : 'nil'
     ];
-    $pdf = PDF::loadView('pdf.certificate',compact('value'))->setPaper('a4','landscape');
-    return $pdf->stream();
+    // $pdf = PDF::loadView('pdf.certificate',compact('value'))->setPaper('a4','landscape');
+    // return $pdf->stream();
     // return view('pdf.certificate', compact('value'));
 // }
+return response()->json([
+    'success'=>'success',
+    'message'=>'data found successfully',
+    'data'=>$value
+], 200, );
 
 }
 }
