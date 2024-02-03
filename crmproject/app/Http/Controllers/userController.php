@@ -141,7 +141,7 @@ class userController extends Controller
             'color' => 'required',
             'insurance_partner' => 'required',
             'vas' => 'required', // Assuming this is a required field
-            'vas_options' => 'nullable',
+            'vas_options' => 'nullable|string',
             'segment' => 'nullable',
             'demo_duration' => 'nullable', // Assuming this is a required field
             'tracker_charges' => 'required',
@@ -164,12 +164,12 @@ class userController extends Controller
             'segment'=>'required'
 
         ]);
-        // if($validatedData->fails()){
-        //     return response()->json([
-        //         'success'=>false,
-        //         'message'=>$validatedData->errors()
-        //     ], 400, );
-        // }
+        if($validatedData->fails()){
+            return response()->json([
+                'success'=>false,
+                'message'=>$validatedData->errors()
+            ], 400, );
+        }
     
         try {
             DB::beginTransaction();
