@@ -175,7 +175,8 @@ class userController extends Controller
             DB::beginTransaction();
     
             $data = new User();
-            $data->fill($validator); // Fill the model with validated data
+            $data->fill($validator->validated()); // Fill the model with validated data
+            // Fill the model with validated data
     
             // Other fields
             $data->form_status = 'completed';
