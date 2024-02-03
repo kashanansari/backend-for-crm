@@ -720,8 +720,19 @@ return response()->json([
         $data->remarks = $request->input('remarks');
         $data->status = 'Removed';
         $data->save();
-        $check=Deviceinventory::where('device_serialno',$request->device)->first()
-        ->update(['status'=>'Removed']);
+        $check = Deviceinventory::where('device_serialno', $request->device)->first();
+
+        if ($check) {
+            $check->update(['status' => 'Removed']);
+        } else {
+            // Handle the case where no matching record is found
+            return response()->json([
+                'success' => false,
+                'message' => 'Device not found in inventory',
+                'data' => null
+            ], 404);
+        }
+        
 
         return response()->json([
             'success'=>true,
