@@ -200,4 +200,4 @@ Route::get('/download_renewals', [userController::class, 'download_renewals'])->
 Route::get('/view_forget', [userController::class, 'get_forgetpassword'])->name('view_forget');
 
 
-Route::get('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');
+Route::post('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');
