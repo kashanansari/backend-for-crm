@@ -640,7 +640,7 @@ return response()->json([
 
 
         if($data->nature_of_complain=='N/R(no report)'){
-          $technical=  Technicaldetails::where('client_code',$data->client_id)->update(['tracker_status'=>'inactive']);
+          $technical=  Technicaldetails::where('client_code',$data->client_id)->update(['tracker_status'=>'N/R']);
 
         }
 
@@ -3530,6 +3530,9 @@ public function complain_box(Request $request){
             'message'=>$validator->errors()
         ], 422, );
     }
+    $lastComplaint = Complain::latest()->first();
+    $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
+
     $user=User::where('registeration_no',$request->search_term)
     ->orWhere('engine_no',$request->search_term)
     ->orWhere('chasis_no',$request->search_term)
@@ -3550,6 +3553,7 @@ public function complain_box(Request $request){
     return response()->json([
         'success'=>true,
         'messsage'=>'Data found successfully',
+        'complain_id'=>$lastComplaintId,
         'data'=>$data,
         'compalin'=>$complain
       
