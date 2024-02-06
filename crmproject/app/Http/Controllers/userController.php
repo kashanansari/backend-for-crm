@@ -3528,7 +3528,7 @@ public function complain_box(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 422, );
     }
     $user=User::where('registeration_no',$request->search_term)
     ->orWhere('engine_no',$request->search_term)
@@ -3546,6 +3546,7 @@ public function complain_box(Request $request){
     $complain=Complain::where('client_id',$user->id)
     ->get();
     if($user){
+
     return response()->json([
         'success'=>true,
         'messsage'=>'Data found successfully',
@@ -3559,7 +3560,7 @@ else{
         'success'=>false,
         'messsage'=>'Data not found',
         'data'=>null
-    ], 200, );
+    ], 420, );
 }
 }
 }
