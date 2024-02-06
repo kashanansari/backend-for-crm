@@ -3520,4 +3520,46 @@ if($validator->fails()){
         ], 200, );
     }
 }
+public function complain_box(Request $request){
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $user=User::where('registeration_no',$request->search_term)
+    ->orWhere('engine_no',$request->search_term)
+    ->orWhere('chasis_no',$request->search_term)
+    ->first();
+    $technical=Technicaldetails::where('client_code',$user->id)
+    ->first();
+    $security=secutitydetails::where('client_code',$user->id)
+    ->first();
+     $data=[
+        'user'=>$user,
+        'technical'=>$technical,
+        'security'=>$security
+     ];
+    $complain=Complain::where('client_id',$user->id)
+    ->get();
+    if($user){
+    return response()->json([
+        'success'=>true,
+        'messsage'=>'Data found successfully',
+        'data'=>$data,
+        'compalin'=>$complain
+      
+    ], 200, );
+}
+else{
+    return response()->json([
+        'success'=>false,
+        'messsage'=>'Data not found',
+        'data'=>null
+    ], 200, );
+}
+}
 }
