@@ -161,7 +161,7 @@ Route::get('/tech/{id}', [userController::class, 'tech']);
 
 Route::get('/time', [userController::class, 'view_renewals']);
 // Route::get('/alldatalogs', [userController::class, 'view_all_datalogs']);
-Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
+// Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
 Route::get('/view30datalogs', [userController::class, 'view30days'])->name('view30datalogs');
 
 Route::get('/last30days', [userController::class, 'last_30_days_datalogs'])->name('last30days');
@@ -201,6 +201,8 @@ Route::get('/download_renewals', [userController::class, 'download_renewals'])->
 
 Route::get('/view_forget', [userController::class, 'get_forgetpassword'])->name('view_forget');
 
-// Route::get('/backup', [BackupController::class, 'createAndDownloadBackup'])->name('backup');
-
+Route::get('/api/backup', [userController::class, 'backup'])->name('/api/backup');
+Route::get('/backup', function () {
+    return view('backup');
+});
 // Route::post('/view_certificate', [userController::class, 'view_certificate'])->name('view_certificate');

@@ -29,7 +29,7 @@ return [
         'database_dump_file_extension' => '',
 
         'destination' => [
-            'filename_prefix' => '',
+            'filename_prefix' => '', // You can set a filename prefix here if needed
             'disks' => [
                 'local',
             ],

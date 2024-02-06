@@ -28,6 +28,7 @@ use GuzzleHttp\Client;
 
 
 use Illuminate\Http\Response;
+use Spatie\Backup\Tasks\Backup\BackupJobFactory;
 
 
 use Illuminate\Support\Facades\Auth;
@@ -2775,14 +2776,16 @@ public function view30days(Request $request){
 }
 public function view_all_data_logs(Request $request)
 {
-
-
-
-
     $data = Datalogs::orderBy('created_at', 'desc')
-        ->paginate(20);
-
-    return view('view_all_datalogs')->with('data',$data);
+        ->get();
+        // return view('view_all_datalogs')->with('data',$data);
+        if($data){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$data
+    ], 200, );
+}
 }
 public function view_all_complain_logs(Request $request){
     return view('all_complain_logs');
@@ -3565,6 +3568,24 @@ else{
         'messsage'=>'Data not found',
         'data'=>null
     ], 420, );
+}
+}
+public function backup(Request $request){
+    dd(config('backup'));
+   // Create backup
+   $backupJob = BackupJobFactory::createFromArray(config('backup.backup'));
+   $backupJob->run();
+
+   // Get the latest backup file
+   $newestBackup = BackupDestinationFactory::createFromArray(config('backup.backup'))->newestBackup();
+   $backupFile = $newestBackup ? $newestBackup->path() : null;
+
+   if ($backupFile) {
+       // Download backup file
+       return response()->download($backupFile)->deleteFileAfterSend(true);
+   } else {
+       // Backup was not created
+       return response()->json(['message' => 'Failed to create backup'], 500);
 }
 }
 }

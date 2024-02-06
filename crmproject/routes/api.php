@@ -83,4 +83,5 @@ Route::post('/createAndDownloadBackup', [BackupController::class, 'createAndDown
 
 Route::post('/search_for_all', [userController::class, 'search_for_all'])->name('search_for_all');
 Route::post('/complain_box', [userController::class, 'complain_box'])->name('complain_box');
+Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
 
