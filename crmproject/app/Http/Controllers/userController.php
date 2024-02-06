@@ -852,7 +852,10 @@ public function create_deviceinventory(Request $request) {
     ]);
 
     if ($validator->fails()) {
-        return back()->withErrors($validator)->withInput();
+       return response()->json([
+        'success'=>false,
+        'message'=>$validator->errors()
+       ], 200, );
     }
 
     $device = deviceinventory::where('device_serialno', $request->device_serialno)->first();
@@ -2777,16 +2780,31 @@ public function view30days(Request $request){
 public function view_all_data_logs(Request $request)
 {
     $data = Datalogs::orderBy('created_at', 'desc')
-        ->get();
-        // return view('view_all_datalogs')->with('data',$data);
-        if($data){
+    ->get();
+
+// Convert created_at timestamp to Karachi timezone
+foreach ($data as $entry) {
+    $createdAt = Carbon::parse($entry->created_at)->timezone('Asia/Karachi');
+    $entry->date = $createdAt->format('Y-m-d');
+    $entry->time = $createdAt->format('h:i A');
+
+}
+
+if ($data) {
     return response()->json([
-        'success'=>true,
-        'message'=>'Data found successfully',
-        'data'=>$data
-    ], 200, );
+        'success' => true,
+        'message' => 'Data found successfully',
+        'data' => $data
+    ], 200);
+} else {
+    return response()->json([
+        'success' => false,
+        'message' => 'No data found',
+        'data' => []
+    ], 404);
 }
 }
+
 public function view_all_complain_logs(Request $request){
     return view('all_complain_logs');
 }
