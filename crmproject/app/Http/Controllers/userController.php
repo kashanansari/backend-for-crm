@@ -3426,6 +3426,7 @@ public function device_certificate(Request $request){
     }
   
        $value=[
+        'reg_no'=>$data->registeration_no,
         'model'=>$data->model,
         'make'=>$data->make,
         'year'=>$data->year,
