@@ -29,6 +29,7 @@ use GuzzleHttp\Client;
 
 use Illuminate\Http\Response;
 use Spatie\Backup\Tasks\Backup\BackupJobFactory;
+use Spatie\Backup\BackupDestination\BackupDestinationFactory;
 
 
 use Illuminate\Support\Facades\Auth;
@@ -1774,6 +1775,7 @@ public function emp_login(Request $request)
     ]);
 
     $response->withCookie(cookie('session_token', $uniqueSessionToken, 60, null, null, false, true)); 
+    $response->withCookie(cookie('auth_token', $token, 60, null, null, false, true)); 
 
     // Create a new Emp_login record
     $emp_login = Emp_login::create([
@@ -3588,22 +3590,28 @@ else{
     ], 420, );
 }
 }
-public function backup(Request $request){
-    dd(config('backup'));
-   // Create backup
-   $backupJob = BackupJobFactory::createFromArray(config('backup.backup'));
-   $backupJob->run();
+public function createBackup()
+    {
+        try {
+            // Create backup
+            $backupJob = BackupJobFactory::createFromArray(config('backup.backup'));
+            $backupJob->run();
 
-   // Get the latest backup file
-   $newestBackup = BackupDestinationFactory::createFromArray(config('backup.backup'))->newestBackup();
-   $backupFile = $newestBackup ? $newestBackup->path() : null;
+            // Get the newest backup file
+            $newestBackup = BackupDestinationFactory::createFromArray(config('backup.backup'))->newestBackup();
+            
+            if ($newestBackup) {
+                // Backup created successfully
+                $backupPath = $newestBackup->path();
 
-   if ($backupFile) {
-       // Download backup file
-       return response()->download($backupFile)->deleteFileAfterSend(true);
-   } else {
-       // Backup was not created
-       return response()->json(['message' => 'Failed to create backup'], 500);
-}
-}
-}
+                // Download backup file
+                return response()->download($backupPath)->deleteFileAfterSend(true);
+            } else {
+                // Backup was not created
+                return response()->json(['message' => 'Failed to create backup'], 500);
+            }
+        } catch (\Exception $e) {
+            // Error occurred during backup creation
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }}

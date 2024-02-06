@@ -201,7 +201,7 @@ Route::get('/download_renewals', [userController::class, 'download_renewals'])->
 
 Route::get('/view_forget', [userController::class, 'get_forgetpassword'])->name('view_forget');
 
-Route::get('/api/backup', [userController::class, 'backup'])->name('/api/backup');
+Route::get('/api/backup', [userController::class, 'createBackup'])->name('/api/backup');
 Route::get('/backup', function () {
     return view('backup');
 });
