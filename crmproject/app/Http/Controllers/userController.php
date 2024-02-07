@@ -1761,7 +1761,7 @@ public function emp_login(Request $request)
 
     // Generate a unique session token
     $uniqueSessionToken = 'session_token_' . $empId . '_' . time();
-    $token = $employee->createToken('AuthToken')->plainTextToken;
+    $token = $employee->createToken($employee->emp_id)->plainTextToken;
     // Store employee details with the session token in cookies
     $response = response()->json([
         'success' => true,
@@ -3614,4 +3614,64 @@ public function createBackup()
             // Error occurred during backup creation
             return response()->json(['message' => $e->getMessage()], 500);
         }
-    }}
+    }
+public function NR(Request $request){
+    $validator=Validator::make($request->all(),[
+     'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+
+    $complain=Complain::where('reg_no',$request->search_term)
+    ->orWhere('eng_no',$request->search_term)
+    ->orWhere('chasis_no',$request->search_term)
+    ->first();
+if($complain->Status=='N/R'){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$complain
+    ], 200, );
+}
+else{
+    return response()->json([
+        'success'=>false,
+        'message'=>'Data not found',
+        'data'=>null
+    ], 200, );
+}
+}
+public function Redo_report(Request $request){
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+       ]);
+       if($validator->fails()){
+           return response()->json([
+               'success'=>false,
+               'message'=>$validator->errors()
+           ], 200, );
+       }
+       $redo=Redo::where('reg_no',$request->search_term)
+       ->orWhere('eng_no',$request->search_term)
+       ->orWhere('chasis_no',$request->search_term)
+       ->get();
+       if($redo){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'data'=>$redo
+        ], 200, );
+       }
+       else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 200, );
+       }
+}
+}
