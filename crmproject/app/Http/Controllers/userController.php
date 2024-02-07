@@ -3562,6 +3562,7 @@ $input=$request->search_term;
     ->orWhere('engine_no',$input)
     ->orWhere('chasis_no',$input)
     ->first();
+    $date=$user->created_at->format('d-m-Y');
     IF(!$user){
         return response()->json([
             'success'=>false,
@@ -3569,6 +3570,7 @@ $input=$request->search_term;
             'data'=>null
         ], 400, );
     }
+    $createdDate = $user->created_at->format('d-m-Y');
     $technical=Technicaldetails::where('client_code',$user->id)
     ->first();
     $security=secutitydetails::where('client_code' ,$user->id)
@@ -3592,6 +3594,7 @@ $input=$request->search_term;
     ->get();
           $value=[
         'user'=>$user,
+        'user_date'=>$date,
         'technical'=>$technical,
         'security'=>$security,
         ];
