@@ -329,13 +329,13 @@ class userController extends Controller
         'Gps_check' => 'required',
         'mobilizer' => 'required',
         'operational_status' => 'required',
-        'webtrack_id' => 'required',
-        'webtrack_pass' => 'required|min:6', // Example: minimum length of 6 characters
-        'ignition_alerts' => 'required',
-        'overspeed_alerts' => 'required',
-        'geo_fence_alerts' => 'required',
-        'additional_contact' => 'required',
-        'contact_1' => 'required',
+        'webtrack_id' => 'nullable',
+        'webtrack_pass' => 'nullable', // Example: minimum length of 6 characters
+        'ignition_alerts' => 'nullable',
+        'overspeed_alerts' => 'nullable',
+        'geo_fence_alerts' => 'nullable',
+        'additional_contact' => 'nullable',
+        'contact_1' => 'nullable',
         'contact_2' => 'nullable',
         'contact_3' => 'nullable',
     ]);
@@ -3651,6 +3651,7 @@ public function NR(Request $request){
 
     $complain=Complain::where('reg_no',$request->search_term)
     ->first();
+   
     if(!$complain){
         return response()->json([
             'success'=>false,
@@ -3658,6 +3659,7 @@ public function NR(Request $request){
             'data'=>null
         ], 400, );
     }
+
 if($complain->Status!=='N/R'){
     return response()->json([
         'success'=>true,
@@ -3665,11 +3667,19 @@ if($complain->Status!=='N/R'){
         'data'=>null
     ], 400, );
 }
+
 else{
+    $user=User::where('id',$complain->client_id)
+    ->first();
+    $data[]=[
+        'complain'=>$complain,
+        'user'=>$user
+
+    ];
     return response()->json([
         'success'=>true,
         'message'=>'Data found successfully',
-        'data'=>$complain
+        'data'=>$data
     ], 200, );
 }
 }
@@ -3681,7 +3691,7 @@ public function Redo_report(Request $request){
            return response()->json([
                'success'=>false,
                'message'=>$validator->errors()
-           ], 200, );
+           ], 402, );
        }
        $redo=Redo::where('reg_no',$request->search_term)
        ->orWhere('eng_no',$request->search_term)
@@ -3699,7 +3709,7 @@ public function Redo_report(Request $request){
             'success'=>false,
             'message'=>'Data not found',
             'data'=>null
-        ], 200, );
+        ], 400, );
        }
 }
 }
