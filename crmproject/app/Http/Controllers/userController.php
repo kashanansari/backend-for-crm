@@ -709,9 +709,8 @@ return response()->json([
         $data->customer_name = $request->input('customer_name');
         $data->reg_no = $request->input('reg_no');
         $data->sales_per = $request->input('sales_per');
-        // list($make, $model) = explode('/', $request->input('make_model'));
-    $data->make = $request->input('make');;
-    $data->model = $request->input('model');;
+        $data->make = $request->input('make');
+        $data->model = $request->input('model');
         $data->color = $request->input('color');
         $data->device = $request->input('device');
         $data->eng_no = $request->input('eng_no');
@@ -723,11 +722,13 @@ return response()->json([
         $data->status = 'Removed';
         $data->save();
         $check = Deviceinventory::where('device_serialno', $request->device)->first();
-
+        $user= User::where('id',$request->client_id)
+                 ->update(['status'=>'Removed']);
         if ($check) {
             $check->update(['status' => 'Removed']);
-        } else {
-            // Handle the case where no matching record is found
+        } 
+        else {
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Device not found in inventory',
@@ -3519,22 +3520,42 @@ if($validator->fails()){
         'message'=>$validator->errors()
     ], 200, );
 }
-    $user=User::where('registeration_no',$request->search_term,)
+$input=$request->search_term;
+    $user=User::where('registeration_no',$input)
+    ->orWhere('engine_no',$input)
+    ->orWhere('chasis_no',$input)
     ->first();
-    $removal=Removal::where('reg_no',$request->search_term)
+    $technical=Technicaldetails::where('client_code',$user->id)
     ->first();
-     $complain=complain::where('reg_no',$request->search_term)
+    $security=secutitydetails::where('client_code' ,$user->id)
+    ->first();
+    $removal=Removal::where('client_id',$user->id)
+    // ->orWhere('eng_no',$input)
+    // ->orWhere('chasis',$input)
     ->get();
-    $redo=Redo::where('reg_no',$request->search_term)
-    ->get();
+    //  $complain=complain::where('client_id',$user->id)
+    // ->get();
+    // $redo=Redo::where('client_id ',$user->id)
+    // ->get();
+    // $datalogs=Datalogs::where('client_id',$user->id)
+    // ->get();
+
+
+    
+        $value=[
+        'user'=>$user,
+        'technical'=>$technical,
+        'security'=>$security,
+        ];
     if($user){
         return response()->json([
             'success'=>true,
             'messsage'=>'Data found successfully',
-            'user'=>$user,
+            'data'=>$value,
             'removal'=>$removal,
-            'complain'=>$complain,
-            'redo'=>$redo
+            // 'complain'=>$complain,
+            // 'redo'=>$redo, 
+            // 'datalogs'=>$datalogs
         ], 200, );
     }
     else{
@@ -3625,7 +3646,7 @@ public function NR(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
 
     $complain=Complain::where('reg_no',$request->search_term)
@@ -3635,14 +3656,14 @@ public function NR(Request $request){
             'success'=>false,
             'message'=>'data not sound',
             'data'=>null
-        ], 200, );
+        ], 400, );
     }
 if($complain->Status!=='N/R'){
     return response()->json([
         'success'=>true,
         'message'=>'Data found but status in not N/R yet ',
         'data'=>null
-    ], 200, );
+    ], 400, );
 }
 else{
     return response()->json([
