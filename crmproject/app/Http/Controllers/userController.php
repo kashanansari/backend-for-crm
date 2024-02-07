@@ -3562,6 +3562,13 @@ $input=$request->search_term;
     ->orWhere('engine_no',$input)
     ->orWhere('chasis_no',$input)
     ->first();
+    IF(!$user){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 400, );
+    }
     $technical=Technicaldetails::where('client_code',$user->id)
     ->first();
     $security=secutitydetails::where('client_code' ,$user->id)
