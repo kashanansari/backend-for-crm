@@ -3627,8 +3627,8 @@ public function NR(Request $request){
     }
 
     $complain=Complain::where('reg_no',$request->search_term)
-    ->orWhere('engine_no',$request->search_term)
-    ->orWhere('chasis_no',$request->search_term)
+    // ->orWhere('engine_no',$request->search_term)
+    // ->orWhere('chasis_no',$request->search_term)
     ->first();
 if($complain->Status=='N/R'){
     return response()->json([
