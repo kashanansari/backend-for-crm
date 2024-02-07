@@ -12,6 +12,6 @@ class Redo extends Model
         return $this->belongsTo('App\Models\User', 'client_id', 'id');
     }
     use HasFactory;
-    protected $table='redo';
+    protected $table='Redo';
 
 }

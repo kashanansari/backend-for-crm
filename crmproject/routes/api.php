@@ -86,4 +86,5 @@ Route::post('/complain_box', [userController::class, 'complain_box'])->name('com
 Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
 Route::post('/NR', [userController::class, 'NR'])->name('NR');
 Route::post('/Redo_report', [userController::class, 'Redo_report'])->name('Redo_report');
+Route::post('/create_redo', [userController::class,  'create_redo']);
 

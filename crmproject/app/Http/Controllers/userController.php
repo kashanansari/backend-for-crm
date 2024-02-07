@@ -345,7 +345,7 @@ class userController extends Controller
         'success'=>false,
         'message'=>$validator->errors(),
         'data'=>null
-     ], 200, );
+     ], 402, );
         // return back()->withErrors($validator)->withInput();
     }
 
@@ -358,7 +358,7 @@ class userController extends Controller
           'success' => false,
           'message' => 'Device not found',
           'data' => null
-      ], 200);
+      ], 400);
   }
   
   if ($device->status == 'inactive') {
@@ -366,7 +366,7 @@ class userController extends Controller
           'success' => false,
           'message' => 'Device is already installed',
           'data' => null
-      ], 200);
+      ], 420);
   }
   
  $device->update(['status' => 'inactive']);
@@ -403,7 +403,7 @@ if ($client_value && $device) {
         'success'=>false,
         'message'=>'error in submission',
         'data'=>null
-    ], 200, );
+    ], 400, );
   }
 
 //   return redirect()->route('alert');
@@ -434,7 +434,7 @@ return response()->json([
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
 
     }
 
@@ -466,7 +466,7 @@ return response()->json([
             'success'=>false,
             'message'=>'error in submission',
             'data'=>null
-        ], 200, ); 
+        ], 400, ); 
     }
     
     // return redirect()->route('securityalert');
@@ -936,8 +936,33 @@ public function redo($id){
 
 
 public function create_redo(Request $request){
-    $data= new Redo();
-// $redo=$request->input('old_device');
+    $validator=Validator::make($request->all(),[
+     'client_id'=>'required',
+     'complain_id'=>'required',
+     'charges'=>'nullable',
+     'customer_name'=>'required',
+     'reg_no'=>'required',
+     'technician'=>'nullable',
+     'old_device'=>'required',
+     'new_device'=>'required',
+     'eng_no'=>'nullable',
+     'chasis_no'=>'nullable',
+     'install_loc'=>'nullable',
+     'install_date'=>'nullable',
+     'sales_person'=>'nullable',
+     'harness_change'=>'nullable',
+     'backupbattery_change'=>'nullable',
+     'contact_no'=>'nullable',
+     'remarks'=>'nullable'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 402);
+    }
+   
+
 $check = Technicaldetails::where('device_id', $request->old_device)->select('device_no')->first();
 
 if ($check) {
@@ -950,7 +975,9 @@ $new=Deviceinventory::where('device_serialno',$request->input('new_device'))->fi
 ->update(['status'=>'inactive']);
 $technical=Technicaldetails::where('device_id',$request->input('old_device'))
 ->update(['device_id'=>$request->new_device]);
+    $data= new Redo();
     $data->client_id=$request->input('client_id');
+    $data->complain_id=$request->input('complain_id');
     $data->charges=$request->input('charges');
     $data->customer_name=$request->input('customer_name');
     $data->contact_no=$request->input('contact_no');
@@ -966,20 +993,30 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
     $data->sales_person=$request->input('sales_person');
     $data->harness_change=$request->input('harness_change');
     $data->backupbattery_change=$request->input('backupbattery_change');
-   $data->save();
+    $data->save();
+//    if($data){
+//     $user=User::where('id',$request->input('client_id'))->first();
+//     $user->status='redodone';
+//     $user->save();
+//    }
    if($data){
-    $user=User::where('id',$request->input('client_id'))->first();
-    $user->status='redodone';
-    $user->save();
-   }
-   if($user){
-    $update=complain::where('client_id',$request->input('client_id'))->update(['Status'=>'Resolved']);
+    $update=complain::where('complain_id',$request->input('complain_id'))->update(['Status'=>'Resolved']);
     // $complain=$update->complain_id;
     // $value=Complain_actions::where('complain_code',$complain)->update(['Status'=>'Resolved']);
-
-
+    return response()->json([
+        'scuccess'=>true,
+        'message'=>'redo created successfully',
+        'data'=>$data
+    ], 200, );
    }
-   return redirect()->route('cc');
+   else{
+    return response()->json([
+        'scuccess'=>false,
+        'message'=>'problem in submssion',
+        'data'=>null
+    ], 422, );
+   }
+//    return redirect()->route('cc');
 
 }
 public function create_inventory(Request $request){
@@ -3518,7 +3555,7 @@ if($validator->fails()){
     return response()->json([
         'success'=>false,
         'message'=>$validator->errors()
-    ], 200, );
+    ], 402, );
 }
 $input=$request->search_term;
     $user=User::where('registeration_no',$input)
@@ -3533,16 +3570,20 @@ $input=$request->search_term;
     // ->orWhere('eng_no',$input)
     // ->orWhere('chasis',$input)
     ->get();
-    //  $complain=complain::where('client_id',$user->id)
-    // ->get();
-    // $redo=Redo::where('client_id ',$user->id)
-    // ->get();
-    // $datalogs=Datalogs::where('client_id',$user->id)
-    // ->get();
-
-
-    
-        $value=[
+     $complain=complain::where('client_id',$user->id)
+    ->get();
+  $NR=$complain->where('nature_of_complain','N/R')
+  ->all();
+    $complain_actions = [];
+    foreach($complain as $complaint){
+        $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get();
+        $complain_actions[$complaint->complain_id] = $actions;
+    }
+    $redo=Redo::where('client_id',$user->id)
+    ->get();
+    $datalogs=Datalogs::where('client_id',$user->id)
+    ->get();
+          $value=[
         'user'=>$user,
         'technical'=>$technical,
         'security'=>$security,
@@ -3553,9 +3594,11 @@ $input=$request->search_term;
             'messsage'=>'Data found successfully',
             'data'=>$value,
             'removal'=>$removal,
-            // 'complain'=>$complain,
-            // 'redo'=>$redo, 
-            // 'datalogs'=>$datalogs
+            'complain'=>$complain,
+            'complain_actions'=>$complain_actions,
+            'redo'=>$redo, 
+            'datalogs'=>$datalogs,
+            'NR'=>$NR
         ], 200, );
     }
     else{
@@ -3563,7 +3606,7 @@ $input=$request->search_term;
             'success'=>false,
             'messsage'=>'Data not found',
             'data'=>null
-        ], 200, );
+        ], 400, );
     }
 }
 public function complain_box(Request $request){

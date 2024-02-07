@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('redo', function (Blueprint $table) {
+        Schema::create('Redo', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('users');
+            $table->unsignedBigInteger('complain_id');
+            $table->foreign('complain_id')->references('complain_id')->on('complain');
             $table->string('customer_name');
             $table->string('contact_no');
             $table->string('reg_no');
@@ -44,6 +46,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('redo');
+        Schema::dropIfExists('Redo');
     }
 };
