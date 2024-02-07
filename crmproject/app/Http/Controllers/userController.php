@@ -3404,11 +3404,11 @@ else{
         }
         $input=$request->search_term;
         $user=User::where('registeration_no',$input)
-        // ->orWhere('customer_name','LIKE','%'.$input.'%')
+        ->orWhere('customer_name','LIKE','%'.$input.'%')
         ->orWhere('engine_no',$input)
         ->orWhere('chasis_no',$input)
         ->orderBy('created_at','desc')
-        ->first();
+        ->get();
        
        if($user){
         return response()->json([
@@ -3435,9 +3435,11 @@ public function device_certificate(Request $request){
             'message'=>$validator->errors()
         ], 200, );
     }
-    $data=User::where('registeration_no',$request->search_term)
-    ->orWhere('engine_no',$request->search_term)
-    ->orWhere('chasis_no',$request->search_term)
+    $input=$request->search_term;
+    $data=User::where('registeration_no',$input)
+    // ->orWhere('customer_name','LIKE','%'.$input.'%')
+    ->orWhere('engine_no',$input)
+    ->orWhere('chasis_no',$input)
     ->orderBy('created_at','desc')
     ->first();
     if(!$data){
@@ -3627,21 +3629,26 @@ public function NR(Request $request){
     }
 
     $complain=Complain::where('reg_no',$request->search_term)
-    // ->orWhere('engine_no',$request->search_term)
-    // ->orWhere('chasis_no',$request->search_term)
     ->first();
-if($complain->Status=='N/R'){
+    if(!$complain){
+        return response()->json([
+            'success'=>false,
+            'message'=>'data not sound',
+            'data'=>null
+        ], 200, );
+    }
+if($complain->Status!=='N/R'){
     return response()->json([
         'success'=>true,
-        'message'=>'Data found successfully',
-        'data'=>$complain
+        'message'=>'Data found but status in not N/R yet ',
+        'data'=>null
     ], 200, );
 }
 else{
     return response()->json([
-        'success'=>false,
-        'message'=>'Data not found',
-        'data'=>null
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$complain
     ], 200, );
 }
 }
@@ -3656,9 +3663,9 @@ public function Redo_report(Request $request){
            ], 200, );
        }
        $redo=Redo::where('reg_no',$request->search_term)
-       ->orWhere('engine_no',$request->search_term)
+       ->orWhere('eng_no',$request->search_term)
        ->orWhere('chasis_no',$request->search_term)
-       ->get();
+       ->first();
        if($redo){
         return response()->json([
             'success'=>true,
