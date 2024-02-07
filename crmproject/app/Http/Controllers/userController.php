@@ -3624,7 +3624,7 @@ public function complain_box(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 422, );
+        ], 402, );
     }
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
@@ -3651,7 +3651,7 @@ public function complain_box(Request $request){
         'messsage'=>'Data found successfully',
         'complain_id'=>$lastComplaintId,
         'data'=>$data,
-        'compalin'=>$complain
+        'complain'=>$complain
       
     ], 200, );
 }
@@ -3660,7 +3660,7 @@ else{
         'success'=>false,
         'messsage'=>'Data not found',
         'data'=>null
-    ], 420, );
+    ], 400, );
 }
 }
 public function createBackup()
