@@ -3656,7 +3656,7 @@ public function Redo_report(Request $request){
            ], 200, );
        }
        $redo=Redo::where('reg_no',$request->search_term)
-       ->orWhere('eng_no',$request->search_term)
+       ->orWhere('engine_no',$request->search_term)
        ->orWhere('chasis_no',$request->search_term)
        ->get();
        if($redo){
