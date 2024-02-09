@@ -164,7 +164,8 @@ class userController extends Controller
             'primaryuser_con1'=>'required',
             'primaryuser_cnic'=>'required',
             'transmission'=>'required',
-            'segment'=>'required'
+            'segment'=>'required',
+            'representative'=>'required'
 
         ]);
         if($validator->fails()){
@@ -197,16 +198,18 @@ class userController extends Controller
                 'renewal_status' => 'unpaid',
                 'renewal_date' => $renewalDate,
             ]);
-            $queue=[
-                'client_id'=>$request->client_id,
-                'reg_no'=>$request->client_id,
-                'date'=>$request->client_id,
-                'time'=>$request->client_id,
-                'status'=>$request->client_id,
-                'representative'=>$request->client_id,
-                      
+            $carbon= Carbon::now()->setTimezone('Asia/karachi');
+            $date=$carbon->format('d-m-Y');
+            $time=$carbon->format('h:i A');
+            $queues=[
+                'client_id'=>$request->id,
+                'reg_no'=>$request->registeration_no,
+                'date'=>$request->$date,
+                'time'=>$request->$time,
+                'status'=>"pending",
+                'representative'=>$request->representative,           
             ];
-        //    Queue::create($queue);
+           Queue::create($queues);
             DB::commit();
     
             return response()->json([
@@ -1359,14 +1362,14 @@ if($validator->fails()){
         'success' => true,
         'messsage' => 'Datalogs created successfully',
         'data'=>$datalogs
-    ], 400);
+    ], 200);
 }
 else{
     return response()->json([
         'success'=>false,
         'messsage'=>'Error in submiission',
         'data'=>null
-    ], 200, );
+    ], 400, );
 }
 }
 
@@ -3859,4 +3862,17 @@ public function Redo_report(Request $request){
         ], 400, );
        }
 }
+public function datetime(Request $request){
+   $carbon= Carbon::now()->setTimezone('Asia/karachi');
+   $date=$carbon->format('d-m-Y');
+   $time=$carbon->format('h:i A');
+   return response()->json([
+    'success'=>true,
+    'message'=>'data is here',
+    'date'=>$date,
+    'time'=>$time
+   ], 200, );
+
+}
+
 }

@@ -106,6 +106,7 @@ class User extends Authenticatable
         'installation_loc',
         'conatct_person',
         'remarks',
+        'representative'
     ];
 
     /**

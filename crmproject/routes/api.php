@@ -89,5 +89,6 @@ Route::post('/Redo_report', [userController::class, 'Redo_report'])->name('Redo_
 Route::post('/create_redo', [userController::class,  'create_redo']);
 Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
+Route::get('/datetime', [userController::class, 'datetime'])->name('datetime');
 
 
