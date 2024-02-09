@@ -649,7 +649,8 @@ return response()->json([
 
         return response()->json([
             'success' => true,
-            'data' => 'complain created successfully',
+            'messsage' => 'complain created successfully',
+            'data'=>$data
         ], 200);   
      }
      else{
@@ -1305,12 +1306,13 @@ public function create_datalogs(Request $request)
 { $validator=Validator::make($request->all(),[
     'client_id'=>'required',
     'customer_name'=>'required',
-    'nature'=>'nullable',
+    'nature'=>'required',
     'reg_no'=>'required',
     'representative'=>'required',
-    'contact_no'=>'nullable',
+    'contact_no'=>'required',
     'contact_person'=>'nullable',
-    'remarks'=>'nullable',
+    'remarks'=>'rqeuierd',
+    'em_loginid'=>'required'
 
 
 ]);
@@ -1321,7 +1323,7 @@ if($validator->fails()){
     ], 402, );
 }
 
-$empId = $request->cookie('em_loginid');
+$empId = $request->input('em_loginid');
     $emp = Employee::where('em_loginid', $empId)->first();
 
     $nature = $request->input('nature');
@@ -1345,7 +1347,8 @@ $empId = $request->cookie('em_loginid');
 
     return response()->json([
         'success' => true,
-        'data' => 'Datalogs created successfully',
+        'messsage' => 'Datalogs created successfully',
+        'data'=>$datalogs
     ], 400);
 }
 else{
@@ -3605,15 +3608,22 @@ $input=$request->search_term;
             'data'=>null
         ], 400, );
     }
-    $createdDate = $user->created_at->format('d-m-Y');
+    // $createdDate = $user->created_at->format('d-m-Y');
     $technical=Technicaldetails::where('client_code',$user->id)
     ->first();
-    $security=secutitydetails::where('client_code' ,$user->id)
+    $security=secutitydetails::where('client_code',$user->id)
     ->first();
     $removal=Removal::where('client_id',$user->id)
-    // ->orWhere('eng_no',$input)
-    // ->orWhere('chasis',$input)
-    ->get();
+  
+    ->get()
+    ->map(function($removals){
+       $removals->date= $removals->created_at->format('d-m-Y');
+        $removals->time=$removals->created_at->format('h:i A');
+        unset($removals->created_at);
+        unset($removals->updated_at);        
+        return $removals;
+        
+    });
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
      $complains=complain::where('client_id',$user->id)
@@ -3628,18 +3638,33 @@ unset($complain->updated_at);
     $all_complain=[
       'new_complain_id'=>$lastComplaintId,
       'complain'=>$complains
-
     ];
 
-  $NR=$complains->where('nature_of_complain','N/R')
-  ->all();
+  $NR=complain::where('nature_of_complain','N/R')
+  ->get()
+  ->map(function($NRS){
+    $NRS->date_time=$NRS->created_at->format('d-m-Y h:i A');
+    return $NRS;
+    
+  });
+  
+  
+  
     $complain_actions = [];
     foreach($complains as $complaint){
         $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get();
         $complain_actions[$complaint->complain_id] = $actions;
     }
     $redo=Redo::where('client_id',$user->id)
-    ->get();
+    ->get()
+    ->map(function($redos){
+        $redos->date=$redos->created_at->format('d-m-Y');
+        $redos->time=$redos->created_at->format('h:i A');
+        unset($redos->created_at);
+        unset($redos->updated_at);
+        return $redos;
+
+    });
     $datalogs = Datalogs::where('client_id', $user->id)
                         ->get()
                         ->map(function ($datalog) {
@@ -3654,7 +3679,6 @@ unset($complain->updated_at);
 
           $value=[
         'user'=>$user,
-        // 'user_date'=>$date,
         'technical'=>$technical,
         'security'=>$security,
         ];
