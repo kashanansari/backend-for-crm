@@ -74,7 +74,7 @@ Route::put('/updateall/{id}', [userController::class, 'update_details'])->name('
 Route::post('/creatertransfer', [userController::class, 'create_transfer'])->name('creatertransfer');
 Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');
 Route::post('/create_soldout', [userController::class, 'create_soldout'])->name('create_soldout');
-Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
+// Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
 // Route::post('/create_emp', [userController::class, 'create_emp'])->name('create_emp');
 // Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::post('/change_pic', [userController::class, 'change_pic'])->name('change_pic');

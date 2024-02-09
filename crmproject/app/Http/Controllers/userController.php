@@ -1300,9 +1300,26 @@ if($user=='soldout'){
 return back();
 }
 public function create_datalogs(Request $request)
-{
-    $sessionToken = $request->session()->get('session_token');
-    $empId = $request->session()->get('em_loginid_' . $sessionToken);
+{ $validator=Validator::make($request->all(),[
+    'client_id'=>'required',
+    'customer_name'=>'required',
+    'nature'=>'nullable',
+    'reg_no'=>'required',
+    'representative'=>'required',
+    'contact_no'=>'nullable',
+    'contact_person'=>'nullable',
+    'remarks'=>'nullable',
+
+
+]);
+if($validator->fails()){
+    return response()->json([
+        'success'=>true,
+        'message'=>$validator->errors()
+    ], 402, );
+}
+
+$empId = $request->cookie('em_loginid');
     $emp = Employee::where('em_loginid', $empId)->first();
 
     $nature = $request->input('nature');
@@ -1321,12 +1338,21 @@ public function create_datalogs(Request $request)
         'remarks' => $request->input('remarks'),
     ];
 
-    Datalogs::create($data);
+    $datalogs=Datalogs::create($data);
+    if($datalogs){
 
     return response()->json([
         'success' => true,
         'data' => 'Datalogs created successfully',
-    ], 200);
+    ], 400);
+}
+else{
+    return response()->json([
+        'success'=>false,
+        'messsage'=>'Error in submiission',
+        'data'=>null
+    ], 200, );
+}
 }
 
 public function datalogs($search_term){
@@ -3586,8 +3612,16 @@ $input=$request->search_term;
     // ->orWhere('eng_no',$input)
     // ->orWhere('chasis',$input)
     ->get();
+    $lastComplaint = Complain::latest()->first();
+    $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
      $complain=complain::where('client_id',$user->id)
     ->get();
+    $all_complain=[
+      'new_complain_id'=>$lastComplaintId,
+      'complain'=>$complain
+
+    ];
+
   $NR=$complain->where('nature_of_complain','N/R')
   ->all();
     $complain_actions = [];
@@ -3611,7 +3645,7 @@ $input=$request->search_term;
             'messsage'=>'Data found successfully',
             'data'=>$value,
             'removal'=>$removal,
-            'complain'=>$complain,
+            'complain'=>$all_complain,
             'complain_actions'=>$complain_actions,
             'redo'=>$redo, 
             'datalogs'=>$datalogs,
