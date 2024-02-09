@@ -23,6 +23,7 @@ use App\Models\Emp_logout;
 use App\Models\Inventory_logs;
 use App\Models\Renewals;
 use App\Models\SMS;
+use App\Models\Queue;
 use GuzzleHttp\Client;
 
 
@@ -196,7 +197,16 @@ class userController extends Controller
                 'renewal_status' => 'unpaid',
                 'renewal_date' => $renewalDate,
             ]);
-    
+            $queue=[
+                'client_id'=>$request->client_id,
+                'reg_no'=>$request->client_id,
+                'date'=>$request->client_id,
+                'time'=>$request->client_id,
+                'status'=>$request->client_id,
+                'representative'=>$request->client_id,
+                      
+            ];
+        //    Queue::create($queue);
             DB::commit();
     
             return response()->json([
@@ -1303,7 +1313,8 @@ if($user=='soldout'){
 return back();
 }
 public function create_datalogs(Request $request)
-{ $validator=Validator::make($request->all(),[
+{ 
+    $validator=Validator::make($request->all(),[
     'client_id'=>'required',
     'customer_name'=>'required',
     'nature'=>'required',
@@ -1311,9 +1322,7 @@ public function create_datalogs(Request $request)
     'representative'=>'required',
     'contact_no'=>'required',
     'contact_person'=>'nullable',
-    'remarks'=>'rqeuierd',
-    'em_loginid'=>'required'
-
+    'remarks'=>'required',
 
 ]);
 if($validator->fails()){
@@ -1323,8 +1332,8 @@ if($validator->fails()){
     ], 402, );
 }
 
-$empId = $request->input('em_loginid');
-    $emp = Employee::where('em_loginid', $empId)->first();
+// $empId = $request->input('em_loginid');
+//     $emp = Employee::where('em_loginid', $empId)->first();
 
     $nature = $request->input('nature');
     $editable_nature = $request->input('editable_nature'); // Assuming you'll rename the input field for edited nature to 'editable_nature'
@@ -1336,10 +1345,11 @@ $empId = $request->input('em_loginid');
         'customer_name' => $request->input('customer_name'),
         'nature' => $edited_nature,
         'reg_no' => $request->input('reg_no'),
-        'representative' => $emp->emp_name,
+        'representative' => $request->representative,
         'contact_no' => $request->input('contact_no'),
         'contact_person' => $request->input('contact_person'),
         'remarks' => $request->input('remarks'),
+       
     ];
 
     $datalogs=Datalogs::create($data);
