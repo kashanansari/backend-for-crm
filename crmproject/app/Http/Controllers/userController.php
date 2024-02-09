@@ -588,6 +588,8 @@ return response()->json([
             'Date' => 'nullable',
             'Time' => 'nullable',
             'remarks' => 'required',
+            'em_loginid'=>'required'
+            
 
 
         ]);
@@ -653,7 +655,7 @@ return response()->json([
      else{
         return response()->json([
             'success'=>false,
-            'message'=>'Data not found',
+            'message'=>'Error ion submiiison',
             'data'=>null
         ], 400, );
      }
@@ -3595,7 +3597,7 @@ $input=$request->search_term;
     ->orWhere('engine_no',$input)
     ->orWhere('chasis_no',$input)
     ->first();
-    $date=$user->created_at->format('d-m-Y');
+    // $date=$user->created_at->format('d-m-Y');
     IF(!$user){
         return response()->json([
             'success'=>false,
@@ -3614,28 +3616,45 @@ $input=$request->search_term;
     ->get();
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
-     $complain=complain::where('client_id',$user->id)
-    ->get();
+     $complains=complain::where('client_id',$user->id)
+    ->get()
+    ->map(function($complain){
+        $complain->date=$complain->created_at->format('d-m-Y');
+        $complain->time=$complain->created_at->format('h:i A');
+unset($complain->created_at);
+unset($complain->updated_at);
+        return $complain;
+    });
     $all_complain=[
       'new_complain_id'=>$lastComplaintId,
-      'complain'=>$complain
+      'complain'=>$complains
 
     ];
 
-  $NR=$complain->where('nature_of_complain','N/R')
+  $NR=$complains->where('nature_of_complain','N/R')
   ->all();
     $complain_actions = [];
-    foreach($complain as $complaint){
+    foreach($complains as $complaint){
         $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get();
         $complain_actions[$complaint->complain_id] = $actions;
     }
     $redo=Redo::where('client_id',$user->id)
     ->get();
-    $datalogs=Datalogs::where('client_id',$user->id)
-    ->get();
+    $datalogs = Datalogs::where('client_id', $user->id)
+                        ->get()
+                        ->map(function ($datalog) {
+                            // Convert created_at date to d-m-Y format
+                            $datalog->date = $datalog->created_at->format('d-m-Y');
+                            $datalog->time = $datalog->created_at->format('h:i A');
+                            unset($datalog->updated_at);
+                            unset($datalog->created_at);
+                            return $datalog;
+                        });
+
+
           $value=[
         'user'=>$user,
-        'user_date'=>$date,
+        // 'user_date'=>$date,
         'technical'=>$technical,
         'security'=>$security,
         ];
@@ -3648,7 +3667,7 @@ $input=$request->search_term;
             'complain'=>$all_complain,
             'complain_actions'=>$complain_actions,
             'redo'=>$redo, 
-            'datalogs'=>$datalogs,
+            'datalogs' => $datalogs, // Including $datalogs in the response
             'NR'=>$NR
         ], 200, );
     }
