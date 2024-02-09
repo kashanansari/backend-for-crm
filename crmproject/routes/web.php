@@ -69,7 +69,7 @@ Route::any('/complain_actions', [userController::class,  'action_complain'])->na
 Route::post('/devicecreate', [userController::class,  'create_inventory']);
 
 Route::put('/updateall/{id}', [userController::class, 'update_details'])->name('updateall');
-Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
+// Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 // Route::post('/createremoval', [userController::class, 'create_removal'])->name('createremoval');
 Route::post('/creatertransfer', [userController::class, 'create_transfer'])->name('creatertransfer');
 Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');

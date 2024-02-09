@@ -597,12 +597,11 @@ return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
-            ], 422);
+            ], 402);
         }
 
 
-        $sessionToken = $request->session()->get('session_token');
-        $empId = $request->session()->get('em_loginid_' . $sessionToken);
+        $empId = $request->cookie('em_loginid');
         if ($empId) {
             $empid = Employee::where('em_loginid', $empId)
             ->select('emp_name', 'emp_id', 'designation')
@@ -649,7 +648,15 @@ return response()->json([
         return response()->json([
             'success' => true,
             'data' => 'complain created successfully',
-        ], 200);    }
+        ], 200);   
+     }
+     else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 400, );
+     }
 }
 
     public function removalForm(Request $request){
