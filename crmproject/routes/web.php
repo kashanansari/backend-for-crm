@@ -63,7 +63,7 @@ Route::get('/logout', [userController::class, 'logout'])->name('logout');
 // Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
 // Route::post('/storetechnical', [userController::class,  'technical_details'])->name('storetechnical');
 // Route::post('/storesecurity', [userController::class,  'securitydetails']);
-Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
+// Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 Route::any('/complain_actions', [userController::class,  'action_complain'])->name('complain.actions');
 // Route::post('/redoactions', [userController::class,  'create_redo']);
 Route::post('/devicecreate', [userController::class,  'create_inventory']);

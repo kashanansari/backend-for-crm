@@ -911,8 +911,8 @@ public function requestform(){
 
 public function create_deviceinventory(Request $request) {
 
-    $sessionToken = $request->session()->get('session_token');
-    $empId = $request->session()->get('em_loginid_' . $sessionToken);
+    // $sessionToken = $request->session()->get('session_token');
+    // $empId = $request->session()->get('em_loginid_' . $sessionToken);
 
 
     $validator = Validator::make($request->all(), [
@@ -920,6 +920,9 @@ public function create_deviceinventory(Request $request) {
         'imei_no' => 'required',
         'vendor' => 'required',
         'devciesim_no' => 'required',
+        'representaive'=>'required',
+        'emp_id'=>'required',
+        'emp_loginid'=>'required'
     ]);
 
     if ($validator->fails()) {
@@ -941,16 +944,16 @@ public function create_deviceinventory(Request $request) {
     $data->devciesim_no = $request->input('devciesim_no');
     $data->status = 'active';
     $data->save();
-    if ($empId) {
-        $empid = Employee::where('em_loginid', $empId)
-        ->select('emp_name', 'emp_id', 'designation')
-        ->first();
+    // if ($empId) {
+    //     $empid = Employee::where('em_loginid', $empId)
+    //     ->select('emp_name', 'emp_id', 'designation')
+    //     ->first();
 
 $inevntory_logs= new Inventory_logs();
 $value=[
-    'emp_id'=>$empid->emp_id,
-    'emp_login_id'=>$empId,
-    'emp_name'=>$empid->emp_name,
+    'emp_id'=>$request->emp_id,
+    'emp_login_id'=>$request->emp_loginid,
+    'emp_name'=>$request->representaive,
     'actions'=>'DEVICE INVENTORY FORM',
     'status'=>'done',
     'device_serialno'=>$request->device_serialno,
@@ -965,7 +968,7 @@ Inventory_logs::create($value);
 
 
 // return redirect()->route('reqform');
-}
+
 
 public function installation(){
     return view('installation');
@@ -3919,6 +3922,66 @@ public function datetime(Request $request){
     'time'=>$time
    ], 200, );
 
+}
+public function alert_technical(Request $request){
+    $queue = Queue::where('status', 'pending')->get(); // Fetch a single record
+    $count=$queue->count();
+    if($queue){
+        $data=[];
+        foreach($queue as $record)
+        $data = [
+            'reg_no' => $record->reg_no,
+            'date' => $record->date,
+            'time' => $record->time,
+            'representative' => $record->representative,
+            'status' => $record->status,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Technical Alerts!',
+            'count'=>$count,
+            'data' => $data,
+ 
+        ], 200);
+    }
+    else{
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+            'data' => null
+        ], 400);
+    }
+}
+public function alert_security(Request $request){
+    $queue = Queue::where('status', 'completed')->get(); // Fetch a single record
+    $count=$queue->count();
+    if($queue){
+        $data=[];
+        foreach($queue as $record)
+        $data = [
+            'reg_no' => $record->reg_no,
+            'date' => $record->date,
+            'time' => $record->time,
+            'representative' => $record->representative,
+            'status' => $record->status,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Security Alerts!',
+            'count'=>$count,
+            'data' => $data,
+ 
+        ], 200);
+    }
+    else{
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+            'data' => null
+        ], 400);
+    }
 }
 
 }

@@ -90,5 +90,8 @@ Route::post('/create_redo', [userController::class,  'create_redo']);
 Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
 Route::get('/datetime', [userController::class, 'datetime'])->name('datetime');
+Route::get('/alert_technical', [userController::class, 'alert_technical'])->name('alert_technical');
+Route::get('/alert_security', [userController::class, 'alert_security'])->name('alert_security');
+Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 
 
