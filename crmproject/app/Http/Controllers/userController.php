@@ -603,12 +603,12 @@ return response()->json([
         }
 
 
-        $empId = $request->cookie('em_loginid');
+        $empId = $request->input('em_loginid');
+
         if ($empId) {
             $empid = Employee::where('em_loginid', $empId)
-            ->select('emp_name', 'emp_id', 'designation')
-            ->first();
-
+                ->select('emp_name', 'emp_id', 'designation')
+                ->first();
 
 
 
