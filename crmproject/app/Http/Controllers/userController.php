@@ -179,12 +179,59 @@ class userController extends Controller
             DB::beginTransaction();
     
             $data = new User();
-            $data->fill($validator->validated()); // Fill the model with validated data
-            // Fill the model with validated data
-    
-            // Other fields
-            $data->form_status = 'completed';
-            $data->save();
+            $data = new User();
+
+// Fill each field individually
+$data->id = $request->id;
+$data->customer_name = $request->customer_name;
+$data->father_name = $request->father_name;
+$data->address = $request->address;
+$data->telephone_residence = $request->telephone_residence;
+$data->mobileno_1 = $request->mobileno_1;
+$data->mobileno_2 = $request->mobileno_2;
+$data->mobileno_3 = $request->mobileno_3;
+$data->mobileno_4 = $request->mobileno_4;
+$data->ntn = $request->ntn;
+$data->cnic = $request->cnic;
+$data->seconadryuser_name = $request->seconadryuser_name;
+$data->secondaryuser_con1 = $request->secondaryuser_con1;
+$data->secondaryuser_con2 = $request->secondaryuser_con2;
+$data->relationship = $request->relationship;
+$data->registeration_no = $request->registeration_no;
+$data->chasis_no = $request->chasis_no;
+$data->engine_no = $request->engine_no;
+$data->engine_type = $request->engine_type;
+$data->CC = $request->CC;
+$data->make = $request->make;
+$data->model = $request->model;
+$data->year = $request->year;
+$data->color = $request->color;
+$data->insurance_partner = $request->insurance_partner;
+$data->vas = $request->vas;
+$data->vas_options = $request->vas_options;
+$data->segment = $request->segment;
+$data->demo_duration = $request->demo_duration;
+$data->tracker_charges = $request->tracker_charges;
+$data->date_of_installation = $request->date_of_installation;
+$data->int_comission = $request->int_comission;
+$data->ext_comission = $request->ext_comission;
+$data->discount = $request->discount;
+$data->campaign_point = $request->campaign_point;
+$data->dealership = $request->dealership;
+$data->dealer_name = $request->dealer_name;
+$data->sales_person = $request->sales_person;
+$data->installation_loc = $request->installation_loc;
+$data->conatct_person = $request->conatct_person;
+$data->remarks = $request->remarks;
+// $data->renewal_charges = $request->renewal_charges;
+$data->primaryuser_name = $request->primaryuser_name;
+$data->primaryuser_con1 = $request->primaryuser_con1;
+$data->primaryuser_cnic = $request->primaryuser_cnic;
+$data->transmission = $request->transmission;
+$data->form_status = 'completed'; // Assuming this is a field in the 'users' table
+
+$data->save();
+            
     
             $createdDate = $data->created_at instanceof Carbon ? $data->created_at : new Carbon($data->created_at);
             $renewalDate = $createdDate->addYear();
@@ -204,10 +251,10 @@ class userController extends Controller
             $queues=[
                 'client_id'=>$request->id,
                 'reg_no'=>$request->registeration_no,
-                'date'=>$request->$date,
-                'time'=>$request->$time,
+                'date'=>$date,
+                'time'=>$time,
                 'status'=>"pending",
-                'representative'=>$request->representative,           
+                'representative'=>$request->input('representative'),           
             ];
            Queue::create($queues);
             DB::commit();
@@ -224,7 +271,6 @@ class userController extends Controller
         'error'=>$error,], 420);
         }
     }
-    
     
     public function show(){
               $data = User::orderBy('created_at','desc')

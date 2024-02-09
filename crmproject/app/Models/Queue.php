@@ -15,6 +15,7 @@ class Queue extends Model
         'reg_no',
         'time',
         'representative',
+        'status'
     ];
 
     protected $table='Queue';
