@@ -929,7 +929,7 @@ public function create_deviceinventory(Request $request) {
        return response()->json([
         'success'=>false,
         'message'=>$validator->errors()
-       ], 200, );
+       ], 402, );
     }
 
     $device = deviceinventory::where('device_serialno', $request->device_serialno)->first();
@@ -1086,7 +1086,7 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
         'scuccess'=>false,
         'message'=>'problem in submssion',
         'data'=>null
-    ], 422, );
+    ], 400, );
    }
 //    return redirect()->route('cc');
 
@@ -3882,7 +3882,7 @@ else{
     ], 200, );
 }
 }
-public function Redo_report(Request $request){
+public function redo_search(Request $request){
     $validator=Validator::make($request->all(),[
         'search_term'=>'required'
        ]);
@@ -3892,11 +3892,17 @@ public function Redo_report(Request $request){
                'message'=>$validator->errors()
            ], 402, );
        }
-       $redo=Redo::where('reg_no',$request->search_term)
-       ->orWhere('eng_no',$request->search_term)
+       $user=User::where('registeration_no',$request->search_term)
+       ->orWhere('engine_no',$request->search_term)
        ->orWhere('chasis_no',$request->search_term)
        ->first();
-       if($redo){
+       $technical=Technicaldetails::where('client_code',$user->id)
+       ->first();
+       if($user){
+        $redo=[
+            'user'=>$user,
+            'technical'=>$technical
+        ];
         return response()->json([
             'success'=>true,
             'message'=>'Data found successfully',

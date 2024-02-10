@@ -85,7 +85,7 @@ Route::post('/search_for_all', [userController::class, 'search_for_all'])->name(
 Route::post('/complain_box', [userController::class, 'complain_box'])->name('complain_box');
 Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
 Route::post('/NR', [userController::class, 'NR'])->name('NR');
-Route::post('/Redo_report', [userController::class, 'Redo_report'])->name('Redo_report');
+Route::post('/redo_search', [userController::class, 'redo_search'])->name('redo_search');
 Route::post('/create_redo', [userController::class,  'create_redo']);
 Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
