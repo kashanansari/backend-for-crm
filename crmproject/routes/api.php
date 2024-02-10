@@ -94,5 +94,6 @@ Route::get('/alert_technical', [userController::class, 'alert_technical'])->name
 Route::get('/alert_security', [userController::class, 'alert_security'])->name('alert_security');
 Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 Route::get('/all_redo_info', [userController::class, 'all_redo_info'])->name('all_redo_info');
+Route::get('/view_all_device_inventory', [userController::class, 'all_inventory'])->name('view_all_device_inventory');
 
 

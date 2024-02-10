@@ -3085,9 +3085,14 @@ public function view_dashboard(Request $request){
 }
 public function all_inventory(Request $request){
 $all_devices=Deviceinventory::orderBy('created_at','desc')
-->paginate(20);
+->get();
 
-return view('All_device_inventory')->with('data',$all_devices);
+// 
+return response()->json([
+    'success'=>true,
+    'messsage'=>'Data found successfully',
+    'data'=>$all_devices
+], 200, );
 }
 public function view_update_inventory(Request $request){
 return view('Update_device_info');
@@ -3913,12 +3918,14 @@ public function redo_search(Request $request){
        $technical=Technicaldetails::where('client_code',$user->client_id)
        ->first();
        $sales_per=User::where('id',$user->client_id)
-       ->value('sales_person');
+       ->select('sales_person','date_of_installation','engine_no','chasis_no')
+       ->get();
+    
        if($user){
         $redo=[
             'user'=>$user,
             'technical'=>$technical,
-            'sales_per'=>$sales_per
+            'other_details'=>$sales_per
         ];
         return response()->json([
             'success'=>true,
@@ -4029,6 +4036,14 @@ public function all_redo_info(Request $request){
         'messsage'=>'Data not found',
         'data'=>null], 200, );
  }
+}
+public function all_device_info(Request $request){
+    $device=Deviceinventory::all();
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$device
+    ], 200, );
 }
 
 }

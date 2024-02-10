@@ -170,7 +170,7 @@ Route::get('/view_allcomaplainlogs', [userController::class, 'view_all_complain_
 
 Route::get('/view_data', [userController::class, 'view_data_logs'])->name('view_data');
 Route::get('/allcomplainlogs', [userController::class, 'all_complain_logs'])->name('allcomplainlogs');
-Route::get('/view_all_device_inventory', [userController::class, 'all_inventory'])->name('view_all_device_inventory');
+// Route::get('/view_all_device_inventory', [userController::class, 'all_inventory'])->name('view_all_device_inventory');
 Route::get('/update_device_info', [userController::class, 'update_device_inventory'])->name('update_device_info');
 Route::get('/view_update_inventory', [userController::class, 'view_update_inventory'])->name('view_update_inventory');
 
