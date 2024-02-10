@@ -93,5 +93,6 @@ Route::get('/datetime', [userController::class, 'datetime'])->name('datetime');
 Route::get('/alert_technical', [userController::class, 'alert_technical'])->name('alert_technical');
 Route::get('/alert_security', [userController::class, 'alert_security'])->name('alert_security');
 Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
+Route::get('/all_redo_info', [userController::class, 'all_redo_info'])->name('all_redo_info');
 
 

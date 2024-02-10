@@ -1017,15 +1017,16 @@ public function create_redo(Request $request){
      'technician'=>'nullable',
      'old_device'=>'required',
      'new_device'=>'required',
-     'eng_no'=>'nullable',
-     'chasis_no'=>'nullable',
-     'install_loc'=>'nullable',
-     'install_date'=>'nullable',
-     'sales_person'=>'nullable',
+     'eng_no'=>'required',
+     'chasis_no'=>'required',
+     'install_loc'=>'requierd',
+     'install_date'=>'rqeuired',
+     'sales_person'=>'rqeuired',
      'harness_change'=>'nullable',
      'backupbattery_change'=>'nullable',
-     'contact_no'=>'nullable',
+     'contact_no'=>'required',
      'remarks'=>'nullable'
+     ,'representative'=>'required'
     ]);
     if($validator->fails()){
         return response()->json([
@@ -1065,6 +1066,7 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
     $data->sales_person=$request->input('sales_person');
     $data->harness_change=$request->input('harness_change');
     $data->backupbattery_change=$request->input('backupbattery_change');
+    $data->representative=$request->input('representative');
     $data->save();
 //    if($data){
 //     $user=User::where('id',$request->input('client_id'))->first();
@@ -1077,14 +1079,14 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
     // $value=Complain_actions::where('complain_code',$complain)->update(['Status'=>'Resolved']);
     return response()->json([
         'scuccess'=>true,
-        'message'=>'redo created successfully',
+        'message'=>'Redo created successfully',
         'data'=>$data
     ], 200, );
    }
    else{
     return response()->json([
         'scuccess'=>false,
-        'message'=>'problem in submssion',
+        'message'=>'Error in submssion',
         'data'=>null
     ], 400, );
    }
@@ -3892,11 +3894,23 @@ public function redo_search(Request $request){
                'message'=>$validator->errors()
            ], 402, );
        }
-       $user=User::where('registeration_no',$request->search_term)
-       ->orWhere('engine_no',$request->search_term)
-       ->orWhere('chasis_no',$request->search_term)
+       $user=complain::where('complain_id',$request->search_term)
        ->first();
-       $technical=Technicaldetails::where('client_code',$user->id)
+       if(!$user || $user->nature_of_complain=="Update Form"){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found ',
+            'data'=>null
+        ], 400, );
+       }
+       if($user->Status=="Resolved"){
+        return response()->json([
+            'success'=>false,
+            'message'=>'complain already resolved',
+            'data'=>null
+        ], 400, );
+       }
+       $technical=Technicaldetails::where('client_code',$user->client_id)
        ->first();
        if($user){
         $redo=[
@@ -3909,13 +3923,13 @@ public function redo_search(Request $request){
             'data'=>$redo
         ], 200, );
        }
-       else{
-        return response()->json([
-            'success'=>false,
-            'message'=>'Data not found',
-            'data'=>null
-        ], 400, );
-       }
+    //    else{
+    //     return response()->json([
+    //         'success'=>false,
+    //         'message'=>'Data not found',
+    //         'data'=>null
+    //     ], 400, );
+    //    }
 }
 public function datetime(Request $request){
    $carbon= Carbon::now()->setTimezone('Asia/karachi');
@@ -3988,6 +4002,22 @@ public function alert_security(Request $request){
             'data' => null
         ], 400);
     }
+}
+public function all_redo_info(Request $request){
+ $redo=Redo::all();
+ if($redo){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$redo
+    ], 200, );
+ }   
+ else{
+    return response()->json([
+        'success'=>false,
+        'messsage'=>'Data not found',
+        'data'=>null], 200, );
+ }
 }
 
 }

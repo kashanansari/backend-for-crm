@@ -34,6 +34,7 @@ return new class extends Migration
             $table->string('sales_person');
             $table->string('harness_change');
             $table->string('backupbattery_change');
+            $table->string('representative')->nullable();
 
             $table->timestamps();
         });
