@@ -3912,10 +3912,13 @@ public function redo_search(Request $request){
        }
        $technical=Technicaldetails::where('client_code',$user->client_id)
        ->first();
+       $sales_per=User::where('id',$user->client_id)
+       ->value('sales_person');
        if($user){
         $redo=[
             'user'=>$user,
-            'technical'=>$technical
+            'technical'=>$technical,
+            'sales_per'=>$sales_per
         ];
         return response()->json([
             'success'=>true,
@@ -4005,7 +4008,15 @@ public function alert_security(Request $request){
 }
 public function all_redo_info(Request $request){
  $redo=Redo::all();
+ $redo->map(function($redos) {
+    $redos->redo_date=$redos->created_at->format('d-m-Y');
+    $redos->redo_time=$redos->created_at->format('h:i A');
+    unset($redos->created_at);
+    unset($redos->updated_at);
+    return $redos;
+ });
  if($redo){
+
     return response()->json([
         'success'=>true,
         'message'=>'Data found successfully',
