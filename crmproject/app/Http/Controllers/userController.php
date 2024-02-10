@@ -3918,7 +3918,7 @@ public function redo_search(Request $request){
        $technical=Technicaldetails::where('client_code',$user->client_id)
        ->first();
        $sales_per=User::where('id',$user->client_id)
-       ->select('sales_person','date_of_installation','engine_no','chasis_no')
+       ->select('sales_person','date_of_installation','engine_no','chasis_no','mobileno_1')
        ->get();
     
        if($user){
