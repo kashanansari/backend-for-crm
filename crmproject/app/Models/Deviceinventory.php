@@ -15,7 +15,7 @@ class Deviceinventory extends Model
         'status', // Add the 'status' attribute to the array
     ];
     protected $table='deviceinventory';
-    function client_id()
+   public  function technical()
     {
         return $this->hasMany('App\Models\Technicaldetails', 'device_no', 'id');
     }

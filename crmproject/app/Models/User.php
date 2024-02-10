@@ -40,7 +40,7 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Redo', 'client_id', 'id');
     }
-    function client_code()
+    function technical()
     {
         return $this->hasMany('App\Models\Technicaldetails', 'client_code', 'id');
     }

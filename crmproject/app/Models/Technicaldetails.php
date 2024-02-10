@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class Technicaldetails extends Model
 {
-    public function getcountrycode()
+    public function user()
     {
         return $this->belongsTo('App\Models\User', 'client_code', 'id');
     }
-    public function getdevicecode()
+    public function device()
     {
         return $this->belongsTo('App\Models\Deviceinventory', 'device_no', 'id');
     }

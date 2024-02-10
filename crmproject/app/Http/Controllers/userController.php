@@ -1020,8 +1020,8 @@ public function create_redo(Request $request){
      'eng_no'=>'required',
      'chasis_no'=>'required',
      'install_loc'=>'requierd',
-     'install_date'=>'rqeuired',
-     'sales_person'=>'rqeuired',
+     'install_date'=>'required',
+     'sales_person'=>'required',
      'harness_change'=>'nullable',
      'backupbattery_change'=>'nullable',
      'contact_no'=>'required',
@@ -3941,17 +3941,28 @@ public function redo_search(Request $request){
     //     ], 400, );
     //    }
 }
-public function datetime(Request $request){
-   $carbon= Carbon::now()->setTimezone('Asia/karachi');
-   $date=$carbon->format('d-m-Y');
-   $time=$carbon->format('h:i A');
+public function all_removal_info(Request $request){
+ $removal=Removal::orderBy('created_at','desc')
+ ->get();
+ $count=$removal->count();
+ $removal->map(function($removals){
+    $removals->renewal_date=$removals->created_at->format('d-m-Y');
+    $removals->renewal_time=$removals->created_at->format('j:i A');
+    $removals->reason=$removals->remarks;
+    unset($removals->created_at);
+    unset($removals->created_at);
+    unset($removals->remarks);
+    return $removals;
+ });
+ if($removal){
    return response()->json([
     'success'=>true,
-    'message'=>'data is here',
-    'date'=>$date,
-    'time'=>$time
+    'message'=>'Data is found',
+    'total_count'=>$count,
+    'data'=>$removal
    ], 200, );
 
+}
 }
 public function alert_technical(Request $request){
     $queue = Queue::where('status', 'pending')->get(); // Fetch a single record
@@ -4037,16 +4048,53 @@ public function all_redo_info(Request $request){
         'data'=>null], 200, );
  }
 }
-public function all_device_info(Request $request){
-    $device=Deviceinventory::all();
-    if($device){
+public function all_device_info(Request $request) {
+    $devices = Deviceinventory::orderBy('created_at', 'desc')->get();
 
+    if ($devices->isNotEmpty()) {
+        $combinedData = [];
+        foreach ($devices as $device) {
+            $technicalDetails = $device->technical()->first(); // Get first technical detail for the device
+            $userDetails = $technicalDetails ? $technicalDetails->user : null; // Get user details associated with the technical detail
+
+            $combinedData[] = [
+                'device_info'=>[
+                'device' => $device->device_serialno,
+                'imei_no'=>$device->imei_no,
+                'sim'=>$device->devciesim_no,
+                ],
+                'user_info'=>[
+
+                'reg_no'=>$userDetails->registeration_no ?? null,
+                'eng_no'=>$userDetails->engine_no ?? null,
+                'chasis_no'=>$userDetails->chasis_no ?? null,
+                'customer_name'=>$userDetails->customer_name ?? null,
+                'mobileno_1'=>$userDetails->mobileno_1 ?? null,
+                'date_of_installation'=>$userDetails->date_of_installation ?? null,
+                'technician'=>$technicalDetails->technician_name ?? null,
+                'installation_loc'=>$userDetails->installation_loc ?? null,
+                // 'technical' => $technicalDetails,
+                // 'user' => $userDetails,
+                ]
+            
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data found successfully',
+            'data' => $combinedData
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+        ], 200);
     }
-    return response()->json([
-        'success'=>true,
-        'message'=>'Data found successfully',
-        'data'=>$device
-    ], 200, );
 }
+
+
+
+
 
 }

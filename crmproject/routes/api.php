@@ -89,11 +89,11 @@ Route::post('/redo_search', [userController::class, 'redo_search'])->name('redo_
 Route::post('/create_redo', [userController::class,  'create_redo']);
 Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
-Route::get('/datetime', [userController::class, 'datetime'])->name('datetime');
+Route::get('/all_removal_info', [userController::class, 'all_removal_info'])->name('all_removal_info');
 Route::get('/alert_technical', [userController::class, 'alert_technical'])->name('alert_technical');
 Route::get('/alert_security', [userController::class, 'alert_security'])->name('alert_security');
 Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 Route::get('/all_redo_info', [userController::class, 'all_redo_info'])->name('all_redo_info');
-Route::get('/view_all_device_inventory', [userController::class, 'all_inventory'])->name('view_all_device_inventory');
+Route::get('/all_device_info', [userController::class, 'all_device_info'])->name('all_device_info');
 
 
