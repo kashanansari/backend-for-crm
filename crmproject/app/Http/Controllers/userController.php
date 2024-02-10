@@ -3919,7 +3919,7 @@ public function redo_search(Request $request){
        ->first();
        $sales_per=User::where('id',$user->client_id)
        ->select('sales_person','date_of_installation','engine_no','chasis_no','mobileno_1')
-       ->get();
+       ->first();
     
        if($user){
         $redo=[
@@ -4039,6 +4039,9 @@ public function all_redo_info(Request $request){
 }
 public function all_device_info(Request $request){
     $device=Deviceinventory::all();
+    if($device){
+
+    }
     return response()->json([
         'success'=>true,
         'message'=>'Data found successfully',
