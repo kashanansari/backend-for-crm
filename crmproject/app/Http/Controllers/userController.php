@@ -752,6 +752,7 @@ return response()->json([
         'install_loc' => 'required',
         'install_date' => 'required|date',
         'remarks' => 'required',
+        'representative'=>'required'
      ]);
 
      if($validator->fails()){
@@ -789,6 +790,7 @@ return response()->json([
         $data->install_date = $request->input('install_date');
         $data->remarks = $request->input('remarks');
         $data->status = 'Removed';
+        $data->representative=$request->representative;
         $data->save();
         $check = Deviceinventory::where('device_serialno', $request->device)->first();
         $user= User::where('id',$request->client_id)
@@ -4099,7 +4101,39 @@ public function all_device_info(Request $request) {
     }
 }
 
+public function tech_reg($reg_no){
+    $tech=User::where('registeration_no',$reg_no)->first();
+    if($tech){
+        $data=[
+            'client_id'=>$tech->id,
+            // 'vas_options'=>$tech->vas_options,
+            'cc'=>$tech->CC,
+            'customer_name'=>$tech->customer_name,
+            'reg_no'=>$tech->registeration_no,
+            'chasis_no'=>$tech->chasis_no,
+            'engine_no'=>$tech->engine_no,
+            'coontact_no'=>$tech->mobileno_1
 
+        ];
+        $vas=[
+            $tech->vas_options
+        ];
+
+        return response()->json([
+            'success'=>true,
+            'messsage'=>'Data found successfully',
+            'data'=>$data,
+            'vas_options'=>$vas
+        ], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'messsage'=>'Data not found',
+            'data'=>null
+        ], 200, );
+    }
+}
 
 
 

@@ -91,6 +91,8 @@ Route::post('/createcomplain', [userController::class, 'create_complain'])->name
 Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
 Route::get('/all_removal_info', [userController::class, 'all_removal_info'])->name('all_removal_info');
 Route::get('/alert_technical', [userController::class, 'alert_technical'])->name('alert_technical');
+Route::get('/tech_reg/{reg_no}', [userController::class, 'tech_reg'])->name('tech_reg/{reg_no}');
+
 Route::get('/alert_security', [userController::class, 'alert_security'])->name('alert_security');
 Route::post('/storeinventory', [userController::class, 'create_deviceinventory'])->name('storeinventory');
 Route::get('/all_redo_info', [userController::class, 'all_redo_info'])->name('all_redo_info');
