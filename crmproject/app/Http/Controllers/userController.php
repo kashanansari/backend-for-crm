@@ -4141,6 +4141,9 @@ public function tech_reg($reg_no){
         ], 200, );
     }
 }
+public function inventory_info(Request $request){
+    
+}
 
 
 
