@@ -1701,7 +1701,8 @@ public function complete_vehicle_details(Request $request) {
 
     $status = [];
     foreach ($data as $user) {
-        $userStatus = $user->client_code()->select('operational_status', 'tracker_status')->first();
+        $userStatus = $user->technical()->select('operational_status', 'tracker_status')
+        ->get();
         if ($userStatus) {
             $status[] = $userStatus;
         }
@@ -1711,9 +1712,10 @@ public function complete_vehicle_details(Request $request) {
     return response()->json([
         'success'=>true,
         'message'=>'details found successfully',
-        'data'=>$data,
-        'status'=>$status,
         'count'=>$count,
+        'data'=>$data,
+
+        'status'=>$status,
     ], 200, );
 }
 
@@ -4141,8 +4143,64 @@ public function tech_reg($reg_no){
         ], 200, );
     }
 }
-public function inventory_info(Request $request){
-    
+public function all_inventory_info(Request $request){
+    $inventory=Deviceinventory::get();
+    $inventory->map(function($info){
+$info->entry_date=$info->created_at->format('d-m-Y');
+$info->entry_time=$info->created_at->format('h:i A');
+unset($info->craeted_at);
+unset($info->updated_at);
+return $info;
+    });
+    $data=[];
+    foreach($inventory as $device){
+   $data[]=[
+      'entry_date'=>$device->entry_date,
+      'entry_time'=>$device->entry_time,
+      'device'=>$device->device_serialno,
+      'imei'=>$device->imei_no,
+      'sim'=>$device->devciesim_no,
+      'vendor'=>$device->vendor,
+      'representative'=>$device->representative
+
+
+   ];
+}
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$data
+    ], 200, );
+
+
+}
+public function all_mis_info(Request $request)
+{
+   $user= User::select([
+      'address',
+      'customer_name',
+      'registeration_no',
+      'engine_no',
+      'chasis_no',
+      'make',
+      'model',
+      'year',
+      'registeration_no',
+      'registeration_no',
+      'registeration_no',
+      'registeration_no',
+
+
+
+    ])
+    ->get();
+    if($user){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'data'=>$user
+        ], 200, );
+    }
 }
 
 
