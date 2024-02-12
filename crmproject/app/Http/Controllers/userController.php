@@ -397,6 +397,7 @@ $data->save();
         'contact_1' => 'required',
         'contact_2' => 'nullable',
         'contact_3' => 'nullable',
+        'representative'=>'required'
     ]);
 
     if ($validator->fails()) {
@@ -453,9 +454,12 @@ if ($client_value && $device) {
   $value->contact_1=$request->input('contact_1');
   $value->contact_2=$request->input('contact_2');
   $value->contact_3=$request->input('contact_3');
+  $value->representative=$request->representative;
   $value->tracker_status='active';
   $value->technical_status='completed';
   $technical=$value->save();
+  Queue::where('client_id',$request->client_code)
+  ->update(['status'=>'approved']);
   if(!$technical){
     // User::where('id', $value->client_code)->update(['form_status'=>'pending']);
     return response()->json([
@@ -514,6 +518,8 @@ return response()->json([
     $value->save();
     
     if ($value) {
+        Queue::where('client_id',$request->client_code)
+        ->delete();
         return response()->json([
             'success'=>true,
             'message'=>'Security details submitted successfully',
@@ -923,8 +929,8 @@ public function create_deviceinventory(Request $request) {
         'vendor' => 'required',
         'devciesim_no' => 'required',
         'representaive'=>'required',
-        'emp_id'=>'required',
-        'emp_loginid'=>'required'
+        // 'emp_id'=>'required',
+        // 'emp_loginid'=>'required'
     ]);
 
     if ($validator->fails()) {
@@ -944,6 +950,7 @@ public function create_deviceinventory(Request $request) {
     $data->imei_no = $request->input('imei_no');
     $data->vendor = $request->input('vendor');
     $data->devciesim_no = $request->input('devciesim_no');
+    $data->representaive = $request->input('representaive');
     $data->status = 'active';
     $data->save();
     // if ($empId) {
@@ -951,16 +958,16 @@ public function create_deviceinventory(Request $request) {
     //     ->select('emp_name', 'emp_id', 'designation')
     //     ->first();
 
-$inevntory_logs= new Inventory_logs();
-$value=[
-    'emp_id'=>$request->emp_id,
-    'emp_login_id'=>$request->emp_loginid,
-    'emp_name'=>$request->representaive,
-    'actions'=>'DEVICE INVENTORY FORM',
-    'status'=>'done',
-    'device_serialno'=>$request->device_serialno,
-];
-Inventory_logs::create($value);
+// $inevntory_logs= new Inventory_logs();
+// $value=[
+//     'emp_id'=>$request->emp_id,
+//     'emp_login_id'=>$request->emp_loginid,
+//     'emp_name'=>$request->representaive,
+//     'actions'=>'DEVICE INVENTORY FORM',
+//     'status'=>'done',
+//     'device_serialno'=>$request->device_serialno,
+// ];
+// Inventory_logs::create($value);
     if ($data) {
         return response()->json(['response' => "Inventory created successfully"], 200);
     } else {
@@ -3948,8 +3955,8 @@ public function all_removal_info(Request $request){
  ->get();
  $count=$removal->count();
  $removal->map(function($removals){
-    $removals->renewal_date=$removals->created_at->format('d-m-Y');
-    $removals->renewal_time=$removals->created_at->format('j:i A');
+    $removals->removal_date=$removals->created_at->format('d-m-Y');
+    $removals->removal_time=$removals->created_at->format('j:i A');
     $removals->reason=$removals->remarks;
     unset($removals->created_at);
     unset($removals->created_at);
@@ -4003,7 +4010,7 @@ public function alert_technical(Request $request){
 }
 
 public function alert_security(Request $request){
-    $queue = Queue::where('status', 'completed')->get(); // Fetch a single record
+    $queue = Queue::where('status', 'approved')->get(); // Fetch a single record
     $count=$queue->count();
     if($queue){
         $data=[];

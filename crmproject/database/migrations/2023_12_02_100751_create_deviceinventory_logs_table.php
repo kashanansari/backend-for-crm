@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('emp_name')->nullable();
             $table->string('actions')->nullable();
             $table->string('status')->nullable();
+            $table->string('representative')->nullable();
             $table->timestamps();
         });
     }

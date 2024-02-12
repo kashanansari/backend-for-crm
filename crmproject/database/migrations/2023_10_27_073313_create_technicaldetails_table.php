@@ -40,6 +40,7 @@ return new class extends Migration
             $table->string('contact_3')->nullable();
             $table->string('tracker_status')->nullable();
             $table->string('technical_status')->nullable();
+            $table->string('representative')->nullable();
 
             $table->timestamps();
         });
