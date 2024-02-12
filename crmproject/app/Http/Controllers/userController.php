@@ -4185,15 +4185,19 @@ public function all_mis_info(Request $request)
       'make',
       'model',
       'year',
-      'registeration_no',
-      'registeration_no',
-      'registeration_no',
-      'registeration_no',
+      'color',
+      'sales_person',
+      'remarks',
+      'segment',
+      'tracker_charges as invoice_amount',
+      DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y') as date"),
+      Db::raw("DATE_FORMAT(created_at,'%h:%i %p')as time"),
 
 
 
     ])
     ->get();
+
     if($user){
         return response()->json([
             'success'=>true,
