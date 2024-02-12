@@ -394,7 +394,7 @@ $data->save();
         'overspeed_alerts' => 'nullable',
         'geo_fence_alerts' => 'nullable',
         'additional_contact' => 'nullable',
-        'contact_1' => 'nullable',
+        'contact_1' => 'required',
         'contact_2' => 'nullable',
         'contact_3' => 'nullable',
     ]);
@@ -1019,7 +1019,7 @@ public function create_redo(Request $request){
      'new_device'=>'required',
      'eng_no'=>'required',
      'chasis_no'=>'required',
-     'install_loc'=>'requierd',
+     'install_loc'=>'required',
      'install_date'=>'required',
      'sales_person'=>'required',
      'harness_change'=>'nullable',
