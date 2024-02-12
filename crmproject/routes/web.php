@@ -79,7 +79,7 @@ Route::post('/create_soldout', [userController::class, 'create_soldout'])->name(
 // Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::post('/change_pic', [userController::class, 'change_pic'])->name('change_pic');
 // Route::post('/empLogin', [userController::class, 'emp_login'])->name('empLogin');
-Route::post('/renewals_remarks', [userController::class, 'create_renewal_remarks'])->name('renewals_remarks');
+// Route::post('/renewals_remarks', [userController::class, 'create_renewal_remarks'])->name('renewals_remarks');
 Route::post('/add_payment', [userController::class, 'store_add_renewalpayment'])->name('add_payment');
 Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
 // Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
@@ -142,10 +142,10 @@ Route::get('sales_lead', [userController::class, 'sales_lead'])->name('sales_lea
 
 Route::get('/attendance_report', [userController::class, 'fetchAttendanceReport'])->name('attendance_report');
 Route::get('/view_rewnewals', [userController::class, 'view_renewals'])->name('view_rewnewals');
-Route::get('/getrenewals', [userController::class, 'get_renewals'])->name('getrenewals');
+// Route::get('/getrenewals', [userController::class, 'get_renewals'])->name('getrenewals');
 
-Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks'])->name('get_renewals_remarks');
-Route::get('/renewals_info/{regNo}', [userController::class, 'get_renewals_info'])->name('renewals_info');
+// Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks'])->name('get_renewals_remarks');
+// Route::get('/renewals_info/{regNo}', [userController::class, 'get_renewals_info'])->name('renewals_info');
 Route::get('/add_renewal_payement/{regNo}', [userController::class, 'add_renewal_payement'])->name('add_renewal_payement');
 Route::get('/update_renewal/{regNo}', [userController::class, 'update_renewal'])->name('update_renewal');
 Route::get('/upd_renewal', [userController::class, 'view_update_renewal'])->name('upd_renewal');

@@ -90,8 +90,8 @@
                 <th>Segment</th>
                 <th>Registration No</th>
                 <th>Customer Name</th>
-                <th>DOI</th>
-                <th>Month</th>
+                {{-- <th>DOI</th> --}}
+                {{-- <th>Month</th> --}}
                 <th>Contact No</th>
                 <th>DOR</th>
                 <th>Reg Time</th>
@@ -106,8 +106,8 @@
                 <td>{{ $detail['segment'] }}</td>
                 <td>{{ $detail['registeration_no'] }}</td>
                 <td>{{ $detail['customer_name'] }}</td>
-                <td>{{ $detail['date_of_installation'] }}</td>
-                <td>{{ $detail['month'] }}</td>
+                {{-- <td>{{ $detail['date_of_installation'] }}</td> --}}
+                {{-- <td>{{ $detail['month'] }}</td> --}}
                 <td>{{ $detail['contact_no'] }}</td>
                 <td>{{ $detail['date'] }}</td>
                 <td>{{ $detail['time'] }}</td>
@@ -154,10 +154,10 @@
         });
     </script>
     <!-- Pagination -->
-    <div class="pagination">
+    {{-- <div class="pagination">
         {{ $users->links() }}
     </div>
-    <!-- Include jQuery -->
+    <!-- Include jQuery --> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function viewAction(regNo) {

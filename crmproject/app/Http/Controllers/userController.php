@@ -2092,7 +2092,7 @@ public function emp_login(Request $request)
 
             // Fetching paginated user details
             $users = User::orderBy('created_at','desc')
-            ->paginate(20);
+            ->get();
             $userDetails = [];
 
             // Fetch user details with renewal information
@@ -2101,8 +2101,10 @@ public function emp_login(Request $request)
                     'customer_name' => $user->customer_name,
                     'segment' => $user->segment,
                     'registeration_no' => $user->registeration_no,
-                    'date_of_installation' => Carbon::parse($user->date_of_installation)->format('d-m-Y'),
-                    'month' => Carbon::parse($user->date_of_installation)->format('F'),
+                    'DOI' => $user->date_of_installation,
+                    'Month' => $user->date_of_installation ? date('F', strtotime($user->date_of_installation)) : null,
+                    // 'date_of_installation' => $user->date_of_installation ? Carbon::createFromFormat('d/m/Y', $user->date_of_installation, 'UTC')->format('d-m-Y') : null,
+                    // 'month' => Carbon::createFromFormat('d/m/Y', $user->date_of_installation)->format('F'),
                     'contact_no' => $user->mobileno_1,
                     'sales_person' => $user->sales_person,
                     'status' => $user->renewal_status,
@@ -2110,7 +2112,8 @@ public function emp_login(Request $request)
                     'date' => Carbon::parse($user->created_at)->format('d-m-Y'),
                     // Fetch renewal details based on the client_id from the renewals table
                     'renewal_charges' => $renewalDetails[$user->id]['renewal_charges'] ?? null,
-                    'renewal_status' => $renewalDetails[$user->id]['renewal_status'] ?? null,
+                    'status' => $renewalDetails[$user->id]['renewal_status'] ?? null,
+                    'DOR' => isset($renewalDetails[$user->id]['renewal_date']) ? date('d-m-Y', strtotime($renewalDetails[$user->id]['renewal_date'])) : null,
                     // Add other renewal details here...
                 ];
                 $currentDate = Carbon::now()->format('Y-m-d');
@@ -2121,10 +2124,15 @@ public function emp_login(Request $request)
                 }
             }
 
-            return view('Renewals', [
-                'users' => $users,
-                'renewalDetails' => $userDetails // Pass other necessary details to the view
-            ]);
+            // return view('Renewals', [
+            //     'users' => $users,
+            //     'renewalDetails' => $userDetails // Pass other necessary details to the view
+            // ]);
+            return response()->json([
+                'success'=>true,
+                // 'users'=>$users,
+                'renewalDetails' => $userDetails
+            ], 200, );
         }
             public function renewal_information(Request $request){
             return view ('view_renewal_information');
@@ -2156,7 +2164,6 @@ public function emp_login(Request $request)
                 }
 
                 $responseData = [
-                    'success' => true,
                     'segment' => $user->segment,
                     'customer_name' => $user->customer_name,
                     'contact' => $user->mobileno_1,
@@ -2164,58 +2171,72 @@ public function emp_login(Request $request)
                     'Reg-no' => $user->registeration_no,
                     'sales-person' => $user->sales_person,
                     'month' => $month,
-                    'city' => $user->installation_loc ??'-',
-                    'date-of-installation' => $doi??'-',
+                    'city' => $user->installation_loc ??'nil',
+                    'date-of-installation' => $doi??'nil',
                     'engine' => $user->engine_no,
                     'model' => $user->model,
-                    'reference' => $renewalDetails['id']?? '-',
+                    'reference' => $renewalDetails['id']?? 'nil',
                     'chasis-no' => $user->chasis_no,
-                    'renewal_charges' => $renewalDetails['renewal_charges'] ?? '-',
-                    'renewal_status' => $renewalDetails['renewal_status'] ?? '-',
-                    'renewal-date' => $renewalDetails['renewal_date'] ?? '-',
-                    'renewal_id'=>$renewalDetails['renewal_id']??'-',
-                    'amount'=>$renewalDetails['recieved_renewal']??'-',
+                    'renewal_charges' => $renewalDetails['renewal_charges'] ?? 'nil',
+                    'renewal_status' => $renewalDetails['renewal_status'] ?? 'nil',
+                    'renewal_date' => $renewalDetails['renewal_date'] ?? 'nil',
+                    'renewal_id'=>$renewalDetails['renewal_id']??'nil',
+                    'amount'=>$renewalDetails['recieved_renewal']??'nil',
 
                     // Other fields...
                 ];
 
-               return view('view_renewal_information')->with('data',$responseData);
+            //    return view('view_renewal_information')->with('data',$responseData);
+            return response()->json([
+                'success'=>true,
+                'messsage'=>'Data found successfully',
+                'data'=>$responseData
+            ], 200, );
             } else {
                 // If user not found
                 return response()->json(['message' => 'data not found'], 404, [], JSON_PRETTY_PRINT);
             }
         }
         public function create_renewal_remarks(Request $request){
-            try {
-                $sessionToken = $request->session()->get('session_token');
-                $empId = $request->session()->get('em_loginid_' . $sessionToken);
-                $emp_name = null; // Initialize $emp_name to handle cases where $empId is not found
-                if ($empId) {
-                    $emp_name = Employee::where('em_loginid', $empId)->value('emp_name');
-                }
+            $validator=Validator::make($request->all(),[
+                'remarks' => 'required',
+                    'renewal_id' => 'required|exists:renewals,id',
+                    'representative'=>'required',
+                    'recieved_renewal'=>'nullable'
+            ]);
+        if($validator->fails()){
+            return response()->json([
+                'success'=>false,
+                'message'=>$validator->errors()
+            ], 402, );
+        }
 
-                $validatedData = $request->validate([
-                    'remarks' => 'required',
-                    'renewal_id' => 'required'
-                ]);
 
-                if ($validatedData) {
+              
                     $value = [
                         'renewal_id' => $request->renewal_id,
                         'remarks' => $request->remarks,
-                        'representative' => $emp_name,
+                        'representative' => $request->representative,
+                        'recieved_renewal' => $request->recieved_renewal,
                     ];
                     $remarks = Renewals_remarks::create($value);
                     if ($remarks) {
-                        return response()->json(['message' => 'Remarks submitted successfully'], 200);
+                        return response()->json([
+                            'success'=>true,
+                            'message' => 'Remarks submitted successfully',
+                            'data'=>$remarks
+                        ], 200);
+                    }
+                    else{
+                        return response()->json([
+                            'success'=>false,
+                            'message'=>'Error in submission'
+                        ], 400, );
                     }
                 }
-            } catch (\Exception $e) {
-                // Log the error to identify the issue
-                \Log::error('Error submitting remarks: ' . $e->getMessage());
-                return response()->json(['message' => 'Error submitting remarks. Please try again.'], 500);
-            }
-        }
+           
+            
+        
 
 
         public function get_renewal_remarks( Request $request){
@@ -2236,9 +2257,17 @@ public function emp_login(Request $request)
                         'amount'=>$info->recieved_renewal,
                     ];
                 }
-                return response()->json($details, 200);
+                return response()->json([
+                    'success'=>true,
+                    'message'=>'Remarks found successfully',
+                    'data'=>$details
+                ], 200, );
             } else {
-                return response()->json(['message' => 'No data found'], 404);
+                return response()->json([
+                    'success'=>false,
+                    'message' => 'No data found',
+                'data'=>null
+            ], 400);
             }
         }
 

@@ -19,7 +19,6 @@ use App\Http\Controllers\BackupController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/getrenewals', [userController::class, 'get_renewals']);
 
 Route::post('id', [userController::class, 'getid']);
 Route::post('/checkin', [userController::class, 'check_in']);
@@ -100,4 +99,8 @@ Route::get('/all_device_info', [userController::class, 'all_device_info'])->name
 Route::get('/all_inventory_info', [userController::class, 'all_inventory_info'])->name('all_inventory_info');
 Route::get('/all_mis_info', [userController::class, 'all_mis_info'])->name('all_mis_info');
 
+Route::get('/getrenewals', [userController::class, 'get_renewals'])->name('getrenewals');
+Route::get('/renewals_info/{regNo}', [userController::class, 'get_renewals_info'])->name('renewals_info');
+Route::post('/create_renewal_remarks', [userController::class, 'create_renewal_remarks'])->name('create_renewal_remarks');
+Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks'])->name('get_renewals_remarks');
 
