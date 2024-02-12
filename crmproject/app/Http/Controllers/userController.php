@@ -3967,10 +3967,14 @@ public function all_removal_info(Request $request){
 public function alert_technical(Request $request){
     $queue = Queue::where('status', 'pending')->get(); // Fetch a single record
     $count=$queue->count();
+    $data=[];
     if($queue){
-        $data=[];
-        foreach($queue as $record)
-        $data = [
+     foreach($queue as $record){
+       $customer= User::where('id',$record->client_id)
+        ->select('customer_name')
+        ->first();
+        $data[] = [
+             'name'=>$customer->customer_name,             
             'reg_no' => $record->reg_no,
             'date' => $record->date,
             'time' => $record->time,
@@ -3986,6 +3990,7 @@ public function alert_technical(Request $request){
  
         ], 200);
     }
+}
     else{
         return response()->json([
             'success' => false,
@@ -3994,6 +3999,7 @@ public function alert_technical(Request $request){
         ], 400);
     }
 }
+
 public function alert_security(Request $request){
     $queue = Queue::where('status', 'completed')->get(); // Fetch a single record
     $count=$queue->count();
