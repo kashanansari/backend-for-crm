@@ -4075,13 +4075,10 @@ public function all_device_info(Request $request) {
             $userDetails = $technicalDetails ? $technicalDetails->user : null; // Get user details associated with the technical detail
 
             $combinedData[] = [
-                'device_info'=>[
+                
                 'device' => $device->device_serialno,
                 'imei_no'=>$device->imei_no,
                 'sim'=>$device->devciesim_no,
-                ],
-                'user_info'=>[
-
                 'reg_no'=>$userDetails->registeration_no ?? null,
                 'eng_no'=>$userDetails->engine_no ?? null,
                 'chasis_no'=>$userDetails->chasis_no ?? null,
@@ -4090,9 +4087,10 @@ public function all_device_info(Request $request) {
                 'date_of_installation'=>$userDetails->date_of_installation ?? null,
                 'technician'=>$technicalDetails->technician_name ?? null,
                 'installation_loc'=>$userDetails->installation_loc ?? null,
+                'segment'=>$userDetails->segment?? null
                 // 'technical' => $technicalDetails,
                 // 'user' => $userDetails,
-                ]
+            
             
             ];
         }
