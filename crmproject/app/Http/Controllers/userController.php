@@ -4233,6 +4233,29 @@ public function all_mis_info(Request $request)
         ], 200, );
     }
 }
+public function complain_queue(Request $request){
+ $complain_queue=complain::where('status','Pending')
+ ->orderBy('created_at','desc')
+ ->select(['complain_id',
+ 'client_id',
+ 'emp_name as representative',
+ 'customer_name',
+ 'reg_no',
+ 'nature_of_complain as nature',
+ 'Status',
+ DB::raw("DATE_FORMAT(created_at,'%d-%m-%Y') as date"),
+ DB::raw("DATE_FORMAT(created_at,'%h:%i %p')as time")])
+ ->get();    
+ $count=$complain_queue->count();
+ if($complain_queue){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Complain queues here',
+        'count'=>$count,
+        'data'=>$complain_queue
+    ], 200, );
+ }
+}
 
 
 
