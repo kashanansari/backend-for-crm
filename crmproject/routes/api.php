@@ -104,4 +104,5 @@ Route::get('/renewals_info/{regNo}', [userController::class, 'get_renewals_info'
 Route::post('/create_renewal_remarks', [userController::class, 'create_renewal_remarks'])->name('create_renewal_remarks');
 Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks'])->name('get_renewals_remarks');
 Route::get('/complain_queue', [userController::class, 'complain_queue'])->name('complain_queue');
+Route::get('/complain_resolve/{reg_no}', [userController::class, 'complain_resolve'])->name('complain_resolve/{reg_no}');
 

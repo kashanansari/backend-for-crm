@@ -4243,6 +4243,7 @@ public function complain_queue(Request $request){
  'reg_no',
  'nature_of_complain as nature',
  'Status',
+ 'remarks',
  DB::raw("DATE_FORMAT(created_at,'%d-%m-%Y') as date"),
  DB::raw("DATE_FORMAT(created_at,'%h:%i %p')as time")])
  ->get();    
@@ -4255,6 +4256,19 @@ public function complain_queue(Request $request){
         'data'=>$complain_queue
     ], 200, );
  }
+}
+public function complain_resolve($reg_no){
+
+$data=complain::where('reg_no',$reg_no)
+->
+->first();
+if($data){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$data
+    ], 200, );
+}
 }
 
 
