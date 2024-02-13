@@ -2167,16 +2167,16 @@ public function emp_login(Request $request)
                     'segment' => $user->segment,
                     'customer_name' => $user->customer_name,
                     'contact' => $user->mobileno_1,
-                    'tracker-charges' => $user->tracker_charges,
-                    'Reg-no' => $user->registeration_no,
-                    'sales-person' => $user->sales_person,
+                    'tracker_charges' => $user->tracker_charges,
+                    'Reg_no' => $user->registeration_no,
+                    'sales_person' => $user->sales_person,
                     'month' => $month,
                     'city' => $user->installation_loc ??'nil',
-                    'date-of-installation' => $doi??'nil',
+                    'date_of_installation' => $doi??'nil',
                     'engine' => $user->engine_no,
                     'model' => $user->model,
                     'reference' => $renewalDetails['id']?? 'nil',
-                    'chasis-no' => $user->chasis_no,
+                    'chasis_no' => $user->chasis_no,
                     'renewal_charges' => $renewalDetails['renewal_charges'] ?? 'nil',
                     'renewal_status' => $renewalDetails['renewal_status'] ?? 'nil',
                     'renewal_date' => $renewalDetails['renewal_date'] ?? 'nil',
@@ -2272,6 +2272,18 @@ public function emp_login(Request $request)
         }
 
 public function add_renewal_payement($regNo){
+    $validator=Validator::make($request->all(),[
+    'renewal_id'=>'required',
+    'remarks'=>'required',
+    'recieved_renewal'=>'required',
+    'representative'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
     $user = User::where('registeration_no', $regNo)->first();
             $renewalDetails = [];
 
@@ -2300,16 +2312,16 @@ public function add_renewal_payement($regNo){
                     'segment' => $user->segment,
                     'customer_name' => $user->customer_name,
                     'contact' => $user->mobileno_1,
-                    'tracker-charges' => $user->tracker_charges,
-                    'Reg-no' => $user->registeration_no,
-                    'sales-person' => $user->sales_person,
+                    'tracker_charges' => $user->tracker_charges,
+                    'Reg_no' => $user->registeration_no,
+                    'sales_person' => $user->sales_person,
                     'month' => $month,
                     'city' => $user->installation_loc ??'-',
-                    'date-of-installation' => $doi ??'-',
+                    'date_of_installation' => $doi ??'-',
                     'engine' => $user->engine_no,
                     'model' => $user->model,
                     'reference' => $renewalDetails['id']?? '-',
-                    'chasis-no' => $user->chasis_no,
+                    'chasis_no' => $user->chasis_no,
                     'renewal_charges' => $renewalDetails['renewal_charges'] ?? '-',
                     'renewal_status' => $renewalDetails['renewal_status'] ?? '-',
                     'renewal-date' => $renewalDetails['renewal_date'] ?? '-',
