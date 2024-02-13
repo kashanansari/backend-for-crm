@@ -4257,9 +4257,9 @@ public function complain_queue(Request $request){
     ], 200, );
  }
 }
-public function complain_resolve($reg_no){
+public function complain_resolve($id){
 
-$data=complain::where('reg_no',$reg_no)
+$data=complain::where('compalin_id',$id)
 ->select([
     'complain_id',
     'emp_name as represenatative',
@@ -4279,6 +4279,21 @@ if($data){
         'data'=>$data
     ], 200, );
 }
+}
+public function create_resolve_complain(Request $rqeuest){
+    $validator=Validator::make($request->all(),[
+    'complain_id'=>'required',
+    'status'=>'requeired',
+    'nature'=>'nullable',
+    'remarks'=>'required',
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    if($request->status)
 }
 
 
