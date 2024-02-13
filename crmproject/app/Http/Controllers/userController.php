@@ -4284,7 +4284,7 @@ public function create_resolve_complain(Request $request){
     $validator=Validator::make($request->all(),[
     'complain_id'=>'required',
     'status'=>'required',
-    'nature'=>'rqeuired',
+    'nature'=>'required',
     'remarks'=>'required',
     ]);
     if($validator->fails()){
