@@ -2199,7 +2199,7 @@ public function emp_login(Request $request)
         }
         public function create_renewal_remarks(Request $request){
             $validator=Validator::make($request->all(),[
-                'remarks' => 'required',
+                  'remarks' => 'required',
                     'renewal_id' => 'required|exists:renewals,id',
                     'representative'=>'required',
                     'recieved_renewal'=>'nullable'
@@ -4259,7 +4259,7 @@ public function complain_queue(Request $request){
 }
 public function complain_resolve($id){
 
-$data=complain::where('compalin_id',$id)
+$data=complain::where('complain_id',$id)
 ->select([
     'complain_id',
     'emp_name as represenatative',
