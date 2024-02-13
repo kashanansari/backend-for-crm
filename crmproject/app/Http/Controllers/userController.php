@@ -4280,22 +4280,67 @@ if($data){
     ], 200, );
 }
 }
-public function create_resolve_complain(Request $rqeuest){
+public function create_resolve_complain(Request $request){
     $validator=Validator::make($request->all(),[
     'complain_id'=>'required',
-    'status'=>'requeired',
-    'nature'=>'nullable',
+    'status'=>'required',
+    'nature'=>'rqeuired',
     'remarks'=>'required',
     ]);
     if($validator->fails()){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
-    if($request->status)
-}
+    try{
+    if($request->status=="Resolved"){
+    $resolved=[
+        'complain_code'=>$request->complain_id,
+        'actions'=>$request->status,
+        'remarks'=>$request->remarks,
+        'nature'=>$request->nature
+    ];
 
+        Complain_actions::create($resolved);
+        $data=complain::where('complain_id',$request->complain_id)
+        ->update(['Status'=>$request->status]);
+        if($data){
+            return response()->json([
+                'success'=>true,
+                'message'=>'comnplain resolved successfully',
+      ], 200, );
+
+        }
+    }
+
+    if($request->status=="Update"){
+
+        $update=[
+            'complain_code'=>$request->complain_id,
+            'actions'=>$request->status,
+            'remarks'=>$request->remarks,
+            'nature'=>$request->nature
+        ];
+  $data=Complain_actions::create($update);
+  if($data){
+    return response()->json([
+        'success'=>true,
+        'message'=>'compalin updated successfully'
+    ], 200, );
+  }
+    }
+
+}
+catch(Exception $error){
+    return response()->json([
+        'success'=>false,
+        'message'=>'Internal server error',
+        'error'=>$error
+    ], 500, );
+
+}
+}
 
 
 }

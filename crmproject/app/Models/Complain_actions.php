@@ -15,5 +15,13 @@ class Complain_actions extends Model
     }
     use HasFactory;
     protected $table='complian_actions';
+    protected $fillable = [
+        'complain_code',
+        'actions',
+        'remarks', // Ensure this matches the column name in the table
+        'nature',
+        
+    ];
+
 
 }
