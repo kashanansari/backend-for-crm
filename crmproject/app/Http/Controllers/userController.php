@@ -1727,8 +1727,8 @@ public function Emp_attendance(Request $request){
 
     // Fetching login records for all employees
     $loginRecords = Emp_login::whereIn('emp_id', $employees->pluck('emp_id'))
-    ->orderBy('created_at','desc')
-    ->paginate(20);
+        ->orderBy('created_at','desc')
+        ->get();
 
     // Fetching logout records using login IDs
     $logoutRecords = Emp_logout::whereIn('login_id', $loginRecords->pluck('id'))->get();
@@ -1757,29 +1757,32 @@ public function Emp_attendance(Request $request){
                 $formattedTime = $diff . ' seconds';
             }
         }
+        
+        $employee = $employees->where('emp_id', $login->emp_id)->first();
 
         $attendanceData->push([
             'emp_id' => $login->emp_id,
             'check_in' => $checkIn->format('h:i A'),
             'check_out' => $checkOut ? $checkOut->format('h:i A') : null,
             'time_worked' => $formattedTime,
-            'checkin_date' => $checkIn->format('d-m-Y'),
-            'checkout_date' => $checkOut ? $checkOut->format('d-m-Y') : null,
-
-
+            'date' => $checkIn->format('d-m-Y'),
+            // 'checkout_date' => $checkOut ? $checkOut->format('d-m-Y') : null,
+            'emp_name' => $employee->emp_name,
+            'destination' => $employee->designation,
+            'contact_no' => $employee->contact,
+            'cnic_no' => $employee->cnic,
+            'status'=>$employee->status
         ]);
     }
 
-
-    // return view('EmpAttendance', compact('employees', 'employeeCount', 'attendanceData'));
     return response()->json([
-        'success'=>true,
-        'message'=>'data fetched successfully',
-        'data'=> $employees,
-        'count'=>$employeeCount,
-        'attendance'=>$attendanceData,
-    ], 200, );
+        'success' => true,
+        'message' => 'Attendance detaisls found successfully',
+        'count' => $employeeCount,
+        'data' => $attendanceData,
+    ], 200);
 }
+
 public function fetchAttendanceReport(Request $request) {
     $startDate = Carbon::now()->subDays(30)->startOfDay();
     $endDate = Carbon::now()->endOfDay();
@@ -2197,12 +2200,13 @@ public function emp_login(Request $request)
                 return response()->json(['message' => 'data not found'], 404, [], JSON_PRETTY_PRINT);
             }
         }
-        public function create_renewal_remarks(Request $request){
+        public function add_renewal_remarks(Request $request){
+
             $validator=Validator::make($request->all(),[
                   'remarks' => 'required',
                     'renewal_id' => 'required|exists:renewals,id',
                     'representative'=>'required',
-                    'recieved_renewal'=>'nullable'
+                    
             ]);
         if($validator->fails()){
             return response()->json([
@@ -2217,7 +2221,7 @@ public function emp_login(Request $request)
                         'renewal_id' => $request->renewal_id,
                         'remarks' => $request->remarks,
                         'representative' => $request->representative,
-                        'recieved_renewal' => $request->recieved_renewal,
+                        // 'recieved_renewal' => $request->recieved_renewal,
                     ];
                     $remarks = Renewals_remarks::create($value);
                     if ($remarks) {
@@ -2239,8 +2243,8 @@ public function emp_login(Request $request)
         
 
 
-        public function get_renewal_remarks( Request $request){
-            $data = Renewals_remarks::where('renewal_id', $request->renewal_id)
+        public function get_renewal_remarks($renewal_id){
+            $data = Renewals_remarks::where('renewal_id', $renewal_id)
             ->orderBy('created_at','desc')
             ->get();
             $details = [];
@@ -2262,7 +2266,8 @@ public function emp_login(Request $request)
                     'message'=>'Remarks found successfully',
                     'data'=>$details
                 ], 200, );
-            } else {
+            } 
+            else {
                 return response()->json([
                     'success'=>false,
                     'message' => 'No data found',
@@ -2273,7 +2278,7 @@ public function emp_login(Request $request)
 
 public function add_renewal_payement($regNo){
     $validator=Validator::make($request->all(),[
-    'renewal_id'=>'required',
+    'renewal_id'=>'required|exists:renewals,id',
     'remarks'=>'required',
     'recieved_renewal'=>'required',
     'representative'=>'required'
@@ -2463,24 +2468,39 @@ $doi=$date_of_installation->format('d-m-Y');
 public function update_status_renewal(Request $request){
     {
 
-$validatedData = $request->validate([
-    'status' => 'required',
+$validator=Validator::make($request->all(),[
     'renewal_id'=>'required',
+    'status'=>'required'
+
 ]);
-if($validatedData){
+if($validator->fails()){
+    return response()->json([
+        'success'=>false,
+        'message'=>$validator->errors()
+    ], 402, );
+}
+
   $status=  Renewals::where('id',$request->renewal_id)
     ->update(['renewal_status'=>$request->status]);
     if($status ){
-        return response()->json(['message' => 'status updated successfully'], 200);
+        return response()->json([
+            'success'=>true,
+            'message' => ' Renewals status updated successfully',
+            'data'=>$status
+        ], 200);
     }
     else{
-        return response()->json(['message' => 'Internal server error'], 200);
+        return response()->json([
+            'success'=>false,
+            'message' => 'Error in creation',
+            'data'=>null
+        ], 200);
 
     }
 }
 }
 
-}
+
 public function testapi(Request $rqeuest){
     $lastComplaint = User::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->id + 1 : 1;

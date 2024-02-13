@@ -101,8 +101,8 @@ Route::get('/all_mis_info', [userController::class, 'all_mis_info'])->name('all_
 
 Route::get('/getrenewals', [userController::class, 'get_renewals'])->name('getrenewals');
 Route::get('/renewals_info/{regNo}', [userController::class, 'get_renewals_info'])->name('renewals_info');
-Route::post('/create_renewal_remarks', [userController::class, 'create_renewal_remarks'])->name('create_renewal_remarks');
-Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks'])->name('get_renewals_remarks');
+Route::post('/add_renewal_remarks', [userController::class, 'add_renewal_remarks'])->name('add_renewal_remarks');
+Route::get('/get_renewal_remarks/{renewal_id}', [userController::class, 'get_renewal_remarks'])->name('get_renewal_remarks/{renewal_id}');
 Route::get('/complain_queue', [userController::class, 'complain_queue'])->name('complain_queue');
 Route::get('/complain_resolve/{id}', [userController::class, 'complain_resolve'])->name('complain_resolve/{id}');
 Route::post('/create_resolve_complain', [userController::class, 'create_resolve_complain'])->name('create_resolve_complain');
