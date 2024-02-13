@@ -106,4 +106,5 @@ Route::get('/get_renewals_remarks', [userController::class, 'get_renewal_remarks
 Route::get('/complain_queue', [userController::class, 'complain_queue'])->name('complain_queue');
 Route::get('/complain_resolve/{id}', [userController::class, 'complain_resolve'])->name('complain_resolve/{id}');
 Route::post('/create_resolve_complain', [userController::class, 'create_resolve_complain'])->name('create_resolve_complain');
+Route::post('/add_renewal_payment', [userController::class, 'add_renewal_payment'])->name('add_renewal_payment');
 

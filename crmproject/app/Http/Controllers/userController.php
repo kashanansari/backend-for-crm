@@ -2336,38 +2336,39 @@ public function add_renewal_payement($regNo){
             }
 
 }
-public function store_add_renewalpayment(Request $request){
-    $sessionToken = $request->session()->get('session_token');
-    $empId = $request->session()->get('em_loginid_' . $sessionToken);
-    if($empId){
-        $emp_name=Employee::where('em_loginid',$empId)->value('emp_name');
+public function add_renewal_payment(Request $request){
+ 
+    $validator=Validator::make($request->all(),[
+        'renewal_id'=>'required',
+        'remarks'=>'nullable',
+        'recieved_renewal'=>'nullable',
+        'representative'=>'required',
+        'status'=>'required'
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'success'=>false,
+                'message'=>$validator->errors()
+            ], 402, );
+        }
 
-    }
-$validatedData = $request->validate([
-    'status' => 'required',
-    'renewal_id'=>'required',
-    // 'remarks'=>'required',
-    'recieved_renewal'=>'required',
-    // 'representative'=>'required',
-]);
-if($validatedData){
 $value=[
     'renewal_id'=>$request->renewal_id,
-    'remarks'=>$request->remarks??'Payment has been transacted',
+    'remarks'=>$request->remarks,
     'recieved_renewal'=>$request->recieved_renewal,
-    'representative'=>$emp_name,
+    'representative'=>$request->representative,
 
 ];
 $data=Renewals_remarks::create($value);
 $renewal=Renewals::where('id',$request->renewal_id)->first();
 
 if ($request->status == 'removed') {
-    // Update renewal status to 'pending' when status is 'removed'
-    $renewal->update(['renewal_status' => 'pending']);
+ 
+    $renewal->update(['renewal_status' => 'removed']);
 
 }
 else if ($request->status == 'paid') {
-    // Update renewal date and status for 'paid' status
+    
     $renewalDate = Carbon::parse($renewal->renewal_date);
     $renewal->renewal_date = $renewalDate->addYear();
     $renewal->update(['renewal_status' => 'paid']);
@@ -2381,14 +2382,22 @@ else if ($request->status == 'paid') {
 if($data && $renewal ){
 
 
-    return response()->json(['message' => 'Remarks submitted successfully'], 200);
+    return response()->json([
+        'success'=>true,
+        'message' => 'Remarks submitted successfully',
+        'data'=>$data
+    ], 200);
 }
 else{
-    return response()->json(['message' => 'Internal server error'], 200);
+    return response()->json([
+        'success'=>false,
+        'message' => 'Error in submission',
+        'data'=>null
+    ], 400);
 
 }
 }
-}
+
 
 
 
