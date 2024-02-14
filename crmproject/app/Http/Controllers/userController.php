@@ -487,8 +487,9 @@ return response()->json([
         'security_ques' => 'required',
         'security_ans' => 'required',
         'password' => 'required', // Example rule for password, adjust as needed
-        'emergency_person_contact' => 'nullable',
+        'emergency_person_contact' => 'required',
         'client_code' => 'required|exists:users,id', // Assuming client_code should exist in users table
+        'representative' => 'required',
     ]);
 
     // Check if validation fails
@@ -512,6 +513,7 @@ return response()->json([
     $value->emergency_person = $request->input('emergency_person');
     $value->security_ques = $request->input('security_ques');
     $value->security_ans = $request->input('security_ans');
+    $value->representative = $request->input('representative');
     $value->password = Hash::make($request->input('password'));
     $value->emergency_person_contact = $request->input('emergency_person_contact');
     $value->security_status="completed";
@@ -2470,7 +2472,8 @@ public function update_status_renewal(Request $request){
 
 $validator=Validator::make($request->all(),[
     'renewal_id'=>'required',
-    'status'=>'required'
+    'status'=>'required',
+    // 'representative'=>'required'
 
 ]);
 if($validator->fails()){
