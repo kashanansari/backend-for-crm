@@ -1764,9 +1764,9 @@ public function Emp_attendance(Request $request){
             'emp_id' => $login->emp_id,
             'check_in' => $checkIn->format('h:i A'),
             'check_out' => $checkOut ? $checkOut->format('h:i A') : null,
-            'time_worked' => $formattedTime,
-            'date' => $checkIn->format('d-m-Y'),
-            // 'checkout_date' => $checkOut ? $checkOut->format('d-m-Y') : null,
+            'hours_worked' => $formattedTime,
+            'checkin_date' => $checkIn->format('d-m-Y'),
+            'checkout_date' => $checkOut ? $checkOut->format('d-m-Y') : null,
             'emp_name' => $employee->emp_name,
             'destination' => $employee->designation,
             'contact_no' => $employee->contact,
@@ -1777,7 +1777,7 @@ public function Emp_attendance(Request $request){
 
     return response()->json([
         'success' => true,
-        'message' => 'Attendance detaisls found successfully',
+        'message' => 'Attendance details found successfully',
         'count' => $employeeCount,
         'data' => $attendanceData,
     ], 200);
@@ -2486,7 +2486,7 @@ if($validator->fails()){
         return response()->json([
             'success'=>true,
             'message' => ' Renewals status updated successfully',
-            'data'=>$status
+        
         ], 200);
     }
     else{

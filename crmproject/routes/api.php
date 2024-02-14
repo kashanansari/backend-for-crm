@@ -107,4 +107,5 @@ Route::get('/complain_queue', [userController::class, 'complain_queue'])->name('
 Route::get('/complain_resolve/{id}', [userController::class, 'complain_resolve'])->name('complain_resolve/{id}');
 Route::post('/create_resolve_complain', [userController::class, 'create_resolve_complain'])->name('create_resolve_complain');
 Route::post('/add_renewal_payment', [userController::class, 'add_renewal_payment'])->name('add_renewal_payment');
+Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
 

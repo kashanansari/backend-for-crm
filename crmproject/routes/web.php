@@ -81,7 +81,7 @@ Route::post('/change_pic', [userController::class, 'change_pic'])->name('change_
 // Route::post('/empLogin', [userController::class, 'emp_login'])->name('empLogin');
 // Route::post('/renewals_remarks', [userController::class, 'create_renewal_remarks'])->name('renewals_remarks');
 // Route::post('/add_payment', [userController::class, 'store_add_renewalpayment'])->name('add_payment');
-Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
+// Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
 // Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
 Route::post('/renewal_status', [userController::class, 'action_removal_renewals'])->name('renewal_status');
 Route::post('/sms_service', [userController::class, 'create_sms_service'])->name('sms_service');
