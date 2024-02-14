@@ -135,7 +135,7 @@ Route::get('single_emp/{emp_id}', [userController::class, 'single_emp'])->name('
 Route::get('completedetails', [userController::class, 'complete_vehicle_details'])->name('completedetails');
 
 // Route::get('emp_attends', [userController::class, 'Emp_attendance'])->name('emp_attends');
-Route::get('get_attends', [userController::class, 'attendance'])->name('get_attends');
+// Route::get('get_attends', [userController::class, 'attendance'])->name('get_attends');
 
 
 Route::get('sales_lead', [userController::class, 'sales_lead'])->name('sales_lead');

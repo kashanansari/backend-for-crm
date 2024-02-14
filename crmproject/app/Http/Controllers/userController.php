@@ -1851,7 +1851,7 @@ public function attendance(Request $request){
     }
 
     $diff = $attendanceData->map(function ($attendance) {
-        $checkIn = strtotime($attendance->check_in);
+        $checkIn = strtotime($attendance->checkin_time);
         $checkOut = strtotime($attendance->check_out);
 
         // Calculate the difference in seconds
@@ -1861,14 +1861,23 @@ public function attendance(Request $request){
         $hours = floor($timeDiff / 3600);
         $minutes = floor(($timeDiff % 3600) / 60);
 
-        return [
-            'check_in' => $attendance->check_in,
-            'check_out' => $attendance->check_out,
-            'time_diff' => $hours.' hours '.$minutes.' minutes',
-        ];
+        $data= [
+            
+            'emp_id'=>$attendance->emp_id,
+            'checkin_date' => (new DateTime($attendance->checkin_time))->format('d-m-Y'),
+
+            'checkin_time' => (new DateTime($attendance->checkin_time))->format('h:i A'),
+            'checkout_time' => (new DateTime($attendance->checkout_time))->format('h:i A'),        
+            'checkout_date' => (new DateTime($attendance->checkout_time))->format('d-m-Y'),        
+                'time_diff' => $hours.' hours '.$minutes.' minutes',];
+            return $data;
     });
 
-    return $diff;
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found succsessfully',
+        'data'=>$diff
+    ], 200, );
     // return view('EmpAttendance', compact('attendanceData')); // Ensure the variable name passed is 'attendanceData'
 }
 
@@ -2842,23 +2851,26 @@ return response()->json([
 }
 public function get_all_record(Request $request)
 {
-    // Fetch all attendance records
-    $attendances = Attendance::all();
+    // Fetch all attendance records with eager loading for efficient queries
+    $attendances = Attendance::with('employee')->get();
 
     // Format check-in and check-out times to AM/PM format
     $formattedAttendances = $attendances->map(function ($attendance) {
         return [
             'emp_id' => $attendance->emp_id,
+            'designation' => $attendance->designation,
+            'emp_id' => $attendance->emp_id,
+            'emp_name' => $attendance->emp_name ?? null, // Handle potentially missing employee data
             'checkin_time' => $attendance->checkin_time ? Carbon::parse($attendance->checkin_time)->format('h:i:s A') : null,
             'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : null,
-            'date'=>$attendance->date,
+            'date' => $attendance->date,
         ];
     });
 
-    // Ensure the response is properly formatted as JSON
+    // Return JSON response with HTTP status code 200 (OK)
     return response()->json($formattedAttendances->values()->all(), 200);
-
 }
+
 public function view_profle(Request $request){
     $validator = Validator::make($request->all(),[
         'emp_id' => 'required|string'
@@ -4331,6 +4343,7 @@ public function create_resolve_complain(Request $request){
     'nature'=>'required',
     'remarks'=>'required',
     ]);
+
     if($validator->fails()){
         return response()->json([
             'success'=>false,
@@ -4374,7 +4387,6 @@ public function create_resolve_complain(Request $request){
     ], 200, );
   }
     }
-
 }
 catch(Exception $error){
     return response()->json([

@@ -13,7 +13,7 @@ class Employee extends Model
     use HasFactory, HasApiTokens; 
        function emp_id()
     {
-        return $this->hasMany('App\Models\Attendance', 'emp_id', 'emp_id');
+        return $this->belongsTo('App\Models\Attendance', 'emp_id', 'emp_id');
     }
     function emp_login()
     {

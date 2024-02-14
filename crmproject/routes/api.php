@@ -23,10 +23,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('id', [userController::class, 'getid']);
 Route::post('/checkin', [userController::class, 'check_in']);
 
-Route::post('/attendance', [userController::class, 'CheckInout']);
 
 Route::post('/attend', [userController::class, 'manageAttendance']);
-Route::get('/getallattend', [userController::class, 'get_all_record']);
+// Route::get('/getallattend', [userController::class, 'get_all_record']);
 Route::get('/alldatalogs', [userController::class, 'view_all_datalogs']);
 Route::get('/getReg/{customer_name}', [userController::class, 'get_Reg_No']);
 Route::get('/date', [userController::class, 'getcurrenttime']);
@@ -57,10 +56,10 @@ Route::get('roles', [userController::class, 'get_roles'])->name('roles');
 //Integeration for tomorrow
 Route::post('/create_emp', [userController::class, 'create_emp'])->name('create_emp');
 Route::get('view_update', [userController::class, 'view_update'])->name('view_update');
-Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
+// Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::get('/allcomplain', [userController::class, 'allcomplain'])->name('allcomplain');
 Route::get('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
-Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
+// Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
 Route::post('/empLogin', [userController::class, 'emp_login'])->name('empLogin');
 Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
 Route::get('/user', [userController::class, 'user'])->name('user');
@@ -107,5 +106,9 @@ Route::get('/complain_queue', [userController::class, 'complain_queue'])->name('
 Route::get('/complain_resolve/{id}', [userController::class, 'complain_resolve'])->name('complain_resolve/{id}');
 Route::post('/create_resolve_complain', [userController::class, 'create_resolve_complain'])->name('create_resolve_complain');
 Route::post('/add_renewal_payment', [userController::class, 'add_renewal_payment'])->name('add_renewal_payment');
-Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
 
+Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
+Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
+Route::get('get_attends', [userController::class, 'attendance'])->name('get_attends');
+Route::post('/checkin_out', [userController::class, 'CheckInout'])->name('checkin_out');
+Route::get('/getallattend', [userController::class, 'get_all_record'])->name('getallattend');

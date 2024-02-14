@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Traits\TimestampMutators;
 
 class Attendance extends Model
 {
-    public function getemp_id()
+    public function employee()
     {
-        return $this->belongsTo('App\Models\Employee', 'emp_id', 'emp_id');
+        return $this->hasMany('App\Models\Employee', 'emp_id','emp_id');
     }
     use HasFactory;
     protected $table='_employee_attendance';
