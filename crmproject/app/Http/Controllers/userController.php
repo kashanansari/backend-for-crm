@@ -1476,7 +1476,7 @@ return response()->json([
         'contact' => 'required|string|max:20',
         'cnic' => 'required|string|max:15|unique:workers',
         'role' => 'required|unique:roles,roles',
-        'image'=>'required|nullable'
+        'image'=>'required'
     
 
     ]);
