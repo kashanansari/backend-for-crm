@@ -80,7 +80,7 @@ class userController extends Controller
             $request->session()->forget([
                 'emp_id_' . $sessionToken,
                 'emp_name_' . $sessionToken,
-                'em_loginid_' . $sessionToken,
+                // 'em_loginid_' . $sessionToken,
                 // ...other relevant session keys
             ]);
 
