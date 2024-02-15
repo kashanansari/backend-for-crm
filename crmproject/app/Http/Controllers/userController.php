@@ -709,7 +709,7 @@ return response()->json([
 
 
 
-        if($data->nature_of_complain=='N/R(no report)'){
+        if($data->nature_of_complain=='N/R'){
           $technical=  Technicaldetails::where('client_code',$data->client_id)->update(['tracker_status'=>'N/R']);
 
         }
@@ -2858,17 +2858,27 @@ public function get_all_record(Request $request)
     $formattedAttendances = $attendances->map(function ($attendance) {
         return [
             'emp_id' => $attendance->emp_id,
+            'conatct_no' => $attendance->contact,
+            'cnic_no' => $attendance->cnic_no,
             'designation' => $attendance->designation,
             'emp_id' => $attendance->emp_id,
             'emp_name' => $attendance->emp_name ?? null, // Handle potentially missing employee data
             'checkin_time' => $attendance->checkin_time ? Carbon::parse($attendance->checkin_time)->format('h:i:s A') : null,
             'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : null,
-            'date' => $attendance->date,
+            'checkin_date' => $attendance->created_at ? Carbon::parse($attendance->created_at)->format('d-m-Y') : null,
+            'checkout_date' => $attendance->created_at ? Carbon::parse($attendance->checkout_time)->format('d-m-Y') : null,
+
+            // 'date' => $attendance->date,
         ];
     });
 
     // Return JSON response with HTTP status code 200 (OK)
-    return response()->json($formattedAttendances->values()->all(), 200);
+    // return response()->json($formattedAttendances->values()->all(), 200);
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$formattedAttendances
+    ], 200, );
 }
 
 public function view_profle(Request $request){
@@ -3783,7 +3793,7 @@ $input=$request->search_term;
     ->get()
     ->map(function($removals){
        $removals->date= $removals->created_at->format('d-m-Y');
-        $removals->time=$removals->created_at->format('h:i A');
+        $removals->time=$removals->created_at->setTimezone('Asia/karachi')->format('h:i A');
         unset($removals->created_at);
         unset($removals->updated_at);        
         return $removals;
@@ -3795,7 +3805,9 @@ $input=$request->search_term;
     ->get()
     ->map(function($complain){
         $complain->date=$complain->created_at->format('d-m-Y');
-        $complain->time=$complain->created_at->format('h:i A');
+        $complain->time=$complain->created_at->setTimezone('Asia/karachi')->format('h:i A');
+        
+
 unset($complain->created_at);
 unset($complain->updated_at);
         return $complain;
@@ -3824,7 +3836,7 @@ unset($complain->updated_at);
     ->get()
     ->map(function($redos){
         $redos->date=$redos->created_at->format('d-m-Y');
-        $redos->time=$redos->created_at->format('h:i A');
+        $redos->time=$redos->created_at->setTimezone('Asia/karachi')->format('h:i A');
         unset($redos->created_at);
         unset($redos->updated_at);
         return $redos;
@@ -3835,7 +3847,7 @@ unset($complain->updated_at);
                         ->map(function ($datalog) {
                             // Convert created_at date to d-m-Y format
                             $datalog->date = $datalog->created_at->format('d-m-Y');
-                            $datalog->time = $datalog->created_at->format('h:i A');
+                            $datalog->time = $datalog->created_at->setTimezone('Asia/karachi')->format('h:i A');
                             unset($datalog->updated_at);
                             unset($datalog->created_at);
                             return $datalog;
@@ -4397,6 +4409,22 @@ catch(Exception $error){
 
 }
 }
+public function NR_queue(Request $request){
+    $complain=complain::where('nature_of_complain','N/R')
+    ->get();
+    if($complain){
+   $data=$complain->where('status','pending')
+   ->GT();
+    if($data){
 
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'data'=>$data
+        ], 200, );
+    }
 
+}
+
+}
 }

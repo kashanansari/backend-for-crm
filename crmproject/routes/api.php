@@ -112,3 +112,4 @@ Route::post('/editprofile', [userController::class, 'editprofile'])->name('editp
 Route::get('get_attends', [userController::class, 'attendance'])->name('get_attends');
 Route::post('/checkin_out', [userController::class, 'CheckInout'])->name('checkin_out');
 Route::get('/getallattend', [userController::class, 'get_all_record'])->name('getallattend');
+Route::get('/NR_queue', [userController::class, 'NR_queue'])->name('NR_queue');
