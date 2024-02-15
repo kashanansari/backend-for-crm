@@ -4411,20 +4411,16 @@ catch(Exception $error){
 }
 public function NR_queue(Request $request){
     $complain=complain::where('nature_of_complain','N/R')
+    ->where('Status','pending')
     ->get();
     if($complain){
-   $data=$complain->where('status','pending')
-   ->GT();
-    if($data){
-
         return response()->json([
             'success'=>true,
             'message'=>'Data found successfully',
-            'data'=>$data
+            'data'=>$complain
         ], 200, );
     }
 
 }
 
-}
 }
