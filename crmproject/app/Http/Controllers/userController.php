@@ -1495,7 +1495,7 @@ return response()->json([
     $emp = new Employee();
     $emp->emp_name = $request->emp_name;
     $emp->em_loginid = $request->em_loginid;
-    $emp->password = bcrypt($request->password); 
+    $emp->password = $request->password; 
     $emp->designation = $request->designation;
     $emp->contact = $request->contact;
     $emp->cnic = $request->cnic;
@@ -1917,8 +1917,9 @@ public function emp_login(Request $request)
             'message' => 'Invalid Credentials',
         ], 401);
     }
-
     $empId = $employee->emp_id;
+
+    $empimage = $employee->image;
     $empname = $employee->emp_name;
     $loginid = $employee->em_loginid;
     $empRole = $employee->role;
@@ -1929,15 +1930,17 @@ public function emp_login(Request $request)
     $token = $employee->createToken($employee->emp_id)->plainTextToken;
     // Store employee details with the session token in cookies
     $response = response()->json([
+
         'success' => true,
-        'message' => 'Login successful',
+        'message' => 'Login successfully',
         'emp_id' => $empId,
+        'image'=>$empimage,
         'emp_name' => $empname,
         'em_loginid' => $loginid,
         'role' => $empRole,
         'designation' => $designation,
         'token'=>$token
-    ]);
+    ],200);
 
     $response->withCookie(cookie('session_token', $uniqueSessionToken, 60, null, null, false, true)); 
     $response->withCookie(cookie('auth_token', $token, 60, null, null, false, true)); 
@@ -2858,17 +2861,17 @@ public function get_all_record(Request $request)
     $formattedAttendances = $attendances->map(function ($attendance) {
         return [
             'emp_id' => $attendance->emp_id,
-            'conatct_no' => $attendance->contact,
-            'cnic_no' => $attendance->cnic_no,
-            'designation' => $attendance->designation,
-            'designation' => $attendance->designation,
-            'emp_id' => $attendance->emp_id,
+            'conatct_no' => $attendance->employee->contact,
+            'emp_name' =>  $attendance->employee->emp_name ,
+            'cnic_no' => $attendance->employee->cnic,
+            'designation' => $attendance->employee->designation,
+            'designation' => $attendance->employee->designation,
             'status' => $attendance->status ?? null, // Handle potentially missing employee data
             'checkin_time' => $attendance->checkin_time ? Carbon::parse($attendance->checkin_time)->format('h:i:s A') : null,
-            'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : null,
+            'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : 'still logeed in',
             'checkin_date' => $attendance->created_at ? Carbon::parse($attendance->created_at)->format('d-m-Y') : null,
             'checkout_date' => $attendance->created_at ? Carbon::parse($attendance->checkout_time)->format('d-m-Y') : null,
-
+            
             // 'date' => $attendance->date,
         ];
     });
