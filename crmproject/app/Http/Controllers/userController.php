@@ -56,45 +56,82 @@ class userController extends Controller
 
     public function logout(Request $request)
     {
+$validator=Validator::make($request->all(),[
+  'active_id'=>'required|exists:workers_login,id'
+]);
+if($validator->fails()){
+    return response()->json([
+        'success'=>false,
+        'message'=>$validator->errors()
+    ], 402, );
+}
+  $logout=Emp_login::where('id',$request->active_id)
+  ->first();
+  if($logout){
+    $valid=$logout->logout_time;
+    if($valid){
+    return response()->json([
+        'success'=>false,
+        'message'=>'Employee already logged out'
+    ], 400, );
+}
 
+  }
+  if($logout){
+    $logout->logout_date=Carbon::now()->format('d-m-Y');
+    $logout->logout_time=Carbon::now()->setTimezone('Asia/karachi')->format('h:i A');
+    $logout->update(['status'=>'inactive']);
+    $logout->save();
+    return response()->json([
+        'success'=>true,
+        'message'=>'Employee logout successfully'
+    ], 200, );
+  }
+  else{
+    return response()->json([
+        'success'=>false,
+        'message'=>'Not logged out yet'
+    ], 400, );
+  }
+  }
 
-        $sessionToken = $request->session()->get('session_token');
-        $empId = $request->session()->get('emp_id_' . $sessionToken);
+        // $sessionToken = $request->session()->get('session_token');
+        // $empId = $request->session()->get('emp_id_' . $sessionToken);
 
-        if ($sessionToken !== null && $empId !== null) {
-            // Update Emp_login status to 'inactive'
-            Emp_login::where('emp_id', $empId)->update(['status' => 'inactive']);
+    //     if ($sessionToken !== null && $empId !== null) {
+    //         // Update Emp_login status to 'inactive'
+    //         Emp_login::where('emp_id', $empId)->update(['status' => 'inactive']);
 
-            // Store logout details
-            $empName = $request->session()->get('emp_name_' . $sessionToken);
-            $logoutId = $request->session()->get('em_loginid_' . $sessionToken);
-            $loginId = $request->session()->get('id');
-            Emp_logout::create([
-                'emp_id' => $empId,
-                'Emp_name' => $empName,
-                'logout_id' => $logoutId,
-                'login_id' => $loginId,
-            ]);
+    //         // Store logout details
+    //         $empName = $request->session()->get('emp_name_' . $sessionToken);
+    //         $logoutId = $request->session()->get('em_loginid_' . $sessionToken);
+    //         $loginId = $request->session()->get('id');
+    //         Emp_logout::create([
+    //             'emp_id' => $empId,
+    //             'Emp_name' => $empName,
+    //             'logout_id' => $logoutId,
+    //             'login_id' => $loginId,
+    //         ]);
 
-            // Remove ONLY the specific session data for this employee's session
-            $request->session()->forget([
-                'emp_id_' . $sessionToken,
-                'emp_name_' . $sessionToken,
-                // 'em_loginid_' . $sessionToken,
-                // ...other relevant session keys
-            ]);
+    //         // Remove ONLY the specific session data for this employee's session
+    //         $request->session()->forget([
+    //             'emp_id_' . $sessionToken,
+    //             'emp_name_' . $sessionToken,
+    //             // 'em_loginid_' . $sessionToken,
+    //             // ...other relevant session keys
+    //         ]);
 
-            return redirect('/login');
-        }
+    //         return redirect('/login');
+    //     }
 
-        \Log::error('Invalid or missing session data during logout', [
-            'sessionToken' => $sessionToken,
-            'empId' => $empId,
-            // ...other relevant session data for debugging
-        ]);
+    //     \Log::error('Invalid or missing session data during logout', [
+    //         'sessionToken' => $sessionToken,
+    //         'empId' => $empId,
+    //         // ...other relevant session data for debugging
+    //     ]);
 
-        return view('RefreshError')->with('message', 'you have already loggedout');
-    }
+    //     return view('RefreshError')->with('message', 'you have already loggedout');
+    // }
 
 
 
@@ -1928,6 +1965,24 @@ public function emp_login(Request $request)
     // Generate a unique session token
     $uniqueSessionToken = 'session_token_' . $empId . '_' . time();
     $token = $employee->createToken($employee->emp_id)->plainTextToken;
+    $time=Carbon::now()->setTimezone('Asia/karachi')->format('h:i A');
+    $date=Carbon::now()->format('d-m-Y');
+    // Create a new Emp_login record
+    $emp_login = Emp_login::create([
+        'emp_id' => $empId,
+        'Emp_name' => $empname,  
+        'login_id' => $loginid,
+        'login_time'=>$time,
+        'login_date'=>$date,
+        'status' => 'active',
+    ]);
+
+    if (!$emp_login) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create session',
+        ], 500);
+    }
     // Store employee details with the session token in cookies
     $response = response()->json([
 
@@ -1939,27 +1994,13 @@ public function emp_login(Request $request)
         'em_loginid' => $loginid,
         'role' => $empRole,
         'designation' => $designation,
+        'active_id'=>$emp_login->id,
         'token'=>$token
     ],200);
 
     $response->withCookie(cookie('session_token', $uniqueSessionToken, 60, null, null, false, true)); 
     $response->withCookie(cookie('auth_token', $token, 60, null, null, false, true)); 
-
-    // Create a new Emp_login record
-    $emp_login = Emp_login::create([
-        'emp_id' => $empId,
-        'emp_name' => $empname,
-        'login_id' => $loginid,
-        'status' => 'active',
-    ]);
-
-    if (!$emp_login) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to create session',
-        ], 500);
-    }
-
+   
     return $response;
 }
 
@@ -2865,12 +2906,12 @@ public function get_all_record(Request $request)
             'emp_name' =>  $attendance->employee->emp_name ,
             'cnic_no' => $attendance->employee->cnic,
             'designation' => $attendance->employee->designation,
-            'designation' => $attendance->employee->designation,
+            // 'designation' => $attendance->employee->designation,
             'status' => $attendance->status ?? null, // Handle potentially missing employee data
             'checkin_time' => $attendance->checkin_time ? Carbon::parse($attendance->checkin_time)->format('h:i:s A') : null,
             'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : 'still logeed in',
             'checkin_date' => $attendance->created_at ? Carbon::parse($attendance->created_at)->format('d-m-Y') : null,
-            'checkout_date' => $attendance->created_at ? Carbon::parse($attendance->checkout_time)->format('d-m-Y') : null,
+            'checkout_date' => $attendance->created_at ? Carbon::parse($attendance->created_at)->format('d-m-Y') : null,
             
             // 'date' => $attendance->date,
         ];

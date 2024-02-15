@@ -22,6 +22,8 @@ class Emp_login extends Model
         'emp_id',
         'Emp_name',
         'login_id',
-        'status'
+        'status',
+        'login_date',
+        'login_time'
     ];
 }

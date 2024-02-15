@@ -113,3 +113,4 @@ Route::get('get_attends', [userController::class, 'attendance'])->name('get_atte
 Route::post('/checkin_out', [userController::class, 'CheckInout'])->name('checkin_out');
 Route::get('/getallattend', [userController::class, 'get_all_record'])->name('getallattend');
 Route::get('/NR_queue', [userController::class, 'NR_queue'])->name('NR_queue');
+Route::post('/logout', [userController::class, 'logout'])->name('logout');

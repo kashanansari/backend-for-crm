@@ -20,8 +20,10 @@ return new class extends Migration
             $table->string('Emp_name')->nullable();
             $table->string('login_id')->nullable();
             $table->string('password')->nullable();
-            // $table->dateTime('login_datetime'); // Column to store login date and time
-            $table->string('login_day')->nullable(); // Column to store the day of the week
+            $table->string('login_date')->nullable();
+            $table->string('login_time')->nullable(); // Column to store the day of the week
+            $table->string('logout_time')->nullable(); // Column to store the day of the week
+            $table->string('logout_date')->nullable(); // Column to store the day of the week
 
             $table->timestamps();
         });

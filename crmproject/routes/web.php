@@ -59,7 +59,7 @@ Route::get('delete/{id}', [userController::class, 'delete'])->name('delete');
 Route::get('/complainform', [userController::class, 'complainform'])->name('complainform');
 Route::get('/removalform', [userController::class, 'removalForm'])->name('removalform');
 
-Route::get('/logout', [userController::class, 'logout'])->name('logout');
+// Route::get('/logout', [userController::class, 'logout'])->name('logout');
 // Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
 // Route::post('/storetechnical', [userController::class,  'technical_details'])->name('storetechnical');
 // Route::post('/storesecurity', [userController::class,  'securitydetails']);
