@@ -10,7 +10,7 @@ class Attendance extends Model
 {
     public function employee()
     {
-        return $this->hasMany('App\Models\Employee', 'emp_id','emp_id');
+        return $this->belongsTo('App\Models\Employee', 'emp_id','emp_id');
     }
     use HasFactory;
     protected $table='_employee_attendance';

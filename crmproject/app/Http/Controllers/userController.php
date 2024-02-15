@@ -2861,8 +2861,9 @@ public function get_all_record(Request $request)
             'conatct_no' => $attendance->contact,
             'cnic_no' => $attendance->cnic_no,
             'designation' => $attendance->designation,
+            'designation' => $attendance->designation,
             'emp_id' => $attendance->emp_id,
-            'emp_name' => $attendance->emp_name ?? null, // Handle potentially missing employee data
+            'status' => $attendance->status ?? null, // Handle potentially missing employee data
             'checkin_time' => $attendance->checkin_time ? Carbon::parse($attendance->checkin_time)->format('h:i:s A') : null,
             'checkout_time' => $attendance->checkout_time ? Carbon::parse($attendance->checkout_time)->format('h:i:s A') : null,
             'checkin_date' => $attendance->created_at ? Carbon::parse($attendance->created_at)->format('d-m-Y') : null,
@@ -4414,6 +4415,18 @@ public function NR_queue(Request $request){
     ->where('Status','pending')
     ->get();
     if($complain){
+        $complain->map(function($queue){
+        $queue->creation_time=$queue->created_at->setTimezone('Asia/karachi')->format('h:i A');
+        $queue->creation_date=$queue->created_at->format('d-m-Y');
+        unset($queue->created_at);
+        unset($queue->updated_at);
+        return $queue;
+        
+        });
+
+
+
+
         return response()->json([
             'success'=>true,
             'message'=>'Data found successfully',
