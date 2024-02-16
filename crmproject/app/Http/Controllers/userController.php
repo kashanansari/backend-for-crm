@@ -1625,7 +1625,7 @@ public function viewemp_update(Request $request){
 }
 public function view_update(Request $request){
  $validator=Validator::make($request->all(),[
-    'login_id'=>'required'
+    'emp_id'=>'required'
  ]);
  if ($validator->fails()) {
     return response()->json([
@@ -1636,7 +1636,7 @@ public function view_update(Request $request){
 }
 
     
-    $emp = Employee::where('em_loginid', $request->login_id)
+    $emp = Employee::where('emp_id', $request->emp_id)
     ->first();
     if (!$emp) {
     //    return redirect()->back()->with('error', 'Data not found.');
@@ -2956,15 +2956,15 @@ else{
 }
     }
 
-public function editprofile(request $request)
+public function edit_emp(request $request)
 {
     $validator = Validator::make($request->all(), [
-        'emp_name'=>'required',
+        // 'emp_name'=>'required',
         'old_login_id' => 'required|exists:workers,em_loginid',
         // 'new_login_id'=>'required',
         'old_password' => 'required',
         'new_password' => 'required|confirmed',
-        'new_password_confirmation' => 'required_with:new_password|same:new_password',
+        
     ]);
 
     if ($validator->fails()) {
@@ -4479,8 +4479,16 @@ public function NR_queue(Request $request){
 
 }
 public function active_inactive(Request $request){
-    $logs=Emp_login::with('emp')
-    ->get(); 
+    try {
+        // Move tenDaysAgo definition within the try block
+        $tenDaysAgo = Carbon::now()->subDays(10)->format('d-m-Y');
+        $tenDaysAgoDate = Carbon::createFromFormat('d-m-Y', $tenDaysAgo);
+
+        $logs = Emp_login::where('login_date', '>', $tenDaysAgo)
+            ->with('emp')
+            ->get();
+            Emp_login::where('login_date', '>', $tenDaysAgoDate)->delete();
+
     $details=$logs->map(function($data){
         $hoursDiff = $data->login_time ? Carbon::parse($data->login_time)->diffInHours($data->logout_time) : 0;
         $secondsDiff = $data->login_time ? Carbon::parse($data->login_time)->diffInSeconds($data->logout_time) : 0;
@@ -4496,7 +4504,10 @@ public function active_inactive(Request $request){
         } else {
             $formattedTime = "$secondsDiff seconds";
         }
-        return[
+
+        // $tenDaysAgoDate = Carbon::createFromFormat('d-m-Y', $tenDaysAgo);
+        // Emp_login::where('login_date', '<', $tenDaysAgoDate)->delete();
+                return[
    'emp_name'=> $data->emp->emp_name,
    'contact_no'=> $data->emp->contact,
     'designation'=>$data->emp->designation,
@@ -4521,5 +4532,12 @@ return response()->json([
     'data'=>$details
 ], 200, );
 }
+catch (\Exception $e) {
+    return response()->json([
+        'success' => false,
+        'message' => 'An error occurred: ' . $e->getMessage(),
+    ], 500);}
 
+}
+// public function  
 }

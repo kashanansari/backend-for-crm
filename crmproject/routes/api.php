@@ -59,7 +59,7 @@ Route::post('/view_update', [userController::class, 'view_update'])->name('view_
 // Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::get('/allcomplain', [userController::class, 'allcomplain'])->name('allcomplain');
 Route::get('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
-// Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
+Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
 Route::post('/empLogin', [userController::class, 'emp_login'])->name('empLogin');
 Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
 Route::get('/user', [userController::class, 'user'])->name('user');
@@ -115,3 +115,5 @@ Route::get('/getallattend', [userController::class, 'get_all_record'])->name('ge
 Route::get('/NR_queue', [userController::class, 'NR_queue'])->name('NR_queue');
 Route::post('/logout', [userController::class, 'logout'])->name('logout');
 Route::get('/active_inactive', [userController::class, 'active_inactive'])->name('active_inactive');
+Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
+Route::post('/edit_emp', [userController::class, 'edit_emp'])->name('edit_emp');
