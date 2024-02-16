@@ -67,16 +67,15 @@ if($validator->fails()){
 }
   $logout=Emp_login::where('id',$request->active_id)
   ->first();
-  if($logout){
-    $valid=$logout->logout_time;
-    if($valid){
+  if($logout->logout_time){
+ 
     return response()->json([
         'success'=>false,
-        'message'=>'Employee already logged out'
-    ], 400, );
+        'message' => 'Employee (ID: ' . $logout->id . ') already logged out at ' . $logout->logout_time,
+    ], 460, );
 }
 
-  }
+  
   if($logout){
     $logout->logout_date=Carbon::now()->format('d-m-Y');
     $logout->logout_time=Carbon::now()->setTimezone('Asia/karachi')->format('h:i A');
@@ -90,8 +89,8 @@ if($validator->fails()){
   else{
     return response()->json([
         'success'=>false,
-        'message'=>'Not logged out yet'
-    ], 400, );
+        'message'=>'Not logged in yet'.$request->active_id
+    ], 500, );
   }
   }
 
