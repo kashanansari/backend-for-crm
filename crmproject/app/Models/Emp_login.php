@@ -11,7 +11,7 @@ class Emp_login extends Model
     {
         return $this->hasMany('App\Models\Emp_logout', 'login_id', 'id');
     }
-    public function get_emp_login()
+    public function emp()
     {
         return $this->belongsTo('App\Models\Employee', 'emp_id', 'emp_id');
     }

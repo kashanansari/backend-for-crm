@@ -4478,5 +4478,48 @@ public function NR_queue(Request $request){
     }
 
 }
+public function active_inactive(Request $request){
+    $logs=Emp_login::with('emp')
+    ->get(); 
+    $details=$logs->map(function($data){
+        $hoursDiff = $data->login_time ? Carbon::parse($data->login_time)->diffInHours($data->logout_time) : 0;
+        $secondsDiff = $data->login_time ? Carbon::parse($data->login_time)->diffInSeconds($data->logout_time) : 0;
+        $minutesDiff = $secondsDiff / 60; // Calculate minutes from seconds
+
+        // Choose the most appropriate unit for display
+        if ($hoursDiff > 0) {
+            $hours = number_format($hoursDiff,0); // Format with 2 decimal places for hours
+            $formattedTime = "$hours hours";
+        } elseif ($minutesDiff > 0) {
+            $minutes = number_format($minutesDiff, 0); // Format without decimals for minutes
+            $formattedTime = "$minutes minutes";
+        } else {
+            $formattedTime = "$secondsDiff seconds";
+        }
+        return[
+   'emp_name'=> $data->emp->emp_name,
+   'contact_no'=> $data->emp->contact,
+    'designation'=>$data->emp->designation,
+    'cnic'=>$data->emp->cnic,
+    'role'=>$data->emp->role,
+    'login_time'=>$data->login_time,
+    'login_date'=>$data->login_date,
+    'logout_time'=>$data->logout_time,
+    'logout_date'=>$data->logout_date,
+    'status'=>$data->status,
+    'hours'=>$formattedTime,
+    // $data->emp->emp_name,
+    // $data->emp->emp_name,
+    // $data->emp->emp_name,
+    // $data->emp->emp_name,
+    // $data->emp->emp_name
+        ];
+    });
+return response()->json([
+    'success'=>true,
+    'message'=>'Employees data found successfully',
+    'data'=>$details
+], 200, );
+}
 
 }

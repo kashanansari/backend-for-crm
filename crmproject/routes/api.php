@@ -55,7 +55,7 @@ Route::get('allemp', [userController::class, 'all_emp'])->name('allemp');
 Route::get('roles', [userController::class, 'get_roles'])->name('roles');
 //Integeration for tomorrow
 Route::post('/create_emp', [userController::class, 'create_emp'])->name('create_emp');
-Route::get('view_update', [userController::class, 'view_update'])->name('view_update');
+Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
 // Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::get('/allcomplain', [userController::class, 'allcomplain'])->name('allcomplain');
 Route::get('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
@@ -114,3 +114,4 @@ Route::post('/checkin_out', [userController::class, 'CheckInout'])->name('checki
 Route::get('/getallattend', [userController::class, 'get_all_record'])->name('getallattend');
 Route::get('/NR_queue', [userController::class, 'NR_queue'])->name('NR_queue');
 Route::post('/logout', [userController::class, 'logout'])->name('logout');
+Route::get('/active_inactive', [userController::class, 'active_inactive'])->name('active_inactive');
