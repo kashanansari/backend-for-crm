@@ -3875,12 +3875,29 @@ unset($complain->updated_at);
     ];
 
   $NR=complain::where('nature_of_complain','N/R')
+  ->select('complain_id','customer_name','reg_no','nature_of_complain','remarks','Status','created_at','emp_name')
   ->get()
+
   ->map(function($NRS){
     $NRS->date_time=$NRS->created_at->format('d-m-Y h:i A');
     return $NRS;
     
   });
+  $NR_actions = [];
+foreach ($NR as $NRS) {
+    $nr_actions = Complain_actions::where('complain_code', $NRS->complain_id)->get()->map(function($data) {
+        return [
+            'time' => $data->created_at->format('h:i A'),
+            'date' => $data->created_at->format('d-m-Y'),
+            'remarks' => $data->remarks
+        ];
+    });
+    $NR_actions[$NRS->complain_id] = $nr_actions;
+}
+
+  
+  
+  
   
   
   
@@ -3926,7 +3943,8 @@ unset($complain->updated_at);
             'complain_actions'=>$complain_actions,
             'redo'=>$redo, 
             'datalogs' => $datalogs, // Including $datalogs in the response
-            'NR'=>$NR
+            'NR'=>$NR,
+            'NR_actions'=>$NR_actions
         ], 200, );
     }
     else{
