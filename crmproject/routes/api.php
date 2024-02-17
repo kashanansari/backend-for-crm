@@ -35,7 +35,7 @@ Route::get('/inactive_devices', [userController::class, 'inactive_devices']);
 Route::get('/inactive_devices', [userController::class, 'inactive_devices']);
 Route::get('/chunk', [userController::class, 'chunk']);
 Route::get('/alll', [userController::class, 'sms']);
-Route::get('/all', [userController::class, 'view_all_data_logs']);
+// Route::get('/all', [userController::class, 'view_all_data_logs']);
 Route::get('/jj', [userController::class, 'joins']);
 // Route::get('/dollar_rate', [userController::class, 'dollar_rate']);
 
@@ -81,7 +81,7 @@ Route::post('/createAndDownloadBackup', [BackupController::class, 'createAndDown
 
 Route::post('/search_for_all', [userController::class, 'search_for_all'])->name('search_for_all');
 Route::post('/complain_box', [userController::class, 'complain_box'])->name('complain_box');
-Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
+// Route::get('/alldatalogs', [userController::class, 'view_all_data_logs'])->name('alldatalogs');
 Route::post('/NR', [userController::class, 'NR'])->name('NR');
 Route::post('/redo_search', [userController::class, 'redo_search'])->name('redo_search');
 Route::post('/create_redo', [userController::class,  'create_redo']);
@@ -117,3 +117,4 @@ Route::post('/logout', [userController::class, 'logout'])->name('logout');
 Route::get('/active_inactive', [userController::class, 'active_inactive'])->name('active_inactive');
 Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
 Route::post('/edit_emp', [userController::class, 'edit_emp'])->name('edit_emp');
+Route::get('/reg_datalogs/{regno}', [userController::class, 'view_all_data_logs'])->name('reg_datalogs/{regno}');

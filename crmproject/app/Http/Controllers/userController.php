@@ -2963,7 +2963,7 @@ public function edit_emp(request $request)
         'old_login_id' => 'required|exists:workers,em_loginid',
         // 'new_login_id'=>'required',
         'old_password' => 'required',
-        'new_password' => 'required|confirmed',
+        'new_password' => 'required',
         
     ]);
 
@@ -3069,33 +3069,46 @@ public function view_data_logs(Request $request){
 public function view30days(Request $request){
     return view('last_30day_datalogs');
 }
-public function view_all_data_logs(Request $request)
+public function view_all_data_logs($regno)
 {
-    $data = Datalogs::orderBy('created_at', 'desc')
-    ->get();
+    $data = Datalogs::where('reg_no', $regno)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-// Convert created_at timestamp to Karachi timezone
-foreach ($data as $entry) {
-    $createdAt = Carbon::parse($entry->created_at)->timezone('Asia/Karachi');
-    $entry->date = $createdAt->format('Y-m-d');
-    $entry->time = $createdAt->format('h:i A');
+    if ($data->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No data found',
+            'data' => null
+        ], 404);
+    }
 
-}
+    $details = $data->map(function ($datalogs) {
+        $datalogs->date = $datalogs->created_at->format('d-m-Y');
+        $datalogs->time = $datalogs->created_at->format('h:i A');
+        $datalogs->alert = $datalogs->nature;
+        $datalogs->customer_name = $datalogs->customer_name;
+        $datalogs->reg_no = $datalogs->reg_no;
+        $datalogs->contact_person = $datalogs->contact_person;
+        $datalogs->remarks = $datalogs->remarks;
+        $datalogs->contact_no = $datalogs->contact_no;
+        $datalogs->representative = $datalogs->representative;
+        unset($datalogs->created_at);
+        unset($datalogs->updated_at);
+        return $datalogs;
+    });
 
-if ($data) {
     return response()->json([
         'success' => true,
         'message' => 'Data found successfully',
-        'data' => $data
-    ], 200);
-} else {
-    return response()->json([
-        'success' => false,
-        'message' => 'No data found',
-        'data' => []
-    ], 404);
+        'data' => $details
+    ]);
 }
-}
+
+
+ 
+
+
 
 public function view_all_complain_logs(Request $request){
     return view('all_complain_logs');
@@ -4539,5 +4552,4 @@ catch (\Exception $e) {
     ], 500);}
 
 }
-// public function  
 }
