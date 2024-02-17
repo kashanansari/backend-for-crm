@@ -2980,7 +2980,7 @@ public function edit_emp(request $request)
 
 if($emp){
 $emp->update([
-'emp_name'=>$request->emp_name,
+// 'emp_name'=>$request->emp_name,
 'password'=>$request->new_password]);
 
 return response()->json([
