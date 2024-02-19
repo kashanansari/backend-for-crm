@@ -879,7 +879,7 @@ return response()->json([
         $data = complain::orderBy('created_at', 'desc')->get();
         $count = $data->count();
         
-        $resolved = complain::where('Status', 'Resolved')->get();
+        $resolved = complain::orderBy('created_at','desc')->get();
     
         $all_complaints = [];
     
