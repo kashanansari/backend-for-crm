@@ -879,38 +879,34 @@ return response()->json([
         $data = complain::orderBy('created_at', 'desc')->get();
         $count = $data->count();
         
-        $resolved = complain::orderBy('created_at','desc')->get();
-    
         $all_complaints = [];
-    
+        
         // Fetch and format complaint actions for each resolved complaint
-        foreach ($resolved as $resolved_complaint) {
-            $actions = Complain_actions::where('complain_code', $resolved_complaint->complain_id)->get()->map(function ($action) {
+        foreach ($data as $complaint) {
+            $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get()->map(function ($action) {
                 return [
                     'date' => $action->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
                     'time' => $action->created_at->timezone('Asia/Karachi')->format('h:i A'),
                     'resolved_by' => $action->representative,
                 ];
             });
-    
+            
             $complaint_data = [
-                
-                    'ticker' => $resolved_complaint->complain_id,
-                    'customer_name' => $resolved_complaint->customer_name,
-                    'reg_no' => $resolved_complaint->reg_no,
-                    'complain_nature' => $resolved_complaint->nature_of_complain,
-                    'remarks' => $resolved_complaint->remarks,
-                    'Status' => $resolved_complaint->Status,
-                    'date' => $resolved_complaint->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
-                    'time' => $resolved_complaint->created_at->timezone('Asia/Karachi')->format('h:i A'),
-                    'respresentative' => $resolved_complaint->emp_name,
-                    'actions' => $actions,
-                
+                'ticker' => $complaint->complain_id,
+                'customer_name' => $complaint->customer_name,
+                'reg_no' => $complaint->reg_no,
+                'complain_nature' => $complaint->nature_of_complain,
+                'remarks' => $complaint->remarks,
+                'Status' => $complaint->Status,
+                'date' => $complaint->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
+                'time' => $complaint->created_at->timezone('Asia/Karachi')->format('h:i A'),
+                'respresentative' => $complaint->emp_name,
+                'actions' => $actions->toArray(), // Convert actions to array and merge directly
             ];
-    
+            
             $all_complaints[] = $complaint_data;
         }
-    
+        
         return response()->json([
             'success' => true,
             'message' => 'complaints fetched successfully',
@@ -3893,6 +3889,7 @@ $input=$request->search_term;
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
      $complains=complain::where('client_id',$user->id)
+     ->orderBy('created_at','desc')
     ->get()
     ->map(function($complain){
         $complain->date=$complain->created_at->format('d-m-Y');
@@ -3928,6 +3925,8 @@ foreach ($NR as $NRS) {
             'representative'=>$data->representative??null
         ];
     });
+  
+
     $NR_actions[$NRS->complain_id] = $nr_actions;
 }
 
