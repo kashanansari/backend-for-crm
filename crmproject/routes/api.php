@@ -26,7 +26,7 @@ Route::post('/checkin', [userController::class, 'check_in']);
 
 Route::post('/attend', [userController::class, 'manageAttendance']);
 // Route::get('/getallattend', [userController::class, 'get_all_record']);
-Route::get('/alldatalogs', [userController::class, 'view_all_datalogs']);
+Route::get('/alldatalogs', [userController::class, 'all_data_logs']);
 Route::get('/getReg/{customer_name}', [userController::class, 'get_Reg_No']);
 Route::get('/date', [userController::class, 'getcurrenttime']);
 Route::get('/all_device_inventory', [userController::class, 'all_inventory']);

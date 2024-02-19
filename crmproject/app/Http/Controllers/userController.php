@@ -3069,10 +3069,9 @@ public function view_data_logs(Request $request){
 public function view30days(Request $request){
     return view('last_30day_datalogs');
 }
-public function view_all_data_logs($regno)
+public function all_data_logs(Request $request)
 {
-    $data = Datalogs::where('reg_no', $regno)
-        ->orderBy('created_at', 'desc')
+    $data = Datalogs::orderBy('created_at', 'desc')
         ->get();
 
     if ($data->isEmpty()) {
