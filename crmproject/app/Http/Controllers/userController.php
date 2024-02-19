@@ -709,8 +709,8 @@ return response()->json([
         $empId = $request->input('em_loginid');
 
         if ($empId) {
-            $empid = Employee::where('em_loginid', $empId)
-                ->select('emp_name', 'emp_id', 'designation')
+            $emp_name = Employee::where('em_loginid', $empId)
+                ->select('emp_name')
                 ->first();
 
 
@@ -733,9 +733,9 @@ return response()->json([
         $data->remarks = $request->input('remarks');
         $data->Status = 'Pending';
 
-        $data->emp_id = $empid->emp_id;
-        $data->emp_login_id = $empId;
-        $data->emp_name =  $empid->emp_name;
+        // $data->emp_id = $empid->emp_id;
+        // $data->emp_login_id = $empId;
+        $data->emp_name =  $emp_name->emp_name;
 
 
 
@@ -794,7 +794,7 @@ return response()->json([
         'chasis' => 'required',
         'contact_no' => 'required',
         'install_loc' => 'required',
-        'install_date' => 'required|date',
+        'install_date' => 'required',
         'remarks' => 'required',
         'representative'=>'required'
      ]);
@@ -874,26 +874,41 @@ return response()->json([
 
     }
 
-    public function allcomplain(){
-        $data = complain::orderBy('created_at','desc')->get();
-        $count = $data->count();
     
-        // Format created_at field according to Karachi timezone
+    public function allcomplain() {
+        $data = complain::orderBy('created_at', 'desc')->get();
+        $count = $data->count();
+        
+        $resolved = complain::where('Status', 'Resolved')->get();
+    
+        // Fetch and format complaint actions for each resolved complaint
+        foreach ($resolved as $resolved_complaint) {
+            $actions = Complain_actions::where('complain_code', $resolved_complaint->complain_id)->get();
+            $resolved_complaint->actions = $actions->map(function ($action) {
+                return [
+                    'date' => $action->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
+                    'time' => $action->created_at->timezone('Asia/Karachi')->format('h:i A'),
+                    'representative' => $action->representative,
+                ];
+            });
+            $resolved_complaint->actions=$actions;
+        }
+    
+        // Format created_at field according to Karachi timezone for complaints
         $data->transform(function ($item) {
             $item['date'] = $item['created_at']->timezone('Asia/Karachi')->format('d_m_Y');
             $item['time'] = $item['created_at']->timezone('Asia/Karachi')->format('h:i A');
             unset($item['created_at']); // Remove original created_at field
             return $item;
         });
-    
+
         return response()->json([
             'success' => true,
             'message' => 'complains fetched successfully',
             'count' => $count,
-            'all_complains' => $data,
+            'all_complains' => $actions,
         ], 200);
     }
-    
 
  public function single_complain($complain_id)
  {
@@ -3891,6 +3906,7 @@ unset($complain->updated_at);
 
   ->map(function($NRS){
     $NRS->date_time=$NRS->created_at->format('d-m-Y h:i A');
+    unset($NRS->created_at);
     return $NRS;
     
   });
@@ -3900,7 +3916,8 @@ foreach ($NR as $NRS) {
         return [
             'time' => $data->created_at->format('h:i A'),
             'date' => $data->created_at->format('d-m-Y'),
-            'remarks' => $data->remarks
+            'remarks' => $data->remarks,
+            'representative'=>$data->representative??null
         ];
     });
     $NR_actions[$NRS->complain_id] = $nr_actions;
@@ -4440,6 +4457,7 @@ public function create_resolve_complain(Request $request){
     'status'=>'required',
     'nature'=>'required',
     'remarks'=>'required',
+    'representative'=>'required'
     ]);
 
     if($validator->fails()){
@@ -4454,16 +4472,19 @@ public function create_resolve_complain(Request $request){
         'complain_code'=>$request->complain_id,
         'actions'=>$request->status,
         'remarks'=>$request->remarks,
-        'nature'=>$request->nature
+        'nature'=>$request->nature,
+        'representative'=>$request->representative
     ];
 
-        Complain_actions::create($resolved);
+        $resolved_complain=Complain_actions::create($resolved);
         $data=complain::where('complain_id',$request->complain_id)
         ->update(['Status'=>$request->status]);
         if($data){
             return response()->json([
                 'success'=>true,
                 'message'=>'comnplain resolved successfully',
+                'data'=>$resolved_complain
+                
       ], 200, );
 
         }
@@ -4481,7 +4502,8 @@ public function create_resolve_complain(Request $request){
   if($data){
     return response()->json([
         'success'=>true,
-        'message'=>'compalin updated successfully'
+        'message'=>'compalin updated successfully',
+        'data'=>$data
     ], 200, );
   }
     }
@@ -4529,7 +4551,7 @@ public function active_inactive(Request $request){
         $logs = Emp_login::where('login_date', '>', $tenDaysAgo)
             ->with('emp')
             ->get();
-            Emp_login::where('login_date', '>', $tenDaysAgoDate)->delete();
+            Emp_login::where('login_date', '<', $tenDaysAgo)->delete();
 
     $details=$logs->map(function($data){
         $hoursDiff = $data->login_time ? Carbon::parse($data->login_time)->diffInHours($data->logout_time) : 0;
@@ -4560,7 +4582,7 @@ public function active_inactive(Request $request){
     'logout_time'=>$data->logout_time,
     'logout_date'=>$data->logout_date,
     'status'=>$data->status,
-    'hours'=>$formattedTime,
+    'time_worked'=>$formattedTime,
     // $data->emp->emp_name,
     // $data->emp->emp_name,
     // $data->emp->emp_name,

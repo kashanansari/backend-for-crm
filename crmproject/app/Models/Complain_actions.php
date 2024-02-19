@@ -20,6 +20,7 @@ class Complain_actions extends Model
         'actions',
         'remarks', // Ensure this matches the column name in the table
         'nature',
+        'representative'
         
     ];
 
