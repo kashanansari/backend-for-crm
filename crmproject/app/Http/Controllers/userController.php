@@ -4610,4 +4610,40 @@ catch (\Exception $e) {
     ], 500);}
 
 }
+public function put(Request $request){
+    $validator=Validator::make($request->all(),[
+        'client_id'=>'required|exsists:users,id',
+        'reg_no'=>'required',
+        'contact'=>'required',
+        'sms_type'=>'required',
+        'message'=>'required',
+        'representative'=>'required',
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'messsage'=>$validator->errors()
+        ], 200, );
+    }
+    $data=[
+        'client_id'=>$request->client_id,
+        'reg_no'=>$request->reg_no,
+        'contact'=>$request->contact,
+        'sms_type'=>$request->sms_type,
+        'message'=>$request->message,
+        'representative'=>$request->representative,
+    ];
+    DB::beginTransaction();
+   $sms= SMS::update($data);
+   $get=SMS::all();
+   if($sms && $get){
+    return response()->json([
+        'sucesss'=>true,
+        'messsage'=>'Sms created successfullly',
+        'data'=>$get
+    ], 200, );
+   }
+
+
+}
 }
