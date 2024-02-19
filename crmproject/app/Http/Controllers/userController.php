@@ -881,35 +881,43 @@ return response()->json([
         
         $resolved = complain::where('Status', 'Resolved')->get();
     
+        $all_complaints = [];
+    
         // Fetch and format complaint actions for each resolved complaint
         foreach ($resolved as $resolved_complaint) {
-            $actions = Complain_actions::where('complain_code', $resolved_complaint->complain_id)->get();
-            $resolved_complaint->actions = $actions->map(function ($action) {
+            $actions = Complain_actions::where('complain_code', $resolved_complaint->complain_id)->get()->map(function ($action) {
                 return [
                     'date' => $action->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
                     'time' => $action->created_at->timezone('Asia/Karachi')->format('h:i A'),
-                    'representative' => $action->representative,
+                    'resolved_by' => $action->representative,
                 ];
             });
-            $resolved_complaint->actions=$actions;
+    
+            $complaint_data = [
+                'complaint' => [
+                    'ticker' => $resolved_complaint->complain_id,
+                    'customer_name' => $resolved_complaint->customer_name,
+                    'reg_no' => $resolved_complaint->reg_no,
+                    'complain_nature' => $resolved_complaint->nature_of_complain,
+                    'remarks' => $resolved_complaint->remarks,
+                    'Status' => $resolved_complaint->Status,
+                    'date' => $resolved_complaint->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
+                    'time' => $resolved_complaint->created_at->timezone('Asia/Karachi')->format('h:i A'),
+                    'respresentative' => $resolved_complaint->emp_name,
+                    'actions' => $actions,
+                ]
+            ];
+    
+            $all_complaints[] = $complaint_data;
         }
     
-        // Format created_at field according to Karachi timezone for complaints
-        $data->transform(function ($item) {
-            $item['date'] = $item['created_at']->timezone('Asia/Karachi')->format('d_m_Y');
-            $item['time'] = $item['created_at']->timezone('Asia/Karachi')->format('h:i A');
-            unset($item['created_at']); // Remove original created_at field
-            return $item;
-        });
-
         return response()->json([
             'success' => true,
-            'message' => 'complains fetched successfully',
+            'message' => 'complaints fetched successfully',
             'count' => $count,
-            'all_complains' => $actions,
+            'all_complaints' => $all_complaints,
         ], 200);
     }
-
  public function single_complain($complain_id)
  {
     $data=complain::where('complain_id',$complain_id)->first();
