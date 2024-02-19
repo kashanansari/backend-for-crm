@@ -966,7 +966,7 @@ public function create_deviceinventory(Request $request) {
         'imei_no' => 'required',
         'vendor' => 'required',
         'devciesim_no' => 'required',
-        'representaive'=>'required',
+        'representative'=>'required',
         // 'emp_id'=>'required',
         // 'emp_loginid'=>'required'
     ]);
@@ -980,7 +980,11 @@ public function create_deviceinventory(Request $request) {
 
     $device = deviceinventory::where('device_serialno', $request->device_serialno)->first();
     if ($device) {
-        return response()->json(['response' => "This device already exists"], 400);
+        return response()->json([
+            'success'=>false,
+            'message' => "This device already exists",
+        'data'=>null
+    ], 400);
     }
 
     $data = new deviceinventory();
@@ -988,7 +992,7 @@ public function create_deviceinventory(Request $request) {
     $data->imei_no = $request->input('imei_no');
     $data->vendor = $request->input('vendor');
     $data->devciesim_no = $request->input('devciesim_no');
-    $data->representaive = $request->input('representaive');
+    $data->representative = $request->input('representative');
     $data->status = 'active';
     $data->save();
     // if ($empId) {
@@ -1007,9 +1011,17 @@ public function create_deviceinventory(Request $request) {
 // ];
 // Inventory_logs::create($value);
     if ($data) {
-        return response()->json(['response' => "Inventory created successfully"], 200);
+        return response()->json([
+            'successs'=>true,
+            'message' => "Inventory created successfully",
+        'data'=>$data
+    ], 200);
     } else {
-        return response()->json(['response' => "Might be server error"], 500);
+        return response()->json([
+            'success'=>false,
+            'message' => "Might be server error",
+        'data'=>null
+    ], 500);
     }
 }
 
