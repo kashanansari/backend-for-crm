@@ -894,7 +894,7 @@ return response()->json([
             });
     
             $complaint_data = [
-                'complaint' => [
+                
                     'ticker' => $resolved_complaint->complain_id,
                     'customer_name' => $resolved_complaint->customer_name,
                     'reg_no' => $resolved_complaint->reg_no,
@@ -905,7 +905,7 @@ return response()->json([
                     'time' => $resolved_complaint->created_at->timezone('Asia/Karachi')->format('h:i A'),
                     'respresentative' => $resolved_complaint->emp_name,
                     'actions' => $actions,
-                ]
+                
             ];
     
             $all_complaints[] = $complaint_data;
