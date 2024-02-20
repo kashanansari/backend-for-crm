@@ -1764,29 +1764,24 @@ public function single_emp($emp_id){
 }
 
 public function complete_vehicle_details(Request $request) {
-    $data = User::OrderBy('created_at','desc')
-    ->get();
+    $data = User::orderBy('created_at', 'desc')->get();
     $count = $data->count();
 
-    $status = [];
+    $combinedData = [];
     foreach ($data as $user) {
-        $userStatus = $user->technical()->select('operational_status', 'tracker_status')
-        ->get();
-        if ($userStatus) {
-            $status[] = $userStatus;
-        }
+        $userData = $user->toArray(); // Convert the user object to array
+        $userStatus = $user->technical()->select('operational_status', 'tracker_status')->first(); // Assuming each user has only one technical status
+        $userData['status'] = $userStatus ? $userStatus->toArray() : null; // Add status to user data or null if no status found
+        $combinedData[] = $userData; // Add the combined data to the array
     }
-
-    // return view('completeDetails', compact('data', 'count', 'status'));
+   
     return response()->json([
-        'success'=>true,
-        'message'=>'details found successfully',
-        'count'=>$count,
-        'data'=>$data,
-        'status'=>$status,
-    ], 200, );
+        'success' => true,
+        'message' => 'Details found successfully',
+        'count' => $count,
+        'data' => $combinedData,
+    ], 200);
 }
-
 
 
 public function Emp_attendance(Request $request){
