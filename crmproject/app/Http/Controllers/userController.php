@@ -4204,11 +4204,13 @@ public function alert_security(Request $request){
     $queue = Queue::where('status', 'approved')->get() // Fetch a single record
 ->map(function($queues){
   $queues->reg_no=$queues->reg_no;
-  $queues->reg_no=$queues->client_id;
-  $queues->reg_no=$queues->date;
-  $queues->reg_no=$queues->time;
-  $queues->reg_no=$queues->representative;
-  $queues->reg_no=$queues->status;
+  $queues->client_id=$queues->client_id;
+  $queues->date=$queues->date;
+  $queues->time=$queues->time;
+  $queues->representative=$queues->representative;
+  $queues->status=$queues->status;
+  unset($queues->created_at);
+  unset($queues->updated_at);
 return $queues;
 }); 
 $count=$queue->count();  
