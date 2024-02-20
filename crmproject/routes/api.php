@@ -119,4 +119,4 @@ Route::post('/view_update', [userController::class, 'view_update'])->name('view_
 Route::post('/edit_emp', [userController::class, 'edit_emp'])->name('edit_emp');
 Route::get('/reg_datalogs/{regno}', [userController::class, 'view_all_data_logs'])->name('reg_datalogs/{regno}');
 Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
-Route::put('/put', [userController::class, 'put'])->name('put');
+Route::get('/gg', [userController::class, 'gg'])->name('gg');

@@ -1783,7 +1783,6 @@ public function complete_vehicle_details(Request $request) {
         'message'=>'details found successfully',
         'count'=>$count,
         'data'=>$data,
-
         'status'=>$status,
     ], 200, );
 }
@@ -3848,149 +3847,130 @@ return response()->json([
 
 }
 public function search_for_all(Request $request){
-$validator=Validator::make($request->all(),[
-    'search_term'=>'required'
-]);
-if($validator->fails()){
-    return response()->json([
-        'success'=>false,
-        'message'=>$validator->errors()
-    ], 402, );
-}
-$input=$request->search_term;
-    $user=User::where('registeration_no',$input)
-    ->orWhere('engine_no',$input)
-    ->orWhere('chasis_no',$input)
-    ->first();
-    // $date=$user->created_at->format('d-m-Y');
-    IF(!$user){
+    $validator = Validator::make($request->all(), [
+        'search_term' => 'required'
+    ]);
+
+    if($validator->fails()){
         return response()->json([
-            'success'=>false,
-            'message'=>'Data not found',
-            'data'=>null
-        ], 400, );
+            'success' => false,
+            'message' => $validator->errors()
+        ], 402);
     }
-    // $createdDate = $user->created_at->format('d-m-Y');
-    $technical=Technicaldetails::where('client_code',$user->id)
-    ->first();
-    $security=secutitydetails::where('client_code',$user->id)
-    ->first();
-    $removal=Removal::where('client_id',$user->id)
-  
-    ->get()
-    ->map(function($removals){
-       $removals->date= $removals->created_at->format('d-m-Y');
-        $removals->time=$removals->created_at->setTimezone('Asia/karachi')->format('h:i A');
-        unset($removals->created_at);
-        unset($removals->updated_at);        
-        return $removals;
-        
-    });
+
+    $input = $request->search_term;
+    $user = User::where('registeration_no', $input)
+                ->orWhere('engine_no', $input)
+                ->orWhere('chasis_no', $input)
+                ->first();
+
+    if(!$user){
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+            'data' => null
+        ], 400);
+    }
+
+    $technical = Technicaldetails::where('client_code', $user->id)->first();
+    $security = secutitydetails::where('client_code', $user->id)->first();
+    $removal = Removal::where('client_id', $user->id)
+                      ->get()
+                      ->map(function($removals){
+                          $removals->date = $removals->created_at->format('d-m-Y');
+                          $removals->time = $removals->created_at->setTimezone('Asia/karachi')->format('h:i A');
+                          unset($removals->created_at);
+                          unset($removals->updated_at);
+                          return $removals;
+                      });
+
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
-     $complains=complain::where('client_id',$user->id)
-     ->orderBy('created_at','desc')
-    ->get()
-    ->map(function($complain){
-        $complain->date=$complain->created_at->format('d-m-Y');
-        $complain->time=$complain->created_at->setTimezone('Asia/karachi')->format('h:i A');
-        
 
-unset($complain->created_at);
-unset($complain->updated_at);
-        return $complain;
-    });
-    $all_complain=[
-      'new_complain_id'=>$lastComplaintId,
-      'complain'=>$complains
+    $complaints = complain::where('client_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function($complaint){
+            $complaint->date = $complaint->created_at->format('d-m-Y');
+            $complaint->time = $complaint->created_at->setTimezone('Asia/karachi')->format('h:i A');
+            unset($complaint->created_at);
+            unset($complaint->updated_at);
+            // Fetch associated actions for each complaint
+            $actions = Complain_actions::where('complain_code', $complaint->complain_id)
+                ->get()
+                ->map(function($action){
+                    return [
+                        'time' => $action->created_at->format('h:i A'),
+                        'date' => $action->created_at->format('d-m-Y'),
+                        'remarks' => $action->remarks,
+                        'representative' => $action->representative ?? null
+                    ];
+                });
+            $complaint->actions = $actions;
+            return $complaint;
+        });
+
+    $redo = Redo::where('client_id', $user->id)
+        ->get()
+        ->map(function($redos){
+            $redos->date = $redos->created_at->format('d-m-Y');
+            $redos->time = $redos->created_at->setTimezone('Asia/karachi')->format('h:i A');
+            unset($redos->created_at);
+            unset($redos->updated_at);
+            return $redos;
+        });
+
+    $datalogs = Datalogs::where('client_id', $user->id)
+        ->get()
+        ->map(function($datalog){
+            $datalog->date = $datalog->created_at->format('d-m-Y');
+            $datalog->time = $datalog->created_at->setTimezone('Asia/karachi')->format('h:i A');
+            unset($datalog->updated_at);
+            unset($datalog->created_at);
+            return $datalog;
+        });
+
+    $NR = Complain::where('nature_of_complain', 'N/R')
+        ->select('complain_id', 'customer_name', 'reg_no', 'nature_of_complain', 'remarks', 'Status', 'created_at', 'emp_name')
+        ->get()
+        ->map(function ($NRS) {
+            $NRS->date_time = $NRS->created_at->format('d-m-Y h:i A');
+            unset($NRS->created_at);
+            unset($NRS->updated_at);
+            $NR_actions = Complain_actions::where('complain_code', $NRS->complain_id)
+                ->get()
+                ->map(function ($data) {
+                    return [
+                        'time' => $data->created_at->format('h:i A'),
+                        'date' => $data->created_at->format('d-m-Y'),
+                        'remarks' => $data->remarks,
+                        'representative' => $data->representative ?? null
+                    ];
+                });
+            $NRS->actions = $NR_actions;
+            return $NRS;
+        });
+
+    $value = [
+        'user' => $user,
+        'technical' => $technical,
+        'security' => $security,
     ];
 
-  $NR=complain::where('nature_of_complain','N/R')
-  ->select('complain_id','customer_name','reg_no','nature_of_complain','remarks','Status','created_at','emp_name')
-  ->get()
-
-  ->map(function($NRS){
-    $NRS->date_time=$NRS->created_at->format('d-m-Y h:i A');
-    unset($NRS->created_at);
-    return $NRS;
-    
-  });
-  $NR_actions = [];
-foreach ($NR as $NRS) {
-    $nr_actions = Complain_actions::where('complain_code', $NRS->complain_id)->get()->map(function($data) {
-        return [
-            'time' => $data->created_at->format('h:i A'),
-            'date' => $data->created_at->format('d-m-Y'),
-            'remarks' => $data->remarks,
-            'representative'=>$data->representative??null
-        ];
-    });
-  
-
-    $NR_actions[$NRS->complain_id] = $nr_actions;
-}
-
-  
-  
-  
-  
-  
-  
-    $complain_actions = [];
-    foreach($complains as $complaint){
-        $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get();
-        $complain_actions[$complaint->complain_id] = $actions;
-    }
-    $redo=Redo::where('client_id',$user->id)
-    ->get()
-    ->map(function($redos){
-        $redos->date=$redos->created_at->format('d-m-Y');
-        $redos->time=$redos->created_at->setTimezone('Asia/karachi')->format('h:i A');
-        unset($redos->created_at);
-        unset($redos->updated_at);
-        return $redos;
-
-    });
-    $datalogs = Datalogs::where('client_id', $user->id)
-                        ->get()
-                        ->map(function ($datalog) {
-                            // Convert created_at date to d-m-Y format
-                            $datalog->date = $datalog->created_at->format('d-m-Y');
-                            $datalog->time = $datalog->created_at->setTimezone('Asia/karachi')->format('h:i A');
-                            unset($datalog->updated_at);
-                            unset($datalog->created_at);
-                            return $datalog;
-                        });
-
-
-          $value=[
-        'user'=>$user,
-        'technical'=>$technical,
-        'security'=>$security,
-        ];
-    if($user){
-        return response()->json([
-            'success'=>true,
-            'messsage'=>'Data found successfully',
-            'data'=>$value,
-            'removal'=>$removal,
-            'complain'=>$all_complain,
-            'complain_actions'=>$complain_actions,
-            'redo'=>$redo, 
-            'datalogs' => $datalogs, // Including $datalogs in the response
-            'NR'=>$NR,
-            'NR_actions'=>$NR_actions
-        ], 200, );
-    }
-    else{
-        return response()->json([
-            'success'=>false,
-            'messsage'=>'Data not found',
-            'data'=>null
-        ], 400, );
-    }
-}
-public function complain_box(Request $request){
+    return response()->json([
+        'success' => true,
+        'messsage' => 'Data found successfully',
+        'data' => $value,
+        'removal' => $removal,
+        'complain' => [
+            'new_complain_id' => $lastComplaintId,
+            'complains' => $complaints,
+            'NR' => $NR
+        ],
+        'redo' => $redo,
+        'datalogs' => $datalogs
+    ], 200);
+}public function complain_box(Request $request){
     $validator=Validator::make($request->all(),[
         'search_term'=>'required'
     ]);
@@ -4610,40 +4590,31 @@ catch (\Exception $e) {
     ], 500);}
 
 }
-public function put(Request $request){
-    $validator=Validator::make($request->all(),[
-        'client_id'=>'required|exsists:users,id',
-        'reg_no'=>'required',
-        'contact'=>'required',
-        'sms_type'=>'required',
-        'message'=>'required',
-        'representative'=>'required',
-    ]);
-    if($validator->fails()){
-        return response()->json([
-            'success'=>false,
-            'messsage'=>$validator->errors()
-        ], 200, );
-    }
-    $data=[
-        'client_id'=>$request->client_id,
-        'reg_no'=>$request->reg_no,
-        'contact'=>$request->contact,
-        'sms_type'=>$request->sms_type,
-        'message'=>$request->message,
-        'representative'=>$request->representative,
+public function gg(Request $request){
+  $complaints=complain::where('nature_of_complain','N/R')
+  ->get()
+  ->map(function($complains){
+   $complains->date=$complains->created_at->format('d-m-Y');
+   $complains->time=$complains->created_at->format('h:i A');
+   unset($complains->created_at);
+   unset($complains->updated_at);
+ $complain_actions=Complain_actions::where('complain_code',$complains->complain_id)
+ ->get()
+ ->map(function($actions){
+    return [
+    'date'=>$actions->created_at->format('d-m-Y'),
+    'time'=>$actions->created_at->format('h:i A'),
+    'representative'=>$actions->representative,
+   
     ];
-    DB::beginTransaction();
-   $sms= SMS::update($data);
-   $get=SMS::all();
-   if($sms && $get){
-    return response()->json([
-        'sucesss'=>true,
-        'messsage'=>'Sms created successfullly',
-        'data'=>$get
-    ], 200, );
-   }
-
-
+});
+$complains->actions=$complain_actions;
+return $complains;
+});
+ return response()->json([
+    'success'=>true,
+    'messsage'=>'Data found successfullly',
+    'data'=>$complaints
+ ], 200, );
 }
 }
