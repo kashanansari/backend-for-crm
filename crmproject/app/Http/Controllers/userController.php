@@ -135,8 +135,7 @@ if($validator->fails()){
 
 
     public function user(){
-        // Fetch data from the database using your User model
-        // Get the last complaint ID
+     
         $lastComplaint = User::latest()->first();
         $lastComplaintId = $lastComplaint ? $lastComplaint->id + 1 : 1;
         // $data = User::pluck('client_id', 'client_id');
