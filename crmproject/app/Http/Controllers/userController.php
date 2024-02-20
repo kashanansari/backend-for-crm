@@ -4205,7 +4205,7 @@ public function alert_security(Request $request){
     $count=$queue->count();
     if($queue){
         $data=[];
-        foreach($queue as $record)
+        foreach($queue as $record){
         $data = [
             'reg_no' => $record->reg_no,
             'date' => $record->date,
@@ -4213,6 +4213,7 @@ public function alert_security(Request $request){
             'representative' => $record->representative,
             'status' => $record->status,
         ];
+    }
 
         return response()->json([
             'success' => true,
