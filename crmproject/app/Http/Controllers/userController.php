@@ -4201,36 +4201,29 @@ public function alert_technical(Request $request){
 }
 
 public function alert_security(Request $request){
-    $queue = Queue::where('status', 'approved')->get(); // Fetch a single record
-    $count=$queue->count();
-    if($queue){
-        $data=[];
-        foreach($queue as $record){
-        $data = [
-            'reg_no' => $record->reg_no,
-            'date' => $record->date,
-            'time' => $record->time,
-            'representative' => $record->representative,
-            'status' => $record->status,
-        ];
-    }
+    $queue = Queue::where('status', 'approved')->get() // Fetch a single record
+->map(function($queues){
+  $queues->reg_no=$queues->reg_no;
+  $queues->reg_no=$queues->client_id;
+  $queues->reg_no=$queues->date;
+  $queues->reg_no=$queues->time;
+  $queues->reg_no=$queues->representative;
+  $queues->reg_no=$queues->status;
+return $queues;
+}); 
+$count=$queue->count();  
+if($queue){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Alerts found successfully',
+        'count'=>$count,
+        'data'=>$queue
+    ], 200, );
+} 
+   
+    
+  }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Security Alerts!',
-            'count'=>$count,
-            'data' => $data,
- 
-        ], 200);
-    }
-    else{
-        return response()->json([
-            'success' => false,
-            'message' => 'Data not found',
-            'data' => null
-        ], 400);
-    }
-}
 public function all_redo_info(Request $request){
  $redo=Redo::all();
  $redo->map(function($redos) {
