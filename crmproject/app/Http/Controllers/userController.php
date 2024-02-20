@@ -4612,4 +4612,38 @@ return $complains;
     'data'=>$complaints
  ], 200, );
 }
+public function cc(Request $request)
+{
+    $user=User::orderBy('created_at','desc')
+    ->get()
+    ->map(function($users){
+        if($users->created_at){
+$users->date=$users->created_at->format('d-m-Y');
+$users->time=$users->created_at->format('h:i A');
+unset($users->created_at);
+unset($users->updated_at);
+        }
+        else{
+            $users->date=null;
+            $users->time=null;
+
+        }
+$tracker_status=Technicaldetails::where('client_code',$users->id)
+->get()
+->map(function($status){
+    return[
+    'trcaker_status'=>$status->tracker_status,
+    ];
+});
+ $users->status=$tracker_status;
+ return $users;
+    });
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfully',
+        'data'=>$user
+
+    ], 200, );
+    
+}
 }
