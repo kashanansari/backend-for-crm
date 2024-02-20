@@ -1506,7 +1506,14 @@ public function datalogs($search_term){
     $datalogs = Datalogs::where('reg_no', $search_term)
     ->orWhere('customer_name','LIKE',"%$search_term%")
     ->orderBy('created_at','desc')
-    ->get();
+    ->get()
+    ->map(function($details){
+      $details->date=$details->created_at->format('d-m-Y');
+      $details->time=$details->created_at->format('h:i A');
+      unset($details->created_at);
+      unset($details->updated_at);
+      return $details; 
+    });
 
    if ($datalogs->isNotEmpty()) {
     $reg_no = $datalogs->first()->customer_name;
@@ -1518,7 +1525,7 @@ return response()->json([
     'success'=>true,
     'message'=>'detail fetched successfully',
     'datalogs'=>$datalogs,
-    'reg_no'=>$reg_no
+    'customer_name'=>$reg_no
 ], 200, ); }
  public function view_employees(Request $request){
     return view('totalemployees');
