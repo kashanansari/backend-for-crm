@@ -4646,4 +4646,14 @@ $tracker_status=Technicaldetails::where('client_code',$users->id)
     ], 200, );
     
 }
+public function model_keys(){
+    $otp = mt_rand(1000, 9999);
+
+return response()->json([
+    'success'=>true,
+    'message'=>'OTP code is here!',
+    'otp'=>$otp
+], 200, );    
+}
+
 }
