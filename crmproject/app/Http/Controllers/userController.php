@@ -1285,18 +1285,37 @@ public function removal_transfer(Request $request){
     return view('removaltransfer');
 }
 public function removalate(Request $request)
-{
-    // Remova
-    $regNo = $request->input('reg_no');
+{ $removal=Removal::latest()->first();
+    $lastremovalid=$removal?$removal->id+1:1;
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 402, );
+    }
+    $regNo = $request->search_term;
 
      $user = User::where('registeration_no', $regNo)
      ->first();
      if (!$user) {
-        return redirect()->back()->with('error', 'This user desnot exist or might be removed.');
+        // return redirect()->back()->with('error', 'This user desnot exist or might be removed.');
+        return response()->json([
+            'success'=>false,
+            'message'=>'This user doesnot exsist',
+            'data'=>null
+        ], 400, );
     }
      $removalTransfer=Transfer::where('old_reg',$regNo)->first();
      if($removalTransfer){
-        return redirect()->back()->with('error', 'The removal transfer alreday exists');
+        // return redirect()->back()->with('error', 'The removal transfer alreday exists');
+        return response()->json([
+            'success'=>false,
+            'message'=>'The removal transfer alreday exists',
+            'data'=>null
+        ], 200, );
 
      }
      $device=Removal::where('client_id',$user->id)->select('device')->first();
@@ -1304,18 +1323,61 @@ public function removalate(Request $request)
 
      if ($device && $technical) {
 
-         // If a user is found, you can pass the user data to the view
-         return view('removaltransfer', compact('user','device','technical'))->with('message','Found');
+        //  return view('removaltransfer', compact('user','device','technical'))->with('message','Found');
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'user'=>$user,
+            'device'=>$device,
+            'technical'=>$technical
+        ], 200, );
      }
      else{
-        return redirect()->back()->with('error', 'This device is is not removed yet!');
-
+        // return redirect()->back()->with('error', 'This device is is not removed yet!');
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data not found ',
+            'data'=>null
+        ], 400, );
 
      }
 
 }
-public function create_transfer(Request $request){
-    // \Log::info($request->all());
+public function create_removal_transfer(Request $request){
+    $validator = Validator::make($request->all(), [
+        'client_id' => 'required',
+        'old_reg' => 'required',
+        'old_chasis' => 'required',
+        'old_eng' => 'required',
+        'old_make' => 'required',
+        'old_model' => 'required',
+        'old_cc' => 'required',
+        'old_color' => 'required',
+        'old_trans' => 'required',
+        'old_mob' => 'required',
+        'old_device' => 'required',
+        'new_reg' => 'required',
+        'new_chasis' => 'required',
+        'new_eng' => 'required',
+        'new_make' => 'required',
+        'new_cc' => 'required',
+        'new_color' => 'required',
+        'new_trans' => 'required',
+        'new_mob' => 'required',
+        'remarks' => 'required',
+        'customer_name' => 'required',
+        'old_year' => 'required',
+        'new_year' => 'required',
+        'new_model' => 'required',
+        'new_device' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success'=>false,
+            'messsage' => $validator->errors(),
+        ], 402);
+    }
 
     $data= new Transfer();
     $data->client_id =$request->input('client_id');
@@ -1369,13 +1431,25 @@ public function create_transfer(Request $request){
     }
 
  }
-return response()->json(['messsage'=>'Transfer created successfully'], 200,);}
+return response()->json([
+    'success'=>true,
+    'messsage'=>'Transfer created successfully'
+], 200,);}
 
 public function view_owner_form(){
     return view('ownership');
 }
 public function viewownership(Request $request){
-    $searchTerm = $request->input('search_term'); // Assuming 'search_term' is used for both customer name and reg_no
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required',
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $searchTerm = $request->search_term; // Assuming 'search_term' is used for both customer name and reg_no
 
     // Search by registration number
     $user = User::where('registeration_no', $searchTerm)
@@ -1384,7 +1458,11 @@ public function viewownership(Request $request){
                 ->first();
 
     if (!$user) {
-        return view('ownership')->with('error', 'Data not found.');
+        // return view('ownership')->with('error', 'Data not found.');
+        return response()->json([
+            'success'=>false,
+            'messsage'=>$validator->errors()
+                ], 200, );
     }
 
     $technical = Technicaldetails::where('client_code', $user->id)
@@ -1392,7 +1470,13 @@ public function viewownership(Request $request){
                                 ->first();
 
     // If a user is found, pass the user data to the view
-    return view('ownership', compact('user', 'technical'));
+    // return view('ownership', compact('user', 'technical'));
+    return response()->json([
+        'success'=>false,
+        'message'=>'Data found successfully',
+        'user'=>$user,
+        'technical'=>$technical
+    ], 200, );
 }
 
 public function ownership_create(Request $request){
@@ -4686,14 +4770,40 @@ $tracker_status=Technicaldetails::where('client_code',$users->id)
     ], 200, );
     
 }
-public function model_keys(){
-    $otp = mt_rand(1000, 9999);
-
+public function model_keys(Request $request){
+   $validator=Validator::make($request->all(),[
+    'search_term'=>'required'
+   ]);
+   if($validator->fails()){
+    return response()->json([
+        'success'=>false,
+        'messsage'=>$validator->errors()
+    ], 200, );
+   }
+   $user=User::where('registeration_no',$request->search_term)
+   ->first()
+   ->map(function($users){
+    $users->date=$users->created_at->format('d-m-Y');
+    $users->time=$users->created_at->format('h:i A');
+    unset($users->created_at);
+    unset($users->updated_at);
+    return $users;
+   });
+if($user){
 return response()->json([
     'success'=>true,
-    'message'=>'OTP code is here!',
-    'otp'=>$otp
+    'message'=>'Data found successfully',
+    'data'=>$user
 ], 400, );    
 }
 
+else{
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data not found ',
+        'data'=>null
+    ], 400, ); 
+}
+
+}
 }

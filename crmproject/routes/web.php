@@ -71,7 +71,7 @@ Route::post('/devicecreate', [userController::class,  'create_inventory']);
 Route::put('/updateall/{id}', [userController::class, 'update_details'])->name('updateall');
 // Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 // Route::post('/createremoval', [userController::class, 'create_removal'])->name('createremoval');
-Route::post('/creatertransfer', [userController::class, 'create_transfer'])->name('creatertransfer');
+// Route::post('/creatertransfer', [userController::class, 'create_transfer'])->name('creatertransfer');
 Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');
 Route::post('/create_soldout', [userController::class, 'create_soldout'])->name('create_soldout');
 // Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
@@ -99,7 +99,7 @@ Route::get('/singlecomplain/{complain_id}', [userController::class, 'single_comp
 Route::get('/reguserdata', [userController::class, 'reguserdata'])->name('reguserdata');
 Route::get('/removal', [userController::class, 'removalForm'])->name('removal');
 // Route::get('/data', [userController::class, 'removal_create'])->name('data');
-Route::get('/dataa', [userController::class, 'removalate'])->name('dataa');
+// Route::get('/dataa', [userController::class, 'removalate'])->name('dataa');
 
 Route::get('/complainLogs/{regNo}', [userController::class, 'complainLogs'])->name('complainlogs');
 Route::get('/datalogs/{search_term}', [userController::class, 'datalogs'])->name('datalogs');
@@ -116,7 +116,7 @@ Route::get('/removal_transfer', [userController::class, 'removal_transfer'])->na
 
 Route::get('/transfer', [userController::class, 'transfer'])->name('transfer');
 
-Route::get('/viewowner', [userController::class, 'viewownership'])->name('viewowner');
+// Route::get('/viewowner', [userController::class, 'viewownership'])->name('viewowner');
 Route::get('/ownershipform', [userController::class, 'view_owner_form'])->name('ownershipform');
 Route::get('/datlogs/{regNo}', [userController::class, 'datlogs'])->name('datlogs');
 

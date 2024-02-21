@@ -121,7 +121,10 @@ Route::get('/reg_datalogs/{search_term}', [userController::class, 'datalogs'])->
 Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
 // Route::get('/gg', [userController::class, 'gg'])->name('gg');
 // // Route::get('/cc', [userController::class, 'cc'])->name('cc');
-// Route::get('/model_keys', [userController::class, 'model_keys'])->name('model_keys');
+Route::post('/model_keys', [userController::class, 'model_keys'])->name('model_keys');
 Route::post('/getdevices', [userController::class, 'getDeviceSerialNumbers'])->name('getdevices');
 Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
 Route::post('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
+Route::post('/removalate', [userController::class, 'removalate'])->name('removalate');
+Route::post('/create_removal_transfer', [userController::class, 'create_removal_transfer'])->name('create_removal_transfer');
+Route::post('/viewowner', [userController::class, 'viewownership'])->name('viewowner');
