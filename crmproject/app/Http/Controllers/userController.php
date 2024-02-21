@@ -214,7 +214,7 @@ if($validator->fails()){
             DB::beginTransaction();
     
             $data = new User();
-            $data = new User();
+            
 
 // Fill each field individually
 $data->id = $request->id;
@@ -549,7 +549,7 @@ return response()->json([
     $value->security_ques = $request->input('security_ques');
     $value->security_ans = $request->input('security_ans');
     $value->representative = $request->input('representative');
-    $value->password = Hash::make($request->input('password'));
+    $value->password = $request->input('password');
     $value->emergency_person_contact = $request->input('emergency_person_contact');
     $value->security_status="completed";
     $value->save();
@@ -1151,15 +1151,26 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
 //     $user->save();
 //    }
    if($data){
-    $update=complain::where('complain_id',$request->input('complain_id'))->update(['Status'=>'Resolved']);
-    // $complain=$update->complain_id;
-    // $value=Complain_actions::where('complain_code',$complain)->update(['Status'=>'Resolved']);
+    $update=complain::where('complain_id',$request->input('complain_id'))->first();
+    if($update){
+    $update->Status='Resolved';
+    $update->save();
+    
+    Complain_actions::create([
+        'complain_code'=>$request->complain_id,
+        'actions'=>$update->Status,
+        'remarks'=>$request->remarks,
+        'nature'=>$update->nature_of_complain,
+        'representative'=>$request->representative,
+
+    ]);
     return response()->json([
         'scuccess'=>true,
         'message'=>'Redo created successfully',
         'data'=>$data
     ], 200, );
    }
+}
    else{
     return response()->json([
         'scuccess'=>false,
@@ -3931,7 +3942,8 @@ public function search_for_all(Request $request){
             return $datalog;
         });
 
-    $NR = Complain::where('nature_of_complain', 'N/R')
+    $NR = Complain::where('client_id',$user->id)
+    ->where('nature_of_complain', 'N/R')
         ->select('complain_id', 'customer_name', 'reg_no', 'nature_of_complain', 'remarks', 'Status', 'created_at', 'emp_name')
         ->get()
         ->map(function ($NRS) {
