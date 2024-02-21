@@ -115,10 +115,12 @@ Route::get('/getallattend', [userController::class, 'get_all_record'])->name('ge
 Route::get('/NR_queue', [userController::class, 'NR_queue'])->name('NR_queue');
 Route::post('/logout', [userController::class, 'logout'])->name('logout');
 Route::get('/active_inactive', [userController::class, 'active_inactive'])->name('active_inactive');
-Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
+// Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
 Route::post('/edit_emp', [userController::class, 'edit_emp'])->name('edit_emp');
 Route::get('/reg_datalogs/{search_term}', [userController::class, 'datalogs'])->name('reg_datalogs/{search_term}');
 Route::post('/update_status_renewal', [userController::class, 'update_status_renewal'])->name('update_status_renewal');
-Route::get('/gg', [userController::class, 'gg'])->name('gg');
-// Route::get('/cc', [userController::class, 'cc'])->name('cc');
-Route::get('/model_keys', [userController::class, 'model_keys'])->name('model_keys');
+// Route::get('/gg', [userController::class, 'gg'])->name('gg');
+// // Route::get('/cc', [userController::class, 'cc'])->name('cc');
+// Route::get('/model_keys', [userController::class, 'model_keys'])->name('model_keys');
+Route::post('/getdevices', [userController::class, 'getDeviceSerialNumbers'])->name('getdevices');
+Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');

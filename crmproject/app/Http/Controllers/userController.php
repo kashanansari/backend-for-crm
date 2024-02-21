@@ -1205,15 +1205,31 @@ public function create_inventory(Request $request){
    return redirect()->route('reqform');
 
 }
-public function getDeviceSerialNumbers(Request $request)
+public function getDeviceSerialNumbers (Request $request)
 {
-    $searchTerm = $request->input('searchTerm');
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+    ]);
+
+if($validator->fails()){
+    return response()->json([
+        'success'=>false,
+        'message'=>$validator->errors()
+    ], 402, );
+}
+
+    $searchTerm = $request->search_term;
 
     $deviceSerialNumbers = Deviceinventory::where('status','active')->select('device_serialno')
         ->where('device_serialno', 'LIKE', "%$searchTerm%")
         ->get();
 
-    return response()->json($deviceSerialNumbers);
+    return response()->json([
+        'success'=>true,
+        'message'=>'Devices found successfully',
+        'data'=>$deviceSerialNumbers ,
+        
+    ],200);
 }
 public function removal_search(Request $request){
     $validator=validator::make($request->all(),
@@ -1682,18 +1698,18 @@ public function viewemp_update(Request $request){
 }
 public function view_update(Request $request){
  $validator=Validator::make($request->all(),[
-    'emp_id'=>'required'
+    'login_id'=>'required'
  ]);
  if ($validator->fails()) {
     return response()->json([
         'success' => false,
         'message' => 'Validation error',
         'errors' => $validator->errors(),
-    ], 400);
+    ], 402);
 }
 
     
-    $emp = Employee::where('emp_id', $request->emp_id)
+    $emp = Employee::where('em_loginid', $request->login_id)
     ->first();
     if (!$emp) {
     //    return redirect()->back()->with('error', 'Data not found.');
@@ -1701,7 +1717,7 @@ public function view_update(Request $request){
         'success'=>false,
         'message'=>'data not found',
         'data'=>null
-    ], 200, );
+    ], 400, );
    }
 
    if ($emp) {

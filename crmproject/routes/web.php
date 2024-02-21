@@ -111,7 +111,7 @@ Route::get('/installation', [userController::class, 'installation'])->name('inst
 Route::get('/redo_create', [userController::class, 'redo_create'])->name('redo_create');
 
 Route::get('redo/{id}', [userController::class, 'redo'])->name('redo');
-Route::get('/getdevices', [userController::class, 'getDeviceSerialNumbers'])->name('getdevices');
+// Route::get('/getdevices', [userController::class, 'getDeviceSerialNumbers'])->name('getdevices');
 Route::get('/removal_transfer', [userController::class, 'removal_transfer'])->name('removal_transfer');
 
 Route::get('/transfer', [userController::class, 'transfer'])->name('transfer');
