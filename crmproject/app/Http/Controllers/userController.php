@@ -1102,8 +1102,10 @@ public function create_redo(Request $request){
      'harness_change'=>'nullable',
      'backupbattery_change'=>'nullable',
      'contact_no'=>'required',
-     'remarks'=>'nullable'
-     ,'representative'=>'required'
+     'remarks'=>'nullable',
+     'representative'=>'required',
+     'nature'=>'required'
+
     ]);
     if($validator->fails()){
         return response()->json([
@@ -1125,6 +1127,7 @@ $new=Deviceinventory::where('device_serialno',$request->input('new_device'))->fi
 ->update(['status'=>'inactive']);
 $technical=Technicaldetails::where('device_id',$request->input('old_device'))
 ->update(['device_id'=>$request->new_device]);
+
     $data= new Redo();
     $data->client_id=$request->input('client_id');
     $data->complain_id=$request->input('complain_id');
@@ -1145,32 +1148,38 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
     $data->backupbattery_change=$request->input('backupbattery_change');
     $data->representative=$request->input('representative');
     $data->save();
-//    if($data){
-//     $user=User::where('id',$request->input('client_id'))->first();
-//     $user->status='redodone';
-//     $user->save();
-//    }
-   if($data){
-    $update=complain::where('complain_id',$request->input('complain_id'))->first();
-    if($update){
-    $update->Status='Resolved';
-    $update->save();
-    
-    Complain_actions::create([
-        'complain_code'=>$request->complain_id,
-        'actions'=>$update->Status,
-        'remarks'=>$request->remarks,
-        'nature'=>$update->nature_of_complain,
-        'representative'=>$request->representative,
 
+   if($data){
+    $update=complain::where('complain_id',$request->input('complain_id'))->update([
+        'Status'=>'Resolved'
     ]);
+    $action=[
+        'complain_code'=>$request->complain_id,
+        'actions'=>'Resolved',
+        'remarks'=>$request->remarks,
+        'nature'=>$request->nature,
+        'representative'=>$request->representative,
+    ];
+    Complain_actions::create($action);
+    // if($update){
+    // $update->Status='Resolved';
+    // $update->update();
+    
+    // Complain_actions::create([
+    //     'complain_code'=>$request->complain_id,
+    //     'actions'=>'Resolved',
+    //     'remarks'=>$request->remarks,
+    //     'nature'=>$update->nature_of_complain,
+    //     'representative'=>$request->representative,
+
+    // ]);
     return response()->json([
         'scuccess'=>true,
         'message'=>'Redo created successfully',
         'data'=>$data
     ], 200, );
    }
-}
+
    else{
     return response()->json([
         'scuccess'=>false,
