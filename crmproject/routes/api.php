@@ -107,7 +107,7 @@ Route::get('/complain_resolve/{id}', [userController::class, 'complain_resolve']
 Route::post('/create_resolve_complain', [userController::class, 'create_resolve_complain'])->name('create_resolve_complain');
 Route::post('/add_renewal_payment', [userController::class, 'add_renewal_payment'])->name('add_renewal_payment');
 
-Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
+Route::post('/create_update_emp', [userController::class, 'create_update_emp'])->name('create_update_emp');
 Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
 Route::get('get_attends', [userController::class, 'attendance'])->name('get_attends');
 Route::post('/checkin_out', [userController::class, 'CheckInout'])->name('checkin_out');
