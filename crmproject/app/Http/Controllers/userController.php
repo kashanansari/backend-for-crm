@@ -1814,27 +1814,9 @@ public function complete_vehicle_details(Request $request) {
     foreach ($data as $user) {
         $userData = $user->toArray(); // Convert the user object to array
         $userStatus = $user->technical()->select('operational_status', 'tracker_status')->first(); // Assuming each user has only one technical status
-        
-        // Check if $userStatus is null, if so, set each variable in $userData to "not available"
-        if (!$userStatus) {
-            $userData['status'] = [
-                'operational_status' => 'not available',
-                'tracker_status' => 'not available'
-            ];
-            // Add more variables if needed and set them to "not available"
-        } else {
-            $userData['status'] = $userStatus->toArray(); // Add status to user data
-        }
-        
+        $userData['status'] = $userStatus ? $userStatus->toArray() : null; // Add status to user data or null if no status found
         $combinedData[] = $userData; // Add the combined data to the array
     }
-   
-    // Replace null values with "not available" in $combinedData
-    $combinedData = array_map(function($item) {
-        return array_map(function($value) {
-            return $value === null ? 'not available' : $value;
-        }, $item);
-    }, $combinedData);
    
     return response()->json([
         'success' => true,
