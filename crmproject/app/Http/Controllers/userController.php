@@ -1286,6 +1286,7 @@ public function removal_transfer(Request $request){
 }
 public function removalate(Request $request)
 {
+    // Remova
     $regNo = $request->input('reg_no');
 
      $user = User::where('registeration_no', $regNo)
@@ -2994,11 +2995,11 @@ public function get_all_record(Request $request)
 
 public function view_profle(Request $request){
     $validator = Validator::make($request->all(),[
-        'emp_id' => 'required|string'
+        'emp_id' => 'required'
     ]);
     
  if ($validator->fails()) {
-    return response()->json($validator->messages(), 400);
+    return response()->json($validator->messages(), 402);
 }
     // $sessionToken = $request->session()->get('session_token');
     // $empId = $request->session()->get('emp_id_' . $sessionToken);
@@ -3017,9 +3018,9 @@ return response()->json([
 else{
     return response()->json([
         'success'=>false,
-        'message'=>'Data not found successfully',
+        'message'=>'Data not found ',
         'data'=>null
-    ], 200, );
+    ], 400, );
 }
     }
 

@@ -58,7 +58,7 @@ Route::post('/create_emp', [userController::class, 'create_emp'])->name('create_
 Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
 // Route::post('/edit_emp', [userController::class, 'create_update_emp'])->name('edit_emp');
 Route::get('/allcomplain', [userController::class, 'allcomplain'])->name('allcomplain');
-Route::get('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
+// Route::post('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
 Route::post('/editprofile', [userController::class, 'editprofile'])->name('editprofile');
 Route::post('/empLogin', [userController::class, 'emp_login'])->name('empLogin');
 Route::post('/storedata', [userController::class,  'storedata'])->name('storedata');
@@ -124,3 +124,4 @@ Route::post('/update_status_renewal', [userController::class, 'update_status_ren
 // Route::get('/model_keys', [userController::class, 'model_keys'])->name('model_keys');
 Route::post('/getdevices', [userController::class, 'getDeviceSerialNumbers'])->name('getdevices');
 Route::post('/view_update', [userController::class, 'view_update'])->name('view_update');
+Route::post('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
