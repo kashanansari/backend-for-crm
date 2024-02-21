@@ -4667,7 +4667,7 @@ return response()->json([
     'success'=>true,
     'message'=>'OTP code is here!',
     'otp'=>$otp
-], 200, );    
+], 400, );    
 }
 
 }
