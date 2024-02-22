@@ -1431,7 +1431,7 @@ return response()->json([
 public function view_owner_form(){
     return view('ownership');
 }
-public function viewownership(Request $request){
+public function seach_ownership(Request $request){
     $validator=Validator::make($request->all(),[
         'search_term'=>'required',
     ]);
@@ -1453,21 +1453,23 @@ public function viewownership(Request $request){
         // return view('ownership')->with('error', 'Data not found.');
         return response()->json([
             'success'=>false,
-            'messsage'=>$validator->errors()
-                ], 200, );
+            'messsage'=>'Data not found'
+      ], 200, );
     }
 
     $technical = Technicaldetails::where('client_code', $user->id)
-                                ->select('mobilizer', 'device_id')
                                 ->first();
-
-    // If a user is found, pass the user data to the view
-    // return view('ownership', compact('user', 'technical'));
+   $security=secutitydetails::where('client_code',$user->id)
+    ->first();
+   $device=Deviceinventory::where('id',$technical->device_no)
+   ->first();
     return response()->json([
         'success'=>false,
         'message'=>'Data found successfully',
         'user'=>$user,
-        'technical'=>$technical
+        'technical'=>$technical??null,
+        'security'=>$security??null,
+        'device'=>$device??null,
     ], 200, );
 }
 
@@ -4809,8 +4811,7 @@ public function testedit($reg_no){
             'data' => null
         ], 400);
     }
-    // $data_1='not availiable';
-    // $data_2='not availiable';
+
 
     $data_1 = Technicaldetails::where('client_code', $data->id)->first();
     $data_2 = secutitydetails::where('client_code', $data->id)->first();

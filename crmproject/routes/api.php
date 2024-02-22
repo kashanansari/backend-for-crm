@@ -127,5 +127,5 @@ Route::post('/view_update', [userController::class, 'view_update'])->name('view_
 Route::post('/viewprofile', [userController::class, 'view_profle'])->name('viewprofile');
 Route::post('/removalate', [userController::class, 'removalate'])->name('removalate');
 Route::post('/create_removal_transfer', [userController::class, 'create_removal_transfer'])->name('create_removal_transfer');
-Route::post('/viewowner', [userController::class, 'viewownership'])->name('viewowner');
+Route::post('/seach_ownership', [userController::class, 'seach_ownership'])->name('seach_ownership');
 Route::get('/testedit/{reg_no}', [userController::class, 'testedit'])->name('testedit/{reg_no}');
