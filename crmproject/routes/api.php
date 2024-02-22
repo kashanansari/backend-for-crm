@@ -129,3 +129,4 @@ Route::post('/removalate', [userController::class, 'removalate'])->name('removal
 Route::post('/create_removal_transfer', [userController::class, 'create_removal_transfer'])->name('create_removal_transfer');
 Route::post('/seach_ownership', [userController::class, 'seach_ownership'])->name('seach_ownership');
 Route::get('/testedit/{reg_no}', [userController::class, 'testedit'])->name('testedit/{reg_no}');
+Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');

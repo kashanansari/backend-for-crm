@@ -72,7 +72,7 @@ Route::put('/updateall/{id}', [userController::class, 'update_details'])->name('
 // Route::post('/createcomplain', [userController::class, 'create_complain'])->name('createcomplain');
 // Route::post('/createremoval', [userController::class, 'create_removal'])->name('createremoval');
 // Route::post('/creatertransfer', [userController::class, 'create_transfer'])->name('creatertransfer');
-Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');
+// Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');
 Route::post('/create_soldout', [userController::class, 'create_soldout'])->name('create_soldout');
 // Route::post('/create_datalogs', [userController::class, 'create_datalogs'])->name('create_datalogs');
 // Route::post('/create_emp', [userController::class, 'create_emp'])->name('create_emp');

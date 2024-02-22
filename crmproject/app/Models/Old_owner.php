@@ -13,6 +13,6 @@ class Old_owner extends Model
     {
         return $this->belongsTo('App\Models\User', 'client_id', 'id');
     }
-    protected $table='ownership_old';
+    protected $table='ownership_transfer';
 
 }

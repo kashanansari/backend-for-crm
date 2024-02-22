@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Renewals extends Model
 {
     use HasFactory;
-    public function client_id()
+    public function user()
     {
         return $this->belongsTo('App\Models\User', 'client_id', 'id');
     }

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('old_trans');
             $table->string('old_mob');
             $table->string('old_device');
+            $table->string('old_inst_loc');
 //New Device
             $table->string('new_reg');
             $table->string('new_chasis');
@@ -38,6 +39,9 @@ return new class extends Migration
             $table->string('new_color');
             $table->string('new_trans');
             $table->string('new_mob');
+            $table->string('representative');
+            $table->string('new_inst_loc');
+
             $table->string('remarks')->nullable();
             $table->string('status')->nullable();
 

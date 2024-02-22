@@ -1362,6 +1362,9 @@ public function create_removal_transfer(Request $request){
         'new_year' => 'required',
         'new_model' => 'required',
         'new_device' => 'required',
+        'old_inst_loc' => 'required',
+        'new_inst_loc' => 'required',
+        'representative' => 'required',
     ]);
 
     if ($validator->fails()) {
@@ -1463,6 +1466,9 @@ public function seach_ownership(Request $request){
     ->first();
    $device=Deviceinventory::where('id',$technical->device_no)
    ->first();
+   $charges=Renewals::where('client_id',$user->id)
+   ->select('renewal_charges')
+   ->first();
     return response()->json([
         'success'=>false,
         'message'=>'Data found successfully',
@@ -1470,48 +1476,61 @@ public function seach_ownership(Request $request){
             'user'=>$user,
             'technical'=>$technical??null,
             'security'=>$security??null,
-            'device'=>$device??null
+            'device'=>$device??null,
+            'renewal_charges'=>$charges??null
         ]
     ], 200, );
 }
 
 public function ownership_create(Request $request){
+    $validator=Validator::make($request->all(),[
+        'id'=>'required|exists:users',
+        'representative'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors(),
+            
+        ], 402, );
+    }
+    $user=User::where('id',$request->id)->first();
+    $device=Technicaldetails::where('client_code',$user->id)
+    ->select('device_id','IMEI_no')
+    ->first();
+    // $renewal=Renewals::where('client_id',$user->id)
+    // ->first();
+    $renewals=Renewals::where('client_id',$user->id)
+    ->select('renewal_charges')
+    ->first();
     $old= new Old_owner();
-//old customer
-    $old->client_id=$request->input('client_id');
-    $old->old_customer=$request->input('old_customer');
-    $old->old_father=$request->input('old_father');
-    $old->old_telephone=$request->input('old_telephone');
-    $old->old_address=$request->input('old_address');
-    $old->old_mobileno_1=$request->input('old_mobileno_1');
-    $old->old_mobileno_2=$request->input('old_mobileno_2');
-    $old->old_mobileno_3=$request->input('old_mobileno_3');
-    $old->old_mobileno_4=$request->input('old_mobileno_4');
-    $old->old_ntn=$request->input('old_ntn');
-    $old->old_cnic=$request->input('old_cnic');
-    $old->old_primaryname=$request->input('old_primaryname');
-    $old->old_primary_con1=$request->input('old_primary_con1');
-    $old->old_primary_con2=$request->input('old_primary_con2');
-    $old->old_primary_cnic=$request->input('old_primary_cnic');
-    $old->old_seconadry_name=$request->input('old_seconadry_name');
-    $old->old_relationship=$request->input('old_relationship');
-    $old->old_reg_no=$request->input('old_reg_no');
-    $old->old_chasis_no=$request->input('old_chasis_no');
-    $old->old_engine_no=$request->input('old_engine_no');
-    $old->old_make=$request->input('old_make');
-    $old->old_color=$request->input('old_color');
-    $old->old_tracker_charges=$request->input('old_tracker_charges');
-    $old->old_date=$request->input('old_date');
-    $old->old_discount=$request->input('old_discount');
-    $old->old_install_loc=$request->input('old_install_loc');
-    $old->old_conatct_person=$request->input('old_conatct_person');
-    $old->old_remarks=$request->input('old_remarks');
-    $old->status='done';
+    $old->client_id=$user->id;
+    $old->customer=$user->customer_name;
+    $old->cnic=$user->cnic;
+    $old->ntn=$user->ntn;
+    $old->mobile_no=$user->primaryuser_con1	;
+    $old->reg_no=$user->registeration_no;
+    $old->chasis_no=$user->chasis_no;
+    $old->eng_no=$user->engine_no;
+    $old->device=$device->device_id;
+    $old->inst_date=$user->date_of_installation;
+    $old->inst_loc=$user->installation_loc;
+    $old->tracker_charges=$user->tracker_charges;
+    $old->model=$user->model;
+    $old->imei=$device->IMEI_no;
+    $old->renewal_charges=$renewals->renewal_charges;
+    $old->representative=$request->representative;
     $old->save();
 
+if($old){
 
+}
 
-    return back();
+return response()->json([
+    'success'=>true,
+    'message'=>'Data submitted successfully',
+    'data'=>$old
+], 200, );
 }
 
 public function create_soldout(Request $request){
