@@ -1361,7 +1361,7 @@ public function create_removal_transfer(Request $request){
         'old_year' => 'required',
         'new_year' => 'required',
         'new_model' => 'required',
-        'new_device' => 'required',
+        'new_device' => 'required|exists:deviceinventory,device_serialno',
         'old_inst_date' => 'required',
         'new_inst_date' => 'required',
         'representative' => 'required',
@@ -1373,6 +1373,8 @@ public function create_removal_transfer(Request $request){
             'messsage' => $validator->errors(),
         ], 402);
     }
+    DB::beginTransaction();
+    try{
 
     $data= new Transfer();
     $data->client_id =$request->input('client_id');
@@ -1424,13 +1426,23 @@ public function create_removal_transfer(Request $request){
         $technical->update();
 
     }
+DB::commit();
+ 
 
- }
 return response()->json([
     'success'=>true,
     'messsage'=>'Transfer created successfully'
 ], 200,);}
-
+}
+catch(\Exception $e){
+    DB::rollback();
+    return response()->json([
+        'success'=>false,
+        'message'=>$e->getMessage(),
+        'data'=>null
+    ], 200, );
+}
+}
 public function view_owner_form(){
     return view('ownership');
 }
@@ -1485,7 +1497,41 @@ public function seach_ownership(Request $request){
 public function ownership_create(Request $request){
     $validator=Validator::make($request->all(),[
         'id'=>'required|exists:users',
-        'representative'=>'required'
+        'customer_name'=>'required',
+        'father_name'=>'required',
+        'address'=>'required',
+        'telephone'=>'required',
+        'mobileno_1'=>'required',
+        'mobileno_2'=>'nullable',
+        'mobileno_3'=>'nullable',
+        'ntn'=>'required',
+        'cnic'=>'required',
+        'primary_user'=>'required',
+        'primary_user_cnic'=>'required',
+        'primary_user_con'=>'required',
+        'secondary_user'=>'required',
+        'relationship'=>'required',
+        'secondary_user_con'=>'required',
+        'insurance_partner'=>'required',
+        'vas'=>'required',
+        'vas_options'=>'nullable',
+        'customer_email'=>'required',
+        'emergency_pass'=>'required',
+        'emergency_per'=>'required',
+        'emergency_per_con'=>'required',
+        'security_ques'=>'required',
+        'security_ans'=>'required',
+        'password'=>'required',
+        'compaign_point_alo'=>'required',
+        'renewal_charges'=>'required',
+        'segment'=>'required',
+        'Demo duration'=>'nullable',
+        'int_comission'=>'required',
+        'ext_comission'=>'required',
+        'discount'=>'required'
+
+        
+        
     ]);
     if($validator->fails()){
         return response()->json([
@@ -1494,6 +1540,8 @@ public function ownership_create(Request $request){
             
         ], 402, );
     }
+    DB::beginTransaction();
+    try{
     $user=User::where('id',$request->id)->first();
     $device=Technicaldetails::where('client_code',$user->id)
     ->select('device_id','IMEI_no')
@@ -1503,6 +1551,7 @@ public function ownership_create(Request $request){
     $renewals=Renewals::where('client_id',$user->id)
     ->select('renewal_charges')
     ->first();
+    
     $old= new Old_owner();
     $old->client_id=$user->id;
     $old->customer=$user->customer_name;
@@ -1523,14 +1572,65 @@ public function ownership_create(Request $request){
     $old->save();
 
 if($old){
+$new_owner=$user->update([
+    'customer_name'=>$request->customer_name,
+    'father_name'=>$request->father_name,
+    'telephone_residence'=>$request->telephone,
+    'address'=>$request->address,
+    'mobileno_1'=>$request->mobileno_1,
+    'mobileno_2'=>$request->mobileno_2,
+    'mobileno_3'=>$request->mobileno_3,
+    'ntn'=>$request->ntn,
+    'cnic'=>$request->cnic,
+    'primaryuser_name'=>$request->primary_user,
+    'primaryuser_con1'=>$request->primary_user_con,
+    'primaryuser_cnic'=>$request->primary_user_cnic,
+    'seconadryuser_name'=>$request->secondary_user,
+    'secondaryuser_con1'=>$request->secondary_user_con,
+    'relationship'=>$request->relationship,
+    'insurance_partner'=>$request->insurance_partner,
+    'vas'=>$request->vas,
+    'vas_options'=>$request->vas_options,
+    'segment'=>$request->segment,
+    'campaign_point'=>$request->compaign_point_alo,
+    'int_comission'=>$request->int_comission,
+    'ext_comission'=>$request->ext_comission,
+    'discount'=>$request->discount,
 
+]);
+secutitydetails::where('client_code',$request->id)
+->update([
+ 'customer_email'=>$request->customer_email,
+    'emergency_pass'=>$request->emergency_pass,
+    'emergency_person'=>$request->customer_name,
+    'emergency_person_contact'=>$request->emergency_per_con,
+    'security_ques'=>$request->security_ques,
+    'security_ans'=>$request->security_ans,
+    'password'=>$request->password,
+]);
+Renewals::Where('client_id',$request->id)
+->update([
+    'renewal_charges'=>$request->renewal_charges
+]);
 }
-
+DB::commit();
 return response()->json([
     'success'=>true,
     'message'=>'Data submitted successfully',
     'data'=>$old
 ], 200, );
+    }
+catch(\Exception $e)
+{
+    DB::rollback();
+    return response()->json([
+        'success'=>false,
+        'message'=>$e->getMessage()
+    ], 500, );
+}
+
+
+
 }
 
 public function create_soldout(Request $request){
