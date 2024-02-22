@@ -4807,7 +4807,7 @@ public function testedit($reg_no){
             'success' => false,
             'message' => 'Data not found',
             'data' => null
-        ], 200);
+        ], 400);
     }
     
     $data_1 = Technicaldetails::where('client_code', $data->id)->first();
