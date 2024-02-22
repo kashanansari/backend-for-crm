@@ -1439,7 +1439,7 @@ public function seach_ownership(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $searchTerm = $request->search_term; // Assuming 'search_term' is used for both customer name and reg_no
 
@@ -1454,7 +1454,7 @@ public function seach_ownership(Request $request){
         return response()->json([
             'success'=>false,
             'messsage'=>'Data not found'
-      ], 200, );
+      ], 400, );
     }
 
     $technical = Technicaldetails::where('client_code', $user->id)
@@ -1466,10 +1466,12 @@ public function seach_ownership(Request $request){
     return response()->json([
         'success'=>false,
         'message'=>'Data found successfully',
-        'user'=>$user,
-        'technical'=>$technical??null,
-        'security'=>$security??null,
-        'device'=>$device??null,
+        'data'=>[
+            'user'=>$user,
+            'technical'=>$technical??null,
+            'security'=>$security??null,
+            'device'=>$device??null
+        ]
     ], 200, );
 }
 
