@@ -4809,11 +4809,13 @@ public function testedit($reg_no){
             'data' => null
         ], 400);
     }
-    
+    // $data_1='not availiable';
+    // $data_2='not availiable';
+
     $data_1 = Technicaldetails::where('client_code', $data->id)->first();
     $data_2 = secutitydetails::where('client_code', $data->id)->first();
     
-    $device = null;
+    $device ='not availiable';
     if($data_1 && !is_null($data_1->device_no)){
         $device = Deviceinventory::where('id', $data_1->device_no)->first();
     }
@@ -4822,8 +4824,8 @@ public function testedit($reg_no){
         'success' => true,
         'message' => 'Data found successfully',
         'user' => $data,
-        'technical' => $data_1,
-        'security' => $data_2,
+        'technical' => $data_1??'not availiable',
+        'security' => $data_2??'not avialiable',
         'device_information' => $device
     ], 200);
 }
