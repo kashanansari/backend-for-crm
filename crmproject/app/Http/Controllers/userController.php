@@ -1362,8 +1362,8 @@ public function create_removal_transfer(Request $request){
         'new_year' => 'required',
         'new_model' => 'required',
         'new_device' => 'required',
-        'old_inst_loc' => 'required',
-        'new_inst_loc' => 'required',
+        'old_inst_date' => 'required',
+        'new_inst_date' => 'required',
         'representative' => 'required',
     ]);
 
