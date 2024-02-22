@@ -324,15 +324,7 @@ $data->save();
         return back();
     }
     public function edit($reg_no){
-        // $validator=Validator::make($request->all(),[
-        //     'reg_no'=>'required'
-        // ]);
-        // if($validator->fails()){
-        //     return response()->json([
-        //         'success'=>false,
-        //         'message'=>$validator->errors()
-        //     ], 200, );
-        // }
+     
         $data = User::where('registeration_no',$reg_no)
         ->first();
         if(!$data){
@@ -4805,5 +4797,34 @@ else{
     ], 400, ); 
 }
 
+}
+public function testedit($reg_no){
+     
+    $data = User::where('registeration_no', $reg_no)->first();
+    
+    if(!$data){
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+            'data' => null
+        ], 200);
+    }
+    
+    $data_1 = Technicaldetails::where('client_code', $data->id)->first();
+    $data_2 = secutitydetails::where('client_code', $data->id)->first();
+    
+    $device = null;
+    if($data_1 && !is_null($data_1->device_no)){
+        $device = Deviceinventory::where('id', $data_1->device_no)->first();
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Data found successfully',
+        'user' => $data,
+        'technical' => $data_1,
+        'security' => $data_2,
+        'device_information' => $device
+    ], 200);
 }
 }
