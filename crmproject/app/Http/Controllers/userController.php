@@ -1529,7 +1529,7 @@ public function ownership_create(Request $request){
         'int_comission'=>'required',
         'ext_comission'=>'required',
         'discount'=>'required',
-        'representative'=>'required'
+        'representative'=>'required',
 
         
         
