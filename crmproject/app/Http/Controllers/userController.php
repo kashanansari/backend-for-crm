@@ -1212,7 +1212,7 @@ if($validator->fails()){
 
     $searchTerm = $request->search_term;
 
-    $deviceSerialNumbers = Deviceinventory::where('status','active')->select('device_serialno')
+    $deviceSerialNumbers = Deviceinventory::where('status','active')->select('device_serialno','vendor','imei_no','devciesim_no')
         ->where('device_serialno', 'LIKE', "%$searchTerm%")
         ->get();
 
