@@ -1414,7 +1414,7 @@ public function create_removal_transfer(Request $request){
         $user->engine_no = $data->new_eng;
         $user->make = $data->new_make;
         $user->model = $data->new_model;
-        $user->CC = $data->new_cc;
+        $user->CC = $data->new_cc; 
         $user->year = $data->new_year;
         $user->color = $data->new_color;
         $user->update();
@@ -1525,10 +1525,11 @@ public function ownership_create(Request $request){
         'compaign_point_alo'=>'required',
         'renewal_charges'=>'required',
         'segment'=>'required',
-        'Demo duration'=>'nullable',
+        'Demo_duration'=>'nullable',
         'int_comission'=>'required',
         'ext_comission'=>'required',
-        'discount'=>'required'
+        'discount'=>'required',
+        'representative'=>'required'
 
         
         
