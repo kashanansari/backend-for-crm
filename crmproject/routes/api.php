@@ -130,3 +130,6 @@ Route::post('/create_removal_transfer', [userController::class, 'create_removal_
 Route::post('/seach_ownership', [userController::class, 'seach_ownership'])->name('seach_ownership');
 Route::get('/testedit/{reg_no}', [userController::class, 'testedit'])->name('testedit/{reg_no}');
 Route::post('/createrownership', [userController::class, 'ownership_create'])->name('createrownership');
+Route::post('/create_sim_inventtory', [userController::class, 'create_sim_inventtory'])->name('create_sim_inventtory');
+Route::post('/get_device_no', [userController::class, 'get_device_no'])->name('get_device_no');
+Route::post('/get_sim_no', [userController::class, 'get_sim_no'])->name('get_sim_no');

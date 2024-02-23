@@ -13,16 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('deviceinventory', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('sim_id');
-            $table->foreign('sim_id')->references('id')->on('sim_inventory');
-            $table->string('device_serialno');
-            $table->string('imei_no');
+        Schema::create('sim_inventory', function (Blueprint $table) {
+            $table->id(); 
+            $table->string('sim_no')->nullable();
+            $table->string('icc_id')->nullable();
+            $table->string('provider')->nullable();
             $table->string('status');
-            $table->string('vendor');
-            $table->string('devciesim_no');
-
             $table->timestamps();
         });
     }
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('deviceinventory');
+        Schema::dropIfExists('sim_inventory');
     }
 };

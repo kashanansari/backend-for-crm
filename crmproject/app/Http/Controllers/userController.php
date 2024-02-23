@@ -24,6 +24,7 @@ use App\Models\Inventory_logs;
 use App\Models\Renewals;
 use App\Models\SMS;
 use App\Models\Queue;
+use App\Models\Sim_inventory;
 use GuzzleHttp\Client;
 
 
@@ -157,37 +158,37 @@ if($validator->fails()){
             'customer_name' => 'required',
             'father_name' => 'required',
             'address' => 'required',
-            'telephone_residence' => 'required|numeric', // Added numeric validation
+            'telephone_residence' => 'nullable|numeric', 
             'mobileno_1' => 'required',
             'mobileno_2' => 'nullable',
             'mobileno_3' => 'nullable',
             'mobileno_4' => 'nullable',
-            'ntn' => 'required|unique:users,ntn',
-            'cnic' => 'required|unique:users,cnic', // Corrected unique validation
-            'seconadryuser_name' => 'required', // Corrected spelling
+            // 'ntn' => 'required|unique:users,ntn',
+            'cnic' => 'required|unique:users,cnic', 
+            'seconadryuser_name' => 'required', 
             'secondaryuser_con1' => 'required',
             'secondaryuser_con2' => 'nullable',
             'relationship' => 'required',
             'registeration_no' => 'required|unique:users,registeration_no',
-            'chasis_no' => 'required',
-            'engine_no' => 'required',
-            'engine_type' => 'required',
+            'chasis_no' => 'nullable',
+            'engine_no' => 'nullable',
+            'engine_type' => 'nullable',
             'CC' => 'required',
             'make' => 'required',
             'model' => 'required',
-            'year' => 'required|numeric',
+            'year' => 'nullable|numeric',
             'color' => 'required',
-            'insurance_partner' => 'required',
-            'vas' => 'required', // Assuming this is a required field
+            'insurance_partner' =>'required',
+            'vas' => 'required', 
             'vas_options' => 'nullable|string',
             'segment' => 'nullable',
-            'demo_duration' => 'nullable', // Assuming this is a required field
+            'demo_duration' => 'nullable', 
             'tracker_charges' => 'required',
             'date_of_installation' => 'required',
             'int_comission' => 'required',
             'ext_comission' => 'required',
             'discount' => 'required',
-            'campaign_point' => 'required',
+            'campaign_point' => 'nullable',
             'dealership' => 'required',
             'dealer_name' => 'required',
             'sales_person' => 'required',
@@ -196,7 +197,7 @@ if($validator->fails()){
             'remarks' => 'required',
             'renewal_charges' => 'required',
             'primaryuser_name'=>'required',
-            'primaryuser_con1'=>'required',
+            'primaryuser_con1'=>'nullable',
             'primaryuser_cnic'=>'required',
             'transmission'=>'required',
             'segment'=>'required',
@@ -975,10 +976,8 @@ public function create_deviceinventory(Request $request) {
         'device_serialno' => 'required',
         'imei_no' => 'required',
         'vendor' => 'required',
-        'devciesim_no' => 'required',
         'representative'=>'required',
-        // 'emp_id'=>'required',
-        // 'emp_loginid'=>'required'
+        
     ]);
 
     if ($validator->fails()) {
@@ -1001,7 +1000,6 @@ public function create_deviceinventory(Request $request) {
     $data->device_serialno = $request->input('device_serialno');
     $data->imei_no = $request->input('imei_no');
     $data->vendor = $request->input('vendor');
-    $data->devciesim_no = $request->input('devciesim_no');
     $data->representative = $request->input('representative');
     $data->status = 'active';
     $data->save();
@@ -4953,4 +4951,112 @@ public function testedit($reg_no){
         'device_information' => $device
     ], 200);
 }
+public function create_sim_inventtory(Request $request){
+    $validator=Validator::make($request->all(),[
+     'sim_no'=>'nullable',
+     'icc_id'=>'required',
+     'provider'=>'required',
+     'status'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>'false',
+            'meessage'=>$validator->errors()
+        ], 402, );
+    }
+    DB::beginTransaction();
+    try{
+    $data=[
+        'sim_no'=>$request->sim_no,
+        'icc_id'=>$request->icc_id,
+        'status'=>$request->status,
+        'provider'=>$request->provider,
+
+    ];
+  
+    $sim_inventoty=Sim_inevntory::create($data);
+    if($sim_inventoty){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data submitted successfullly',
+            'data'=>$sim
+        ], 200, );
+    }
+
+DB::commit();
+    }
+catch(\Exception $e){
+    DB::rollback();
+    return response()->json([
+        'success'=>false,
+        'message'=>$e->getMessage()
+    ], 200, );
 }
+}
+public function get_device_no(Request $request){
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $search_term=$request->search_term;
+
+   $device= Deviceinventory::where('status','active')
+    ->where('device_serialno','LIKE',"%$search_term%")
+    ->select('device_serialno')
+    ->get();
+    if($device){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Devices found successfully',
+            'data'=>$device
+        ], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Devices not found ',
+            'data'=>null
+        ], 200, );
+    }
+}
+
+public function get_sim_no(Request $request){
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $search_term=$request->search_term;
+
+   $sim= Sim_inventory::where('status','availiable')
+    ->where('sim_no','LIKE',"%$search_term%")
+    ->select('sim_no')
+    ->get();
+    if($sim){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Sim found successfully',
+            'data'=>$sim
+        ], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Sim not found ',
+            'data'=>null
+        ], 200, );
+    }
+}
+
+
+}
+
