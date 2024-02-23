@@ -1402,6 +1402,7 @@ public function create_removal_transfer(Request $request){
     $data->new_year =$request->input('new_year');
     $data->new_model =$request->input('new_model');
     $data->new_device =$request->input('new_device');
+    $data->representative =$request->input('representative');
     $data->status='transfered';
  $data->save();
  if($data){
@@ -1440,7 +1441,7 @@ catch(\Exception $e){
         'success'=>false,
         'message'=>$e->getMessage(),
         'data'=>null
-    ], 200, );
+    ], 400, );
 }
 }
 public function view_owner_form(){
