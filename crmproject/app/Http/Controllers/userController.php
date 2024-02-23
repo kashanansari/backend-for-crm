@@ -4956,7 +4956,8 @@ public function create_sim_inventtory(Request $request){
      'sim_no'=>'nullable',
      'icc_id'=>'required',
      'provider'=>'required',
-     'status'=>'required'
+     'status'=>'required',
+     'representative'=>'required'
     ]);
     if($validator->fails()){
         return response()->json([
@@ -4971,6 +4972,7 @@ public function create_sim_inventtory(Request $request){
         'icc_id'=>$request->icc_id,
         'status'=>$request->status,
         'provider'=>$request->provider,
+        'representative'=>$request->representative,
 
     ];
   
