@@ -5061,8 +5061,8 @@ public function get_sim_no(Request $request){
 
 public function create_merge_inventory(request $request){
     $validator=Validator::make($request->all(),[
-        'device_serialno'=>'required',
-        'sim_no'=>'required',     
+        'device_serialno'=>'required|esists:deviceinventory,device_serialno',
+        'sim_no'=>'required|esists:sim_inventory,sim_no',     
     ]);
     if($validator->fails()){
         return response()->json([
