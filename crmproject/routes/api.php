@@ -134,3 +134,5 @@ Route::post('/create_sim_inventtory', [userController::class, 'create_sim_invent
 Route::post('/get_device_no', [userController::class, 'get_device_no'])->name('get_device_no');
 Route::post('/get_sim_no', [userController::class, 'get_sim_no'])->name('get_sim_no');
 Route::post('/create_merge_inventory', [userController::class, 'create_merge_inventory'])->name('create_merge_inventory');
+Route::post('/search_merge_inventory', [userController::class, 'search_merge_inventory'])->name('search_merge_inventory');
+Route::post('/update_merge_inventory', [userController::class, 'update_merge_inventory'])->name('update_merge_inventory');

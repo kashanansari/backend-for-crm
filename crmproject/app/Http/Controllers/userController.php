@@ -158,7 +158,7 @@ if($validator->fails()){
             'customer_name' => 'required',
             'father_name' => 'required',
             'address' => 'required',
-            'telephone_residence' => 'nullable|numeric', 
+            // 'telephone_residence' => 'nullable|numeric', 
             'mobileno_1' => 'required',
             'mobileno_2' => 'nullable',
             'mobileno_3' => 'nullable',
@@ -178,7 +178,7 @@ if($validator->fails()){
             'model' => 'required',
             'year' => 'nullable|numeric',
             'color' => 'required',
-            'insurance_partner' =>'required',
+            'insurance_partner' =>'nullable',
             'vas' => 'required', 
             'vas_options' => 'nullable|string',
             'segment' => 'nullable',
@@ -189,11 +189,11 @@ if($validator->fails()){
             'ext_comission' => 'required',
             'discount' => 'required',
             'campaign_point' => 'nullable',
-            'dealership' => 'required',
+            'dealership' => 'nullable',
             'dealer_name' => 'required',
             'sales_person' => 'required',
             'installation_loc' => 'required',
-            'conatct_person' => 'required',
+            // 'conatct_person' => 'nullable',
             'remarks' => 'required',
             'renewal_charges' => 'required',
             'primaryuser_name'=>'required',
@@ -5091,6 +5091,78 @@ public function create_merge_inventory(request $request){
         'message'=>'Error in submission',
         'data'=>null
     ], 400, );
+}
+public function search_merge_inventory(Request $request){
+    $validator=Validator::make($request->all(),[
+        'search_term'=>'required|exists:deviceinventory,device_serialno'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $device=Deviceinventory::where('device_serialno',$request->search_term)
+    ->where('status','active')
+    ->first();
+    if(!$device){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Device is installed please unisntall first'
+        ], 400, );
+    }
+    if($device){
+        $sim=Siminventory::where('id',$device->id)
+        ->first();
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'device_details'=>$device,
+            'sim_details'=>$sim
+        ], 200, );
+    }
+}
+public function update_merge_inventory(Request $request){
+    $validator=Validator::make($request->all(),[
+    'device_serialno'=>'required',
+    'imei_no'=>'required',
+    'sim_no'=>'required',
+    'icc_id'=>'required',
+    'sim_id'=>'required',
+    'device_serialno'=>'required'
+]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $device=Deviceinventory::where('device_serialno',$request->device_serialno)
+    ->first()
+    ->update([
+        'device_serialno'=>$request->device_serialno,
+        'imei_no'=>$request->imei_no
+    ]);
+    if($device){
+    $sim=Siminventory::where('id',$request->sim_id)
+    ->update([
+        'sim_no'=>$request->sim_no,
+        'icc_id'=>$request->icc_id,
+    ]);
+    if($sim){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data updated successfully',
+            
+        ], 200, );
+    }
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Error in updation',
+        ], 400, );
+    }
 }
 }
 
