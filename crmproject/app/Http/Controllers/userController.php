@@ -5059,6 +5059,11 @@ public function get_sim_no(Request $request){
     }
 }
 
-
+public function create_merge_inventory(request $request){
+    $validator=Validator::make($request->all(),[
+        'sim_no'=>'required',
+        
+    ]);
+}
 }
 
