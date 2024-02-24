@@ -5100,7 +5100,7 @@ public function search_merge_inventory(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $device=Deviceinventory::where('device_serialno',$request->search_term)
     ->where('status','active')
@@ -5135,7 +5135,7 @@ public function update_merge_inventory(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $device=Deviceinventory::where('device_serialno',$request->device_serialno)
     ->first()
