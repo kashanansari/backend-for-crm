@@ -5088,7 +5088,7 @@ public function create_merge_inventory(request $request){
     }
     return response()->json([
         'success'=>false,
-        'message'=>'Error in creation',
+        'message'=>'Error in submission',
         'data'=>null
     ], 400, );
 }
