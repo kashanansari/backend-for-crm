@@ -24,7 +24,7 @@ use App\Models\Inventory_logs;
 use App\Models\Renewals;
 use App\Models\SMS;
 use App\Models\Queue;
-use App\Models\Sim_inventory;
+use App\Models\Siminventory;
 use GuzzleHttp\Client;
 
 
@@ -4953,8 +4953,8 @@ public function testedit($reg_no){
 }
 public function create_sim_inventtory(Request $request){
     $validator=Validator::make($request->all(),[
-     'sim_no'=>'nullable',
-     'icc_id'=>'required',
+     'sim_no'=>'nullable|unique:sim_inventory,sim_no',
+     'icc_id'=>'required|unique:sim_inventory,icc_id',
      'provider'=>'required',
      'status'=>'required',
      'representative'=>'required'
@@ -4965,8 +4965,8 @@ public function create_sim_inventtory(Request $request){
             'meessage'=>$validator->errors()
         ], 402, );
     }
-    DB::beginTransaction();
-    try{
+    // DB::beginTransaction();
+    // try{
     $data=[
         'sim_no'=>$request->sim_no,
         'icc_id'=>$request->icc_id,
@@ -4976,25 +4976,25 @@ public function create_sim_inventtory(Request $request){
 
     ];
   
-    $sim_inventoty=Sim_inevntory::create($data);
+    $sim_inventoty=Siminventory::create($data);
     if($sim_inventoty){
         return response()->json([
             'success'=>true,
             'message'=>'Data submitted successfullly',
-            'data'=>$sim
+            'data'=>$sim_inventoty
         ], 200, );
     }
 
-DB::commit();
-    }
-catch(\Exception $e){
-    DB::rollback();
+// DB::commit();
+//     }
+// catch(\Exception $e){
+//     DB::rollback();
     return response()->json([
         'success'=>false,
         'message'=>$e->getMessage()
     ], 200, );
 }
-}
+
 public function get_device_no(Request $request){
     $validator=Validator::make($request->all(),[
         'search_term'=>'required'
@@ -5064,6 +5064,12 @@ public function create_merge_inventory(request $request){
         'sim_no'=>'required',
         
     ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
 }
 }
 

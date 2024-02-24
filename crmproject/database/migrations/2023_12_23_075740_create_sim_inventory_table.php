@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('icc_id')->nullable();
             $table->string('provider')->nullable();
             $table->string('status');
+            $table->string('respresentative');
             $table->timestamps();
         });
     }
