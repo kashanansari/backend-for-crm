@@ -133,3 +133,4 @@ Route::post('/createrownership', [userController::class, 'ownership_create'])->n
 Route::post('/create_sim_inventtory', [userController::class, 'create_sim_inventtory'])->name('create_sim_inventtory');
 Route::post('/get_device_no', [userController::class, 'get_device_no'])->name('get_device_no');
 Route::post('/get_sim_no', [userController::class, 'get_sim_no'])->name('get_sim_no');
+Route::post('/create_merge_inventory', [userController::class, 'create_merge_inventory'])->name('create_merge_inventory');

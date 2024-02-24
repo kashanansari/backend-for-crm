@@ -4991,8 +4991,8 @@ public function create_sim_inventtory(Request $request){
 //     DB::rollback();
     return response()->json([
         'success'=>false,
-        'message'=>$e->getMessage()
-    ], 200, );
+        'message'=>'Error in creation'
+    ], 400, );
 }
 
 public function get_device_no(Request $request){
@@ -5003,7 +5003,7 @@ public function get_device_no(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $search_term=$request->search_term;
 
@@ -5023,7 +5023,7 @@ public function get_device_no(Request $request){
             'success'=>false,
             'message'=>'Devices not found ',
             'data'=>null
-        ], 200, );
+        ], 400, );
     }
 }
 
@@ -5035,7 +5035,7 @@ public function get_sim_no(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $search_term=$request->search_term;
 
@@ -5055,21 +5055,42 @@ public function get_sim_no(Request $request){
             'success'=>false,
             'message'=>'Sim not found ',
             'data'=>null
-        ], 200, );
+        ], 400, );
     }
 }
 
 public function create_merge_inventory(request $request){
     $validator=Validator::make($request->all(),[
-        'sim_no'=>'required',
-        
+        'device_serialno'=>'required',
+        'sim_no'=>'required',     
     ]);
     if($validator->fails()){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
+        ], 402, );
+    }
+    $sim_id=Siminventory::where('sim_no',$request->sim_no)
+    ->select('id')
+    ->first();
+    $data=Deviceinventory::where('device_serialno',$request->device_serialno)
+    ->first();
+    if($data){
+        $data->sim_id=$sim_id->id;
+        $sim_id->status='installed';
+        $sim_id->update();
+        $data->save();
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data submitted successfully',
+            'data'=>$data
         ], 200, );
     }
+    return response()->json([
+        'success'=>false,
+        'message'=>'Error in creation',
+        'data'=>null
+    ], 400, );
 }
 }
 
