@@ -4997,7 +4997,7 @@ public function create_sim_inventtory(Request $request){
 
 public function get_device_no(Request $request){
     $validator=Validator::make($request->all(),[
-        'search_term'=>'required'
+        'search_term'=>'required|exists:deviceinventory,device_serialno'
     ]);
     if($validator->fails()){
         return response()->json([
@@ -5008,28 +5008,27 @@ public function get_device_no(Request $request){
     $search_term=$request->search_term;
 
    $device= Deviceinventory::where('status','active')
-    ->where('device_serialno','LIKE',"%$search_term%")
-    ->select('device_serialno')
-    ->get();
-    if($device){
-        return response()->json([
-            'success'=>true,
-            'message'=>'Devices found successfully',
-            'data'=>$device
-        ], 200, );
-    }
-    else{
+    ->where('device_serialno',$request->search_term)
+    ->first();
+    if(!$device){
         return response()->json([
             'success'=>false,
             'message'=>'Devices not found ',
             'data'=>null
         ], 400, );
     }
+    else{
+        return response()->json([
+            'success'=>true,
+            'message'=>'Devices found successfully',
+            'data'=>$device
+        ], 400, );
+    }
 }
 
 public function get_sim_no(Request $request){
     $validator=Validator::make($request->all(),[
-        'search_term'=>'required'
+        'search_term'=>'required|exists:sim_inventory,sim_no'
     ]);
     if($validator->fails()){
         return response()->json([
@@ -5039,10 +5038,9 @@ public function get_sim_no(Request $request){
     }
     $search_term=$request->search_term;
 
-   $sim= Sim_inventory::where('status','availiable')
-    ->where('sim_no','LIKE',"%$search_term%")
-    ->select('sim_no')
-    ->get();
+   $sim= Siminventory::where('status','availiable')
+    ->where('sim_no',$request->search_term)
+    ->first();
     if($sim){
         return response()->json([
             'success'=>true,
@@ -5053,7 +5051,7 @@ public function get_sim_no(Request $request){
     else{
         return response()->json([
             'success'=>false,
-            'message'=>'Sim not found ',
+            'message'=>'Sim not availiable ',
             'data'=>null
         ], 400, );
     }
