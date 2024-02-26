@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreign('device_no')->references('id')->on('deviceinventory');
             $table->string('vendor_name');
             $table->string('device_id');
+            $table->string('device_id_1');
             $table->string('IMEI_no');
             $table->text('Gsm_no');
             $table->string('Tavl_mang_id');

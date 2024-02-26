@@ -408,6 +408,7 @@ $data->save();
         'client_code'=>'required',
         'vendor_name' => 'required',
         'device_id' => 'required',
+        'device_id_1' => 'nullable',
         'IMEI_no' => 'required',
         'Gsm_no' => 'required',
         'Tavl_mang_id' => 'required',
@@ -465,6 +466,7 @@ if ($client_value && $device) {
 }
   $value->vendor_name=$request->input('vendor_name');
   $value->device_id=$request->input('device_id');
+  $value->device_id_1=$request->input('device_id_1');
   $value->IMEI_no=$request->input('IMEI_no');
   $value->Gsm_no=$request->input('Gsm_no');
   $value->Tavl_mang_id=$request->input('Tavl_mang_id');
@@ -5060,7 +5062,8 @@ public function get_sim_no(Request $request){
 public function create_merge_inventory(request $request){
     $validator=Validator::make($request->all(),[
         'device_serialno'=>'required|exists:deviceinventory,device_serialno',
-        'sim_no'=>'required|exists:sim_inventory,sim_no',     
+        'sim_no'=>'required|exists:sim_inventory,sim_no',
+        'representative'=>'required'     
     ]);
     if($validator->fails()){
         return response()->json([
@@ -5075,6 +5078,7 @@ public function create_merge_inventory(request $request){
     ->first();
     if($data){
         $data->sim_id=$sim_id->id;
+        $data->merge_representative=$request->representative;        
         $sim_id->status='installed';
         $sim_id->update();
         $data->save();
@@ -5171,6 +5175,26 @@ public function update_merge_inventory(Request $request) {
             'success' => false,
             'message' => $e->getMessage()
         ], 400);
+    }
+}
+public function seach_secondary_device(Request $request){
+    $validator=Valiadtor::make($request->all(),[
+    'search_term'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+       'success'=>false,
+       'message'=>$validator->errors()
+        ], 200, );
+    }
+    $user=User::where('registeration_no',$request->search_term)
+    ->first();
+    if($user){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'data'=>$user
+        ], 200, );
     }
 }
 
