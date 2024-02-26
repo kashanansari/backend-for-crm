@@ -5220,7 +5220,7 @@ public function create_another_device(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $technical=Technicaldetails::where('client_code',$request->client_id)
     ->first();
@@ -5229,6 +5229,14 @@ public function create_another_device(Request $request){
             'success'=>false,
             'message'=>'Already have 2 devices'
         ], 400, );  
+    }
+    if($request->device_id_1){
+        $device=Deviceinventory::where('device_serialno',$request->device_id)
+        ->where('ststus','inactive');
+        return response()->json([
+            'success'=>false,
+            'message'=>'Cannot installed'
+        ], 400, );
     }
     else{
         Deviceinventory::where('device_serialno',$request->device_id_1)
