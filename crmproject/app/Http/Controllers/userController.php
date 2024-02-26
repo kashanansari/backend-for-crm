@@ -5211,48 +5211,56 @@ public function seach_secondary_device(Request $request){
         ], 200, );
     }
 }
-public function create_another_device(Request $request){
-    $validator=Validator::make($request->all(),[
-     'client_id'=>'required',
-     'device_id_1'=>'required|exists:deviceinventory,device_serialno'
+public function create_another_device(Request $request) {
+    $validator = Validator::make($request->all(), [
+        'client_id' => 'required',
+        'device_id_1' => 'required|exists:deviceinventory,device_serialno'
     ]);
-    if($validator->fails()){
+
+    if ($validator->fails()) {
         return response()->json([
-            'success'=>false,
-            'message'=>$validator->errors()
-        ], 402, );
-    }
-    $technical=Technicaldetails::where('client_code',$request->client_id)
-    ->first();
-    if($technical->device_id_1!==null){
-        return response()->json([
-            'success'=>false,
-            'message'=>'Already have 2 devices'
-        ], 400, );  
-    }
-    if($request->device_id_1){
-        $device=Deviceinventory::where('device_serialno',$request->device_id)
-        ->where('ststus','inactive');
-        return response()->json([
-            'success'=>false,
-            'message'=>'Cannot installed'
-        ], 401, );
-    }
-    else{
-        Deviceinventory::where('device_serialno',$request->device_id_1)
-        ->update(['status'=>'inactive']);
-        $technical->device_id_1=$request->device_id_1;
-        $technical->save();
-    
-        return response()->json([
-            'success'=>true,
-            'message'=>'Another devies added successfully',
-                ],
-                 200, );
+            'success' => false,
+            'message' => $validator->errors()
+        ], 402);
     }
 
+    $technical = Technicaldetails::where('client_code', $request->client_id)->first();
 
+    // Check if the first device already exists
+    if ($technical->device_id_1 !== null) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Already have 1 device installed'
+        ], 400);
+    }
+
+    // Check if the device is inactive
+    $device = Deviceinventory::where('device_serialno', $request->device_id_1)
+                              ->where('status', 'active')
+                              ->first();
+
+    if (!$device) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Device cannot be installed or is not inactive'
+        ], 401);
+    }
+
+    // Update device status to inactive and associate it with the technical details
+    Deviceinventory::where('device_serialno', $request->device_id_1)
+                    ->update(['status' => 'inactive']);
+    $technical->device_id_1 = $request->device_id_1;
+    $technical->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Another device added successfully'
+    ], 200);
 }
+    }
 
-}
+
+
+
+
 
