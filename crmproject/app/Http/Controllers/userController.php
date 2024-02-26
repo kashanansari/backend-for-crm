@@ -5061,8 +5061,8 @@ public function get_sim_no(Request $request){
 
 public function create_merge_inventory(request $request){
     $validator=Validator::make($request->all(),[
-        'device_serialno'=>'required|esists:deviceinventory,device_serialno',
-        'sim_no'=>'required|esists:sim_inventory,sim_no',     
+        'device_serialno'=>'required|exists:deviceinventory,device_serialno',
+        'sim_no'=>'required|exists:sim_inventory,sim_no',     
     ]);
     if($validator->fails()){
         return response()->json([
@@ -5112,7 +5112,8 @@ public function search_merge_inventory(Request $request){
         ], 400, );
     }
     if($device){
-        $sim=Siminventory::where('id',$device->id)
+        $sim=Siminventory::where('id',$device->sim_id)
+        // ->select('sim_no','icc_id','provider')
         ->first();
         return response()->json([
             'success'=>true,
@@ -5122,47 +5123,58 @@ public function search_merge_inventory(Request $request){
         ], 200, );
     }
 }
-public function update_merge_inventory(Request $request){
-    $validator=Validator::make($request->all(),[
-    'device_serialno'=>'required',
-    'imei_no'=>'required',
-    'sim_no'=>'required',
-    'icc_id'=>'required',
-    'sim_id'=>'required',
-    'device_serialno'=>'required'
-]);
-    if($validator->fails()){
+public function update_merge_inventory(Request $request) {
+    try {
+        $validator = Validator::make($request->all(), [
+            'device_serialno' => 'required',
+            'imei_no' => 'required',
+            'sim_no' => 'required',
+            'icc_id' => 'required',
+            'sim_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 402);
+        }
+
+        DB::beginTransaction();
+
+        $device = Deviceinventory::where('device_serialno', $request->device_serialno)
+            ->update([
+                'imei_no' => $request->imei_no
+            ]);
+
+        if (!$device) {
+            throw new \Exception('Device update failed.');
+        }
+
+        $sim = Siminventory::where('id', $request->sim_id)
+            ->update([
+                'sim_no' => $request->sim_no,
+                'icc_id' => $request->icc_id,
+            ]);
+
+        if (!$sim) {
+            throw new \Exception('Sim update failed.');
+        }
+
+        DB::commit();
+
         return response()->json([
-            'success'=>false,
-            'message'=>$validator->errors()
-        ], 402, );
-    }
-    $device=Deviceinventory::where('device_serialno',$request->device_serialno)
-    ->first()
-    ->update([
-        'device_serialno'=>$request->device_serialno,
-        'imei_no'=>$request->imei_no
-    ]);
-    if($device){
-    $sim=Siminventory::where('id',$request->sim_id)
-    ->update([
-        'sim_no'=>$request->sim_no,
-        'icc_id'=>$request->icc_id,
-    ]);
-    if($sim){
+            'success' => true,
+            'message' => 'Data updated successfully'
+        ], 200);
+    } catch (\Exception $e) {
+        DB::rollback();
         return response()->json([
-            'success'=>true,
-            'message'=>'Data updated successfully',
-            
-        ], 200, );
-    }
-    }
-    else{
-        return response()->json([
-            'success'=>false,
-            'message'=>'Error in updation',
-        ], 400, );
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 400);
     }
 }
+
 }
 
