@@ -5012,7 +5012,7 @@ public function get_device_no(Request $request){
    $device= Deviceinventory::where('status','active')
     ->where('device_serialno',$request->search_term)
     ->first();
-    if(!$device){
+    if(!$device || $device->sim_id!==null){
         return response()->json([
             'success'=>false,
             'message'=>'Devices not found ',
@@ -5130,8 +5130,8 @@ public function update_merge_inventory(Request $request) {
         $validator = Validator::make($request->all(), [
             'device_serialno' => 'required',
             'imei_no' => 'required',
-            'sim_no' => 'required',
-            'icc_id' => 'required',
+            'sim_no' => 'required|exists:sim_inventory,sim_no',
+            'icc_id' => 'required|exists:sim_inventory,icc_id',
             'sim_id' => 'required'
         ]);
 
@@ -5178,7 +5178,7 @@ public function update_merge_inventory(Request $request) {
     }
 }
 public function seach_secondary_device(Request $request){
-    $validator=Valiadtor::make($request->all(),[
+    $validator=Validator::make($request->all(),[
     'search_term'=>'required'
     ]);
     if($validator->fails()){
@@ -5188,14 +5188,62 @@ public function seach_secondary_device(Request $request){
         ], 200, );
     }
     $user=User::where('registeration_no',$request->search_term)
+    ->select('customer_name','engine_no','id')
     ->first();
     if($user){
+        $technical=Technicaldetails::where('client_code',$user->id)
+        ->select('device_id','IMEi_no')        
+        ->first();
         return response()->json([
             'success'=>true,
             'message'=>'Data found successfully',
-            'data'=>$user
+            'user'=>$user,
+            'technical'=>$technical
+
+
         ], 200, );
     }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 200, );
+    }
+}
+public function create_another_device(Request $request){
+    $validator=Validator::make($request->all(),[
+     'client_id'=>'required',
+     'device_id_1'=>'required|exists:deviceinventory,device_serialno'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $technical=Technicaldetails::where('client_code',$request->client_id)
+    ->first();
+    if($technical->device_id_1!==null){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Already have 2 devices'
+        ], 400, );  
+    }
+    else{
+        Deviceinventory::where('device_serialno',$request->device_id_1)
+        ->update(['status'=>'inactive']);
+        $technical->device_id_1=$request->device_id_1;
+        $technical->save();
+    
+        return response()->json([
+            'success'=>true,
+            'message'=>'Another devies added successfully',
+                ],
+                 200, );
+    }
+
+
 }
 
 }

@@ -137,3 +137,4 @@ Route::post('/create_merge_inventory', [userController::class, 'create_merge_inv
 Route::post('/search_merge_inventory', [userController::class, 'search_merge_inventory'])->name('search_merge_inventory');
 Route::post('/update_merge_inventory', [userController::class, 'update_merge_inventory'])->name('update_merge_inventory');
 Route::post('/seach_secondary_device', [userController::class, 'seach_secondary_device'])->name('seach_secondary_device');
+Route::post('/create_another_device', [userController::class, 'create_another_device'])->name('create_another_device');
