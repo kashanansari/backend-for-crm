@@ -5022,7 +5022,7 @@ public function get_device_no(Request $request){
             'success'=>true,
             'message'=>'Devices found successfully',
             'data'=>$device
-        ], 400, );
+        ], 200, );
     }
 }
 
