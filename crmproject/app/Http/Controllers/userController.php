@@ -5236,7 +5236,7 @@ public function create_another_device(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>'Cannot installed'
-        ], 400, );
+        ], 401, );
     }
     else{
         Deviceinventory::where('device_serialno',$request->device_id_1)
