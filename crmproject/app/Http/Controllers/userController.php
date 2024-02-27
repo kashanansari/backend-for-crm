@@ -1563,7 +1563,7 @@ public function ownership_create(Request $request){
     $old->customer=$user->customer_name;
     $old->cnic=$user->cnic;
     // $old->ntn=$user->ntn;
-    $old->mobile_no=$user->primaryuser_con1	;
+    $old->mobile_no=$user->mobileno_1	;
     $old->reg_no=$user->registeration_no;
     $old->chasis_no=$user->chasis_no;
     $old->eng_no=$user->engine_no;
