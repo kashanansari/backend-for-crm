@@ -196,9 +196,9 @@ if($validator->fails()){
             // 'conatct_person' => 'nullable',
             'remarks' => 'required',
             'renewal_charges' => 'required',
-            'primaryuser_name'=>'required',
-            'primaryuser_con1'=>'nullable',
-            'primaryuser_cnic'=>'required',
+            // 'primaryuser_name'=>'required',
+            // 'primaryuser_con1'=>'nullable',
+            // 'primaryuser_cnic'=>'required',
             'transmission'=>'required',
             'segment'=>'required',
             'representative'=>'required'
@@ -222,12 +222,12 @@ $data->id = $request->id;
 $data->customer_name = $request->customer_name;
 $data->father_name = $request->father_name;
 $data->address = $request->address;
-$data->telephone_residence = $request->telephone_residence;
+// $data->telephone_residence = $request->telephone_residence;
 $data->mobileno_1 = $request->mobileno_1;
 $data->mobileno_2 = $request->mobileno_2;
 $data->mobileno_3 = $request->mobileno_3;
 $data->mobileno_4 = $request->mobileno_4;
-$data->ntn = $request->ntn;
+// $data->ntn = $request->ntn;
 $data->cnic = $request->cnic;
 $data->seconadryuser_name = $request->seconadryuser_name;
 $data->secondaryuser_con1 = $request->secondaryuser_con1;
@@ -260,9 +260,9 @@ $data->installation_loc = $request->installation_loc;
 $data->conatct_person = $request->conatct_person;
 $data->remarks = $request->remarks;
 // $data->renewal_charges = $request->renewal_charges;
-$data->primaryuser_name = $request->primaryuser_name;
-$data->primaryuser_con1 = $request->primaryuser_con1;
-$data->primaryuser_cnic = $request->primaryuser_cnic;
+// $data->primaryuser_name = $request->primaryuser_name;
+// $data->primaryuser_con1 = $request->primaryuser_con1;
+// $data->primaryuser_cnic = $request->primaryuser_cnic;
 $data->transmission = $request->transmission;
 $data->form_status = 'completed'; // Assuming this is a field in the 'users' table
 
@@ -426,6 +426,7 @@ $data->save();
         'contact_1' => 'required',
         'contact_2' => 'nullable',
         'contact_3' => 'nullable',
+        'device_id_1' => 'nullable|exists:deviceinventory,device_serialno,status,active',
         'representative'=>'required'
     ]);
 
@@ -441,7 +442,9 @@ $data->save();
   $value= new Technicaldetails();
   $client_value = User::where('id', $request->client_code)->first();
   $device = Deviceinventory::where('device_serialno', $request->input('device_id'))->select('id', 'status')->first();
-
+  $device_2= Deviceinevntory::where('device_serialno',$request->device_id_1)
+  ->update(['status'=>'inactive']);
+            
   if (!$device) {
       return response()->json([
           'success' => false,
@@ -485,6 +488,7 @@ if ($client_value && $device) {
   $value->contact_2=$request->input('contact_2');
   $value->contact_3=$request->input('contact_3');
   $value->representative=$request->representative;
+  $value->device_id_1=$request->device_id_1;
   $value->tracker_status='active';
   $value->technical_status='completed';
   $technical=$value->save();
