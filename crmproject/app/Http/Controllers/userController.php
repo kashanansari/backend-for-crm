@@ -411,7 +411,7 @@ $data->save();
         'device_id_1' => 'nullable',
         'IMEI_no' => 'required',
         'Gsm_no' => 'required',
-        'Tavl_mang_id' => 'required',
+        // 'Tavl_mang_id' => 'required',
         'technician_name' => 'required',
         'sim' => 'required',
         'Gps_check' => 'required',
@@ -1201,33 +1201,44 @@ public function create_inventory(Request $request){
    return redirect()->route('reqform');
 
 }
-public function getDeviceSerialNumbers (Request $request)
+public function getDeviceSerialNumbers(Request $request)
 {
-    $validator=Validator::make($request->all(),[
-        'search_term'=>'required'
+    $validator = Validator::make($request->all(), [
+        'search_term' => 'required'
     ]);
 
-if($validator->fails()){
-    return response()->json([
-        'success'=>false,
-        'message'=>$validator->errors()
-    ], 402, );
-}
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => $validator->errors()
+        ], 402);
+    }
 
     $searchTerm = $request->search_term;
 
-    $deviceSerialNumbers = Deviceinventory::where('status','active')->select('device_serialno','vendor','imei_no','sim_id')
+    $deviceSerialNumbers = Deviceinventory::where('status', 'active')
         ->where('device_serialno', 'LIKE', "%$searchTerm%")
+        ->select('device_serialno', 'vendor', 'imei_no', 'sim_id')
         ->get();
 
+    $sim = Siminventory::whereIn('id', $deviceSerialNumbers->pluck('sim_id'))->get();
+if($sim){
     return response()->json([
-        'success'=>true,
-        'message'=>'Devices found successfully',
-        'data'=>$deviceSerialNumbers ,
-        
-    ],200);
+        'success' => true,
+        'message' => 'Devices found successfully',
+        'data' => $deviceSerialNumbers,
+        'sim' => $sim
+    ], 200);
 }
-public function removal_search(Request $request){
+else{
+    return response()->json([
+        'success' => false,
+        'message' => 'Devices notfound ',
+        'data' => null,
+        'sim' => null
+    ], 200); 
+}
+}public function removal_search(Request $request){
     $validator=validator::make($request->all(),
     [
        'search_term'=>'required'
