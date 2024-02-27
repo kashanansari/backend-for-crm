@@ -4689,72 +4689,67 @@ if($data){
     ], 200, );
 }
 }
-public function create_resolve_complain(Request $request){
-    $validator=Validator::make($request->all(),[
-    'complain_id'=>'required',
-    'status'=>'required',
-    'nature'=>'required',
-    'remarks'=>'required',
-    'representative'=>'required'
+public function create_resolve_complain(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'complain_id' => 'required',
+        'status' => 'required',
+        'nature' => 'required',
+        'remarks' => 'required',
+        // 'representative' => 'required' // You can remove 'representative' from the required fields
     ]);
 
-    if($validator->fails()){
+    if ($validator->fails()) {
         return response()->json([
-            'success'=>false,
-            'message'=>$validator->errors()
-        ], 402, );
-    }
-    try{
-    if($request->status=="Resolved"){
-    $resolved=[
-        'complain_code'=>$request->complain_id,
-        'actions'=>$request->status,
-        'remarks'=>$request->remarks,
-        'nature'=>$request->nature,
-        'representative'=>$request->representative
-    ];
-
-        $resolved_complain=Complain_actions::create($resolved);
-        $data=complain::where('complain_id',$request->complain_id)
-        ->update(['Status'=>$request->status]);
-        if($data){
-            return response()->json([
-                'success'=>true,
-                'message'=>'comnplain resolved successfully',
-                'data'=>$resolved_complain
-                
-      ], 200, );
-
-        }
+            'success' => false,
+            'message' => $validator->errors()
+        ], 402);
     }
 
-    if($request->status=="Update"){
-
-        $update=[
-            'complain_code'=>$request->complain_id,
-            'actions'=>$request->status,
-            'remarks'=>$request->remarks,
-            'nature'=>$request->nature
+    try {
+        $resolved = [
+            'complain_code' => $request->complain_id,
+            'actions' => $request->status,
+            'remarks' => $request->remarks,
+            'nature' => $request->nature,
+            // Check if 'representative' exists in the request, otherwise set a default value or handle accordingly
+            'representative' => $request->has('representative') ? $request->representative : 'default_value'
         ];
-  $data=Complain_actions::create($update);
-  if($data){
-    return response()->json([
-        'success'=>true,
-        'message'=>'compalin updated successfully',
-        'data'=>$data
-    ], 200, );
-  }
+
+        if ($request->status == "Resolved") {
+            $resolved_complain = Complain_actions::create($resolved);
+            $data = complain::where('complain_id', $request->complain_id)
+                ->update(['Status' => $request->status]);
+
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'complaint resolved successfully',
+                    'data' => $resolved_complain
+                ], 200);
+            }
+        }
+
+        if ($request->status == "Update") {
+            $data = Complain_actions::create($resolved);
+
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'complaint updated successfully',
+                    'data' => $data
+                ], 200);
+            }
+        }
+    } catch (Exception $error) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Internal server error',
+            'error' => $error
+        ], 500);
     }
 }
-catch(Exception $error){
-    return response()->json([
-        'success'=>false,
-        'message'=>'Internal server error',
-        'error'=>$error
-    ], 500, );
 
-}
-}
 public function NR_queue(Request $request){
     $complain=complain::where('nature_of_complain','N/R')
     ->where('Status','pending')
