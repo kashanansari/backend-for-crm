@@ -466,6 +466,7 @@ if ($client_value && $device) {
 
 }
   $value->vendor_name=$request->input('vendor_name');
+  $value->vendor_name_1=$request->input('vendor_name_1');
   $value->device_id=$request->input('device_id');
   $value->device_id_1=$request->input('device_id_1');
   $value->sim_1=$request->input('sim_1');
