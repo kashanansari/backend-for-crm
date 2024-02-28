@@ -407,16 +407,14 @@ $data->save();
     $validator = Validator::make($request->all(), [
         'client_code'=>'required',
         'vendor_name' => 'required',
+        'vendor_name_1' => 'required',
         'device_id' => 'required',
-        'device_id_1' => 'nullable',
         'IMEI_no' => 'required',
-        'Gsm_no' => 'required',
-        // 'Tavl_mang_id' => 'required',
         'technician_name' => 'required',
         'sim' => 'required',
+        'sim_1' => 'nullable',
         'Gps_check' => 'required',
         'mobilizer' => 'required',
-        'operational_status' => 'required',
         'webtrack_id' => 'nullable',
         'webtrack_pass' => 'nullable', // Example: minimum length of 6 characters
         'ignition_alerts' => 'nullable',
@@ -442,7 +440,7 @@ $data->save();
   $value= new Technicaldetails();
   $client_value = User::where('id', $request->client_code)->first();
   $device = Deviceinventory::where('device_serialno', $request->input('device_id'))->select('id', 'status')->first();
-  $device_2= Deviceinevntory::where('device_serialno',$request->device_id_1)
+  $device_1= Deviceinevntory::where('device_serialno',$request->device_id_1)
   ->update(['status'=>'inactive']);
             
   if (!$device) {
@@ -470,6 +468,7 @@ if ($client_value && $device) {
   $value->vendor_name=$request->input('vendor_name');
   $value->device_id=$request->input('device_id');
   $value->device_id_1=$request->input('device_id_1');
+  $value->sim_1=$request->input('sim_1');
   $value->IMEI_no=$request->input('IMEI_no');
   $value->Gsm_no=$request->input('Gsm_no');
   $value->Tavl_mang_id=$request->input('Tavl_mang_id');
