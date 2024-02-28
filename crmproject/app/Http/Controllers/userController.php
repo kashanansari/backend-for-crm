@@ -4418,7 +4418,8 @@ public function all_removal_info(Request $request){
 }
 }
 public function alert_technical(Request $request){
-    $queue = Queue::where('status', 'pending')->get(); // Fetch a single record
+    $queue = Queue::where('status', 'pending')
+    ->get(); // Fetch a single record
     $count=$queue->count();
     $data=[];
     if($queue){
@@ -4427,7 +4428,7 @@ public function alert_technical(Request $request){
         ->select('customer_name')
         ->first();
         $data[] = [
-             'name'=>$customer->customer_name,             
+            'name'=>$customer->customer_name,             
             'reg_no' => $record->reg_no,
             'date' => $record->date,
             'time' => $record->time,
@@ -4435,14 +4436,15 @@ public function alert_technical(Request $request){
             'status' => $record->status,
         ];
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Technical Alerts!',
-            'count'=>$count,
-            'data' => $data,
- 
-        ], 200);
+       
     }
+    return response()->json([
+        'success' => true,
+        'message' => 'Technical Alerts!',
+        'count'=>$count,
+        'data' => $data,
+
+    ], 200);
 }
     else{
         return response()->json([
@@ -5266,6 +5268,14 @@ public function create_another_device(Request $request) {
         'success' => true,
         'message' => 'Another device added successfully'
     ], 200);
+}
+public function sim_inventory_info(Request $request){
+    $sim=Siminventory::all();
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found successfullyy',
+        'data'=>$sim
+    ], 200, );
 }
     }
 
