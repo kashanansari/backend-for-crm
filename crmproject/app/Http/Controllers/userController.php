@@ -410,6 +410,7 @@ $data->save();
         'vendor_name_1' => 'required',
         'device_id' => 'required',
         'IMEI_no' => 'required',
+        'IMEI_no_1' => 'nullable',
         'technician_name' => 'required',
         'sim' => 'required',
         'sim_1' => 'nullable',
@@ -471,6 +472,7 @@ if ($client_value && $device) {
   $value->device_id_1=$request->input('device_id_1');
   $value->sim_1=$request->input('sim_1');
   $value->IMEI_no=$request->input('IMEI_no');
+  $value->IMEI_no_1=$request->input('IMEI_no_1');
   $value->Gsm_no=$request->input('Gsm_no');
   $value->Tavl_mang_id=$request->input('Tavl_mang_id');
   $value->technician_name=$request->input('technician_name');
@@ -1218,27 +1220,38 @@ public function getDeviceSerialNumbers(Request $request)
 
     $deviceSerialNumbers = Deviceinventory::where('status', 'active')
         ->where('device_serialno', 'LIKE', "%$searchTerm%")
+        ->whereNotNull('sim_id')
         ->select('device_serialno', 'vendor', 'imei_no', 'sim_id')
         ->get();
 
     $sim = Siminventory::whereIn('id', $deviceSerialNumbers->pluck('sim_id'))->get();
-if($sim){
-    return response()->json([
-        'success' => true,
-        'message' => 'Devices found successfully',
-        'data' => $deviceSerialNumbers,
-        'sim' => $sim
-    ], 200);
+
+    if ($deviceSerialNumbers->isNotEmpty() && $sim->isNotEmpty()) {
+        $data = [];
+        foreach ($deviceSerialNumbers as $device) {
+            $simDetails = $sim->where('id', $device->sim_id)->first();
+            $data[] = [
+                'device_serialno' => $device->device_serialno,
+                'vendor' => $device->vendor,
+                'imei_no' => $device->imei_no,
+                'sim' => $simDetails ? $simDetails->toArray() : null
+            ];
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Devices found successfully',
+            'data' => $data
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'No devices found with matching SIM ID',
+            'data' => null
+        ], 200);
+    }
 }
-else{
-    return response()->json([
-        'success' => false,
-        'message' => 'Devices notfound ',
-        'data' => null,
-        'sim' => null
-    ], 200); 
-}
-}public function removal_search(Request $request){
+
+public function removal_search(Request $request){
     $validator=validator::make($request->all(),
     [
        'search_term'=>'required'
