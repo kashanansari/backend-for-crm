@@ -886,7 +886,7 @@ return response()->json([
         foreach ($data as $complaint) {
             $actions = Complain_actions::where('complain_code', $complaint->complain_id)->get()->map(function ($action) {
                 return [
-                    'date' => $action->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
+                    'date' => $action->created_at->timezone('Asia/Karachi')->format('d-m-Y'),
                     'time' => $action->created_at->timezone('Asia/Karachi')->format('h:i A'),
                     'resolved_by' => $action->representative,
                     'remarks' => $action->remarks,
