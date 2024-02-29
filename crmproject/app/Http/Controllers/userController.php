@@ -1396,6 +1396,8 @@ public function create_removal_transfer(Request $request){
         'old_inst_date' => 'required',
         'new_inst_date' => 'required',
         'representative' => 'required',
+        'mobilizer' => 'required',
+        'eng_type' => 'required',
     ]);
 
     if ($validator->fails()) {
@@ -1437,6 +1439,7 @@ public function create_removal_transfer(Request $request){
     $data->status='transfered';
  $data->save();
  if($data){
+    // User::where('id',$request->client_id)->update(['engine_type'=>$request->eng_type]);
     Technicaldetails::where('client_code',$request->client_id)->update(['device_id'=>$data->new_device]);
     Deviceinventory::where('device_serialno',$data->new_device)->update(['status'=>'inactive']);
     $user=User::find($data->client_id);
@@ -1449,12 +1452,13 @@ public function create_removal_transfer(Request $request){
         $user->CC = $data->new_cc; 
         $user->year = $data->new_year;
         $user->color = $data->new_color;
+        $user->eng_type = $request->eng_type;
         $user->update();
     }
     $technical=Technicaldetails::find($data->client_id)->first();
     if($technical){
         $technical->device_id=$data->new_device;
-        $technical->mobilizer=$data->new_mob;
+        $technical->mobilizer=$request->mobilizer;
         $technical->update();
 
     }
