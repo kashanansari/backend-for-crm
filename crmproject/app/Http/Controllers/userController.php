@@ -1386,7 +1386,7 @@ public function create_removal_transfer(Request $request){
         'new_cc' => 'required',
         'new_color' => 'required',
         'new_trans' => 'required',
-        'new_mob' => 'nullable',
+        // 'new_mob' => 'nullable',
         'remarks' => 'required',
         'customer_name' => 'required',
         'old_year' => 'required',
