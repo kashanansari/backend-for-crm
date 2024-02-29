@@ -4525,14 +4525,19 @@ public function all_device_info(Request $request) {
     if ($devices->isNotEmpty()) {
         $combinedData = [];
         foreach ($devices as $device) {
+            $simId = $device->sim_id;
+
+            $simDetails = Siminventory::where('id', $simId)->select('sim_no')
+            ->first();
+
             $technicalDetails = $device->technical()->first(); // Get first technical detail for the device
             $userDetails = $technicalDetails ? $technicalDetails->user : null; // Get user details associated with the technical detail
-
+            $simNo = $simDetails ? $simDetails->sim_no : null;
             $combinedData[] = [
                 
                 'device' => $device->device_serialno,
                 'imei_no'=>$device->imei_no,
-                'sim'=>$device->devciesim_no,
+                'sim'=>$simNo,
                 'reg_no'=>$userDetails->registeration_no ?? null,
                 'eng_no'=>$userDetails->engine_no ?? null,
                 'chasis_no'=>$userDetails->chasis_no ?? null,
