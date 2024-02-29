@@ -889,6 +889,8 @@ return response()->json([
                     'date' => $action->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
                     'time' => $action->created_at->timezone('Asia/Karachi')->format('h:i A'),
                     'resolved_by' => $action->representative,
+                    'remarks' => $action->remarks,
+                    'action' => $action->actions,
                 ];
             });
             
