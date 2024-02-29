@@ -716,7 +716,17 @@ return response()->json([
 
 
 
-
+        $duplicate=complain::where('reg_no',$request->reg_no)
+        ->where('nature_of_complain',$request->nature_of_complain)
+        ->where('Status','Pending')
+        ->exists();
+        if($duplicate){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Same compalin already exists',
+                
+            ], 401, );
+        }           
         $data = new complain();
         $data->client_id = $request->input('client_id');
         $data->customer_name = $request->input('customer_name');
@@ -5370,7 +5380,7 @@ public function demo_days_alert(Request $request){
 
 
     }
-
+ 
 
 
 
