@@ -407,7 +407,7 @@ $data->save();
     $validator = Validator::make($request->all(), [
         'client_code'=>'required',
         'vendor_name' => 'required',
-        'vendor_name_1' => 'required',
+        'vendor_name_1' => 'nullable',
         'device_id' => 'required',
         'IMEI_no' => 'required',
         'IMEI_no_1' => 'nullable',
