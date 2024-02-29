@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Models\secutitydetails;
 use App\Models\complain;
-use App\Models\Deviceinventory;
+use App\Models\Deviceinevntory;
 use App\Models\Complain_actions;
 use App\Models\Redo;
 use App\Models\Removal;
@@ -441,7 +441,7 @@ $data->save();
   $value= new Technicaldetails();
   $client_value = User::where('id', $request->client_code)->first();
   $device = Deviceinventory::where('device_serialno', $request->input('device_id'))->select('id', 'status')->first();
-  $device_1= Deviceinevntory::where('device_serialno',$request->device_id_1)
+  $device_1= Deviceinventory::where('device_serialno',$request->device_id_1)
   ->update(['status'=>'inactive']);
             
   if (!$device) {
@@ -481,7 +481,7 @@ if ($client_value && $device) {
   $value->mobilizer=$request->input('mobilizer');
   $value->operational_status=$request->input('operational_status');
   $value->webtrack_id=$request->input('webtrack_id');
-  $value->webtrack_pass=Hash::make($request->input('webtrack_pass'));
+  $value->webtrack_pass=$request->input('webtrack_pass');
   $value->ignition_alerts=$request->input('ignition_alerts');
   $value->overspeed_alerts=$request->input('overspeed_alerts');
   $value->geo_fence_alerts=$request->input('geo_fence_alerts');
