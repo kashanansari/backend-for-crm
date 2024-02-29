@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Models\secutitydetails;
 use App\Models\complain;
-use App\Models\Deviceinevntory;
+use App\Models\Deviceinventory;
 use App\Models\Complain_actions;
 use App\Models\Redo;
 use App\Models\Removal;
@@ -440,8 +440,8 @@ $data->save();
 
   $value= new Technicaldetails();
   $client_value = User::where('id', $request->client_code)->first();
-  $device = Deviceinventory::where('device_serialno', $request->input('device_id'))->select('id', 'status')->first();
-  $device_1= Deviceinventory::where('device_serialno',$request->device_id_1)
+  $device =Deviceinventory::where('device_serialno', $request->input('device_id'))->select('id', 'status')->first();
+  $device_1=Deviceinventory::where('device_serialno',$request->device_id_1)
   ->update(['status'=>'inactive']);
             
   if (!$device) {
