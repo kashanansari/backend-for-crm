@@ -473,13 +473,13 @@ if ($client_value && $device) {
   $value->sim_1=$request->input('sim_1');
   $value->IMEI_no=$request->input('IMEI_no');
   $value->IMEI_no_1=$request->input('IMEI_no_1');
-  $value->Gsm_no=$request->input('Gsm_no');
-  $value->Tavl_mang_id=$request->input('Tavl_mang_id');
+//   $value->Gsm_no=$request->input('Gsm_no');
+//   $value->Tavl_mang_id=$request->input('Tavl_mang_id');
   $value->technician_name=$request->input('technician_name');
   $value->sim=$request->input('sim');
   $value->Gps_check=$request->input('Gps_check');
   $value->mobilizer=$request->input('mobilizer');
-  $value->operational_status=$request->input('operational_status');
+//   $value->operational_status=$request->input('operational_status');
   $value->webtrack_id=$request->input('webtrack_id');
   $value->webtrack_pass=$request->input('webtrack_pass');
   $value->ignition_alerts=$request->input('ignition_alerts');
