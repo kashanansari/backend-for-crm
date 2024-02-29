@@ -4611,12 +4611,17 @@ return $info;
     });
     $data=[];
     foreach($inventory as $device){
-   $data[]=[
+        $simId = $device->sim_id;
+
+        $simDetails = Siminventory::where('id', $simId)->select('sim_no')
+        ->first();
+        $sim=$simDetails?$simDetails->sim_no:null;
+           $data[]=[
       'entry_date'=>$device->entry_date,
       'entry_time'=>$device->entry_time,
       'device'=>$device->device_serialno,
       'imei'=>$device->imei_no,
-      'sim'=>$device->devciesim_no,
+      'sim'=>$sim,
       'vendor'=>$device->vendor,
       'representative'=>$device->representative
 
