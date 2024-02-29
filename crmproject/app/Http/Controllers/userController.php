@@ -491,6 +491,7 @@ if ($client_value && $device) {
   $value->contact_3=$request->input('contact_3');
   $value->representative=$request->representative;
   $value->device_id_1=$request->device_id_1;
+  $value->operational_status="completed";
   $value->tracker_status='active';
   $value->technical_status='completed';
   $technical=$value->save();
