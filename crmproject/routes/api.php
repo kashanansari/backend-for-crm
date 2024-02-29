@@ -140,3 +140,4 @@ Route::post('/seach_secondary_device', [userController::class, 'seach_secondary_
 Route::post('/create_another_device', [userController::class, 'create_another_device'])->name('create_another_device');
 Route::get('/sim_inventory_info', [userController::class, 'sim_inventory_info'])->name('sim_inventory_info');
 Route::get('/get_all_active_devices', [userController::class, 'get_all_active_devices'])->name('get_all_active_devices');
+Route::get('/demo_days_alert', [userController::class, 'demo_days_alert'])->name('demo_days_alert');

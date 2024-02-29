@@ -901,7 +901,7 @@ return response()->json([
                 'complain_nature' => $complaint->nature_of_complain,
                 'remarks' => $complaint->remarks,
                 'Status' => $complaint->Status,
-                'date' => $complaint->created_at->timezone('Asia/Karachi')->format('d_m_Y'),
+                'date' => $complaint->created_at->timezone('Asia/Karachi')->format('d-m-Y'),
                 'time' => $complaint->created_at->timezone('Asia/Karachi')->format('h:i A'),
                 'respresentative' => $complaint->emp_name,
                 'actions' => $actions->toArray(), // Convert actions to array and merge directly
@@ -5344,6 +5344,30 @@ public function get_all_active_devices(Request $request)
         ], 200);
     }
 }
+public function demo_days_alert(Request $request){
+    // Get the current date in the Asia/Karachi timezone
+    $currentDate = Carbon::now()->setTimeZone('Asia/Karachi')->subDay()->format('d-m-Y');
+
+    // Fetch users where demo_duration is less than or equal to the current date minus one day
+    $users = User::where('demo_duration', '<=', $currentDate)->get();
+
+    // If users are found, return them with a success message; otherwise, return a message indicating no data
+    if($users->isNotEmpty()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Data found successfully',
+            'data' => $users
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'No data available for the current date'
+        ], 404);
+    }
+}
+
+
+
 
     }
 
