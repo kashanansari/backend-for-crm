@@ -1452,7 +1452,7 @@ public function create_removal_transfer(Request $request){
         $user->CC = $data->new_cc; 
         $user->year = $data->new_year;
         $user->color = $data->new_color;
-        $user->eng_type = $request->eng_type;
+        $user->engine_type = $request->eng_type;
         $user->update();
     }
     $technical=Technicaldetails::find($data->client_id)->first();
