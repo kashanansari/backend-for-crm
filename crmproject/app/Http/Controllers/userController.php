@@ -1426,7 +1426,7 @@ public function create_removal_transfer(Request $request){
     $data->new_cc =$request->input('new_cc');
     $data->new_color =$request->input('new_color');
     $data->new_trans =$request->input('new_trans');
-    $data->new_mob =$request->input('new_mob');
+    // $data->new_mob =$request->input('new_mob');
     $data->remarks =$request->input('remarks');
     $data->customer_name =$request->input('customer_name');
     $data->old_year =$request->input('old_year');
