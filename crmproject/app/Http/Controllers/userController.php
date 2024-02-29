@@ -5291,6 +5291,43 @@ public function sim_inventory_info(Request $request){
         'data'=>$sim
     ], 200, );
 }
+public function get_all_active_devices(Request $request)
+{
+   
+
+    $deviceSerialNumbers = Deviceinventory::where('status', 'active')
+        // ->where('device_serialno', 'LIKE', "%$searchTerm%")
+        ->whereNotNull('sim_id')
+        ->select('device_serialno', 'vendor', 'imei_no', 'sim_id')
+        ->get();
+
+    $sim = Siminventory::whereIn('id', $deviceSerialNumbers->pluck('sim_id'))->get();
+
+    if ($deviceSerialNumbers->isNotEmpty() && $sim->isNotEmpty()) {
+        $data = [];
+        foreach ($deviceSerialNumbers as $device) {
+            $simDetails = $sim->where('id', $device->sim_id)->first();
+            $data[] = [
+                'device_serialno' => $device->device_serialno,
+                'vendor' => $device->vendor,
+                'imei_no' => $device->imei_no,
+                'sim' => $simDetails ? $simDetails->toArray() : null
+            ];
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Devices found successfully',
+            'data' => $data
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'No devices found with matching SIM ID',
+            'data' => null
+        ], 200);
+    }
+}
+
     }
 
 

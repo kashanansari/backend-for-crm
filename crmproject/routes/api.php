@@ -139,3 +139,4 @@ Route::post('/update_merge_inventory', [userController::class, 'update_merge_inv
 Route::post('/seach_secondary_device', [userController::class, 'seach_secondary_device'])->name('seach_secondary_device');
 Route::post('/create_another_device', [userController::class, 'create_another_device'])->name('create_another_device');
 Route::get('/sim_inventory_info', [userController::class, 'sim_inventory_info'])->name('sim_inventory_info');
+Route::get('/get_all_active_devices', [userController::class, 'get_all_active_devices'])->name('get_all_active_devices');
