@@ -1455,7 +1455,8 @@ public function create_removal_transfer(Request $request){
         $user->engine_type = $request->eng_type;
         $user->update();
     }
-    $technical=Technicaldetails::find($data->client_id)->first();
+    $technical=Technicaldetails::where('client_code',$data->client_id)
+    ->first();
     if($technical){
         $technical->device_id=$data->new_device;
         $technical->mobilizer=$request->mobilizer;
