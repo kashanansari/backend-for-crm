@@ -859,7 +859,7 @@ return response()->json([
             
             return response()->json([
                 'success' => false,
-                'message' => 'Device not found in inventory',
+                'message' => 'Device not found in inventory', 
                 'data' => null
             ], 404);
         }
@@ -5495,6 +5495,28 @@ return response()->json([
         }
     
 }
+public function all_sim_info(Request $request){
+    $sim = Siminventory::orderBy('created_at','desc')
+                    ->get()
+                    ->map(function($sims){
+                        // Check if created_at is not null
+                        if ($sims->created_at !== null) {
+                            $sims->date = $sims->created_at->format('d-m-Y');
+                            $sims->time = $sims->created_at->format('h:i A');
+                        }
+                        // Unset created_at and updated_at if they exist
+                        unset($sims->created_at);
+                        unset($sims->updated_at);
+                        return $sims; 
+                    });
+
+    return response()->json([
+        'success' => true,
+        'message' => 'All Data found',
+        'data' => $sim
+    ], 200);
+}
+
     }
  
 
