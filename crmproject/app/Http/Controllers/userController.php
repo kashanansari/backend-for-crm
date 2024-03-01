@@ -5404,7 +5404,7 @@ public function  create_update_sim_inventory(Request $request){
             'success'=>false,
             'message'=>'Error in submission',
             'data'=>null
-        ], 400, );
+        ], 200, );
     }
 
 }
@@ -5436,7 +5436,33 @@ public function search_update_sim_inventory(Request $request){
     }
 }
 public function demo_removed(Request $request){
-    $validator=Validator::make
+    $validator=Validator::make($request->all(),[
+        'client_id'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 402, );
+    }
+    $status=User::where('id',$request->client_id)
+    ->update([
+        'status'=>'Removed'
+    ]);
+    if($status){
+return response()->json([
+    'success'=>true,
+    'message'=>'Status updated successfully',
+], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Status not updated ',
+        ], 400, );
+    }
+
+
     
 }
     }
