@@ -259,7 +259,7 @@ $data->sales_person = $request->sales_person;
 $data->installation_loc = $request->installation_loc;
 $data->conatct_person = $request->conatct_person;
 $data->remarks = $request->remarks;
-// $data->renewal_charges = $request->renewal_charges;
+$data->status = 'active';
 // $data->primaryuser_name = $request->primaryuser_name;
 // $data->primaryuser_con1 = $request->primaryuser_con1;
 // $data->primaryuser_cnic = $request->primaryuser_cnic;
@@ -5463,8 +5463,33 @@ return response()->json([
             'message'=>'Status not updated',
         ], 400,  );
     }
-
-
+}
+    public function demo_approved(Request $request){
+        $validator=Validator::make($request->all(),[
+            'client_id'=>'required'
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'success'=>false,
+                'message'=>$validator->errors()
+            ], 402, );
+        }
+        $status=User::where('id',$request->client_id)
+        ->update([
+            'status'=>'active'
+        ]);
+        if($status){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Status updated successfully',
+    ], 200, );
+        }
+        else{
+            return response()->json([
+                'success'=>false,
+                'message'=>'Status not updated',
+            ], 400,  );
+        }
     
 }
     }
