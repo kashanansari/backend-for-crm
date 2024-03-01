@@ -5357,11 +5357,10 @@ public function get_all_active_devices(Request $request)
     }
 }
 public function demo_days_alert(Request $request){
-    // Get the current date in the Asia/Karachi timezone
     $currentDate = Carbon::now()->setTimeZone('Asia/Karachi')->subDay()->format('d-m-Y');
 
     // Fetch users where demo_duration is less than or equal to the current date minus one day
-    $users = User::where('demo_duration', '<=', $currentDate)->get();
+    $users = User::where('demo_duration', '>=', $currentDate)->get();
 
     // If users are found, return them with a success message; otherwise, return a message indicating no data
     if($users->isNotEmpty()) {
@@ -5375,6 +5374,58 @@ public function demo_days_alert(Request $request){
             'success' => false,
             'message' => 'No data available for the current date'
         ], 404);
+    }
+}
+public function  create_update_sim_inventory(Request $request){
+    $validator=Validator::make($request->all(),[
+     'sim_id'=>'rqeuired',
+     'sim_no'=>'required',
+     'status'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 402, );
+    }
+    $sim=Siminventory::where('id',$rqeuest->sim_id)
+    ->first();
+    if($sim){
+        $sim->sim_no=$request->sim_no;
+        $sim->status=$request->status;
+        $sim->update();
+        return response()->json([
+            'success'=>true,
+            'message'=>'Updated successfully',
+        ], 200, );
+    }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Error in submission',
+            'data'=>null
+        ], 200, );
+    }
+
+}
+public function search_update_sim_inventory(Request $request){
+    $validator=Validator::make($request->all(),[
+        'icc_id'=>'required'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 200, );
+    }
+    $icc_id=Siminventory::where('icc_id',$request->icc_id)
+    ->first();
+    if($icc_id){
+        return response()->json([
+            'success'=>true,
+            'message'=>'Data found successfully',
+            'data'=>$icc_id
+        ], 200, );
     }
 }
     }
