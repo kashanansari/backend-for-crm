@@ -5378,7 +5378,7 @@ public function demo_days_alert(Request $request){
 }
 public function  create_update_sim_inventory(Request $request){
     $validator=Validator::make($request->all(),[
-     'sim_id'=>'rqeuired',
+     'sim_id'=>'required',
      'sim_no'=>'required',
      'status'=>'required'
     ]);
