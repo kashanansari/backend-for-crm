@@ -1348,7 +1348,7 @@ public function removalate(Request $request)
             'success'=>false,
             'message'=>'The removal transfer alreday exists',
             'data'=>null
-        ], 200, );
+        ], 401, );
 
      }
      $device=Removal::where('client_id',$user->id)->select('device')->first();
@@ -1480,7 +1480,8 @@ DB::commit();
 return response()->json([
     'success'=>true,
     'messsage'=>'Transfer created successfully'
-], 200,);}
+], 200,);
+}
 }
 catch(\Exception $e){
     DB::rollback();
@@ -5376,10 +5377,6 @@ public function demo_days_alert(Request $request){
         ], 404);
     }
 }
-
-
-
-
     }
  
 
