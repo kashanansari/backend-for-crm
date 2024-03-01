@@ -5404,7 +5404,7 @@ public function  create_update_sim_inventory(Request $request){
             'success'=>false,
             'message'=>'Error in submission',
             'data'=>null
-        ], 200, );
+        ], 400, );
     }
 
 }
