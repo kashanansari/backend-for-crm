@@ -847,6 +847,8 @@ return response()->json([
         $data->status = 'Removed';
         $data->representative=$request->representative;
         $data->save();
+        Technicaldetails::where('client_code',$request->client_id)
+        ->update(['tracker_status'=>'Removed']);
         $check = Deviceinventory::where('device_serialno', $request->device)->first();
         $user= User::where('id',$request->client_id)
                  ->update(['status'=>'Removed']);
@@ -2062,7 +2064,7 @@ public function complete_vehicle_details(Request $request) {
     $combinedData = [];
     foreach ($data as $user) {
         $userData = $user->toArray(); // Convert the user object to array
-        $userStatus = $user->technical()->select('operational_status', 'tracker_status')->first(); // Assuming each user has only one technical status
+        $userStatus = $user->technical()->select('operational_status', 'tracker_status',)->first(); // Assuming each user has only one technical status
         $userData['status'] = $userStatus ? $userStatus->toArray() : null; // Add status to user data or null if no status found
         $combinedData[] = $userData; // Add the combined data to the array
     }
