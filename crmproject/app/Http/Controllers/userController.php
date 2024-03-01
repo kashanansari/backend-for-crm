@@ -5360,7 +5360,9 @@ public function demo_days_alert(Request $request){
     $currentDate = Carbon::now()->setTimeZone('Asia/Karachi')->subDay()->format('d-m-Y');
 
     // Fetch users where demo_duration is less than or equal to the current date minus one day
-    $users = User::where('demo_duration', '<=', $currentDate)->get();
+    $users = User::where('demo_duration', '<=', $currentDate)
+    ->whereNot('status','!=','Removed')
+    ->get();
 
     // If users are found, return them with a success message; otherwise, return a message indicating no data
     if($users->isNotEmpty()) {
@@ -5458,7 +5460,7 @@ return response()->json([
     else{
         return response()->json([
             'success'=>false,
-            'message'=>'Status not updated ',
+            'message'=>'Status not updated',
         ], 400,  );
     }
 
