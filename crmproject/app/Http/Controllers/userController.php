@@ -5361,7 +5361,7 @@ public function demo_days_alert(Request $request){
 
     // Fetch users where demo_duration is less than or equal to the current date minus one day
     $users = User::where('demo_duration', '<=', $currentDate)
-    ->whereNot('status','!=','Removed')
+    ->where('status', '!=', 'Removed')
     ->get();
 
     // If users are found, return them with a success message; otherwise, return a message indicating no data
