@@ -1452,7 +1452,7 @@ public function create_removal_transfer(Request $request){
     // User::where('id',$request->client_id)->update(['engine_type'=>$request->eng_type]);
     Technicaldetails::where('client_code',$request->client_id)->update(['device_id'=>$data->new_device]);
     Deviceinventory::where('device_serialno',$data->new_device)->update(['status'=>'inactive']);
-    Deviceinevntory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
+    // Deviceinventory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
     $user=User::find($data->client_id);
     if($user){
         $user->registeration_no = $data->new_reg;
