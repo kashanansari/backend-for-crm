@@ -142,3 +142,4 @@ Route::get('/sim_inventory_info', [userController::class, 'sim_inventory_info'])
 Route::get('/get_all_active_devices', [userController::class, 'get_all_active_devices'])->name('get_all_active_devices');
 Route::get('/demo_days_alert', [userController::class, 'demo_days_alert'])->name('demo_days_alert');
 Route::post('/search_update_sim_inventory', [userController::class, 'search_update_sim_inventory'])->name('search_update_sim_inventory');
+Route::post('/create_update_sim_inventory', [userController::class, 'create_update_sim_inventory'])->name('create_update_sim_inventory');

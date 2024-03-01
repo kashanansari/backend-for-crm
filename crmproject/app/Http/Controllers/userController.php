@@ -5416,7 +5416,7 @@ public function search_update_sim_inventory(Request $request){
         return response()->json([
             'success'=>false,
             'message'=>$validator->errors()
-        ], 200, );
+        ], 402, );
     }
     $icc_id=Siminventory::where('icc_id',$request->icc_id)
     ->first();
@@ -5427,6 +5427,17 @@ public function search_update_sim_inventory(Request $request){
             'data'=>$icc_id
         ], 200, );
     }
+    else{
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 400, );
+    }
+}
+public function demo_removed(Request $request){
+    $validator=Validator::make
+    
 }
     }
  
