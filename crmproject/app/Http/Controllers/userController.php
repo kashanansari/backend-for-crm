@@ -5388,7 +5388,7 @@ public function  create_update_sim_inventory(Request $request){
             'message'=>$validator->errors()
         ], 402, );
     }
-    $sim=Siminventory::where('id',$rqeuest->sim_id)
+    $sim=Siminventory::where('id',$request->sim_id)
     ->first();
     if($sim){
         $sim->sim_no=$request->sim_no;
