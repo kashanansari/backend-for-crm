@@ -849,7 +849,7 @@ return response()->json([
         $data->save();
         $check = Deviceinventory::where('device_serialno', $request->device)->first();
         $user= User::where('id',$request->client_id)
-                 ->update(['status'=>'Removed']);
+                 ->update(['status'=>'active']);
         if ($check) {
             $check->update(['status' => 'Removed']);
         } 
