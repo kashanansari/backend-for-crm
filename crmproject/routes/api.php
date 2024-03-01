@@ -144,3 +144,4 @@ Route::get('/demo_days_alert', [userController::class, 'demo_days_alert'])->name
 Route::post('/search_update_sim_inventory', [userController::class, 'search_update_sim_inventory'])->name('search_update_sim_inventory');
 Route::post('/create_update_sim_inventory', [userController::class, 'create_update_sim_inventory'])->name('create_update_sim_inventory');
 Route::post('/demo_removed', [userController::class, 'demo_removed'])->name('demo_removed');
+Route::post('/demo_approved', [userController::class, 'demo_approved'])->name('demo_approved');
