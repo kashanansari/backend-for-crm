@@ -5476,7 +5476,8 @@ return response()->json([
         }
         $status=User::where('id',$request->client_id)
         ->update([
-            'status'=>'active'
+            'status'=>'active',
+            'segment'=>'cash'
         ]);
         if($status){
     return response()->json([
