@@ -194,7 +194,7 @@ if($validator->fails()){
             'sales_person' => 'required',
             'installation_loc' => 'required',
             // 'conatct_person' => 'nullable',
-            'remarks' => 'required',
+            'remarks' => 'nullable',
             'renewal_charges' => 'required',
             // 'primaryuser_name'=>'required',
             // 'primaryuser_con1'=>'nullable',
