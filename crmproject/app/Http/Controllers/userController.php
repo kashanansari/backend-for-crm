@@ -5444,7 +5444,7 @@ public function search_update_sim_inventory(Request $request){
             'success'=>false,
             'message'=>'Data not found',
             'data'=>null
-        ], 400, );
+        ], 401, );
     }
 }
 public function demo_removed(Request $request){
