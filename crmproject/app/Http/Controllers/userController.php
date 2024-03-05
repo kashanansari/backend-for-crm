@@ -246,7 +246,7 @@ $data->insurance_partner = $request->insurance_partner;
 $data->vas = $request->vas;
 $data->vas_options = $request->vas_options;
 $data->segment = $request->segment;
-$data->demo_duration = $request->demo_duration;
+// $data->demo_duration = $request->demo_duration;
 $data->tracker_charges = $request->tracker_charges;
 $data->date_of_installation = $request->date_of_installation;
 $data->int_comission = $request->int_comission;
@@ -259,13 +259,21 @@ $data->sales_person = $request->sales_person;
 $data->installation_loc = $request->installation_loc;
 $data->conatct_person = $request->conatct_person;
 $data->remarks = $request->remarks;
-$data->status = 'active';
+// $data->status = 'active';
 // $data->primaryuser_name = $request->primaryuser_name;
 // $data->primaryuser_con1 = $request->primaryuser_con1;
 // $data->primaryuser_cnic = $request->primaryuser_cnic;
 $data->transmission = $request->transmission;
 $data->form_status = 'completed'; // Assuming this is a field in the 'users' table
+if($request->has('demo_duration')){
+$data->demo_duration = $request->demo_duration;
+$data->status='demo';
+}
+else{
 
+    $data->status='active';
+
+}
 $data->save();
             
     
@@ -503,7 +511,7 @@ if ($client_value && $device) {
         'success'=>false,
         'message'=>'error in submission',
         'data'=>null
-    ], 400, );
+    ], 401, );
   }
 
 //   return redirect()->route('alert');
@@ -5359,12 +5367,12 @@ public function get_all_active_devices(Request $request)
     }
 }
 public function demo_days_alert(Request $request){
-    $currentDate = Carbon::now()->setTimeZone('Asia/Karachi')->subDay()->format('d-m-Y');
+    $currentDate = Carbon::now()->setTimeZone('Asia/Karachi')->format('Y-m-d');
 
-    // Fetch users where demo_duration is less than or equal to the current date minus one day
-    $users = User::where('demo_duration', '<=', $currentDate)
-    ->where('status', '!=', 'Removed')
-    ->get();
+    // Fetch users where demo_duration is less than or equal to the current date
+    $users = User::where('status','demo')
+        // ->where('status', '!=', 'Removed')
+        ->get();
 
     // If users are found, return them with a success message; otherwise, return a message indicating no data
     if($users->isNotEmpty()) {
@@ -5499,7 +5507,6 @@ public function all_sim_info(Request $request){
     $sim = Siminventory::orderBy('created_at','desc')
                     ->get()
                     ->map(function($sims){
-                        // Check if created_at is not null
                         if ($sims->created_at !== null) {
                             $sims->date = $sims->created_at->format('d-m-Y');
                             $sims->time = $sims->created_at->format('h:i A');
