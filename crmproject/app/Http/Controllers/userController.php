@@ -4566,6 +4566,7 @@ public function all_device_info(Request $request) {
                 
                 'device' => $device->device_serialno,
                 'imei_no'=>$device->imei_no,
+                'device_status'=>$device->status,
                 'sim'=>$simNo,
                 'reg_no'=>$userDetails->registeration_no ?? null,
                 'eng_no'=>$userDetails->engine_no ?? null,
@@ -4575,7 +4576,8 @@ public function all_device_info(Request $request) {
                 'date_of_installation'=>$userDetails->date_of_installation ?? null,
                 'technician'=>$technicalDetails->technician_name ?? null,
                 'installation_loc'=>$userDetails->installation_loc ?? null,
-                'segment'=>$userDetails->segment?? null
+                'segment'=>$userDetails->segment?? null,
+                'tracker_status'=>$technicalDetails->tracker_status?? null
                 // 'technical' => $technicalDetails,
                 // 'user' => $userDetails,
             
