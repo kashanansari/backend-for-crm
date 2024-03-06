@@ -526,7 +526,7 @@ return response()->json([
   public function security_create(Request $request){
     // Define validation rules for each input field
     $validator = Validator::make($request->all(), [
-        'customer_email' => 'required|email',
+        'customer_email' => 'nullable|email',
         'emergency_pass' => 'required',
         'emergency_person' => 'nullable',
         'security_ques' => 'required',
@@ -802,7 +802,7 @@ return response()->json([
      $validator=Validator::make($request->all(),[
         'id'=>'required',
         'reg_no' => 'required|exists:users,registeration_no',
-        'client_id' => 'required',
+        'client_id' => 'required|exists:users,id',
         'customer_name' => 'required',
         'sales_per' => 'required',
         'make' => 'required',
@@ -1138,15 +1138,13 @@ public function create_redo(Request $request){
 
 $check = Technicaldetails::where('device_id', $request->old_device)->select('device_no')->first();
 
-if ($check) {
-    $deviceInventory = Deviceinventory::where('id', $check->device_no)->first(); // Retrieve the Deviceinventory record
-    if ($deviceInventory) {
-        $deviceInventory->update(['status' => 'active']); // Update the 'status' attribute
-    }
-}
-$new=Deviceinventory::where('device_serialno',$request->input('new_device'))->first()
+
+    $deviceInventory = Deviceinventory::where('device_serialno', $request->old_device)->update(['status'=>'active']); // Retrieve the Deviceinventory record
+   
+
+$new=Deviceinventory::where('device_serialno',$request->new_device)
 ->update(['status'=>'inactive']);
-$technical=Technicaldetails::where('device_id',$request->input('old_device'))
+$technical=Technicaldetails::where('device_id',$request->old_device)
 ->update(['device_id'=>$request->new_device]);
 
     $data= new Redo();
@@ -1171,7 +1169,7 @@ $technical=Technicaldetails::where('device_id',$request->input('old_device'))
     $data->save();
 
    if($data){
-    $update=complain::where('complain_id',$request->input('complain_id'))->update([
+    $update=complain::where('complain_id',$request->complain_id)->update([
         'Status'=>'Resolved'
     ]);
     $action=[
@@ -4268,7 +4266,8 @@ public function search_for_all(Request $request){
         'redo' => $redo,
         'datalogs' => $datalogs
     ], 200);
-}public function complain_box(Request $request){
+}
+public function complain_box(Request $request){
     $validator=Validator::make($request->all(),[
         'search_term'=>'required'
     ]);
@@ -4565,8 +4564,10 @@ public function all_device_info(Request $request) {
             $combinedData[] = [
                 
                 'device' => $device->device_serialno,
+                'secondary_device' => $technicalDetails->device_id_1??null,
+                'device_status' => $device->status,
+                'tracker_status' => $technicalDetails->tracker_status?? null,
                 'imei_no'=>$device->imei_no,
-                'device_status'=>$device->status,
                 'sim'=>$simNo,
                 'reg_no'=>$userDetails->registeration_no ?? null,
                 'eng_no'=>$userDetails->engine_no ?? null,
@@ -4576,8 +4577,7 @@ public function all_device_info(Request $request) {
                 'date_of_installation'=>$userDetails->date_of_installation ?? null,
                 'technician'=>$technicalDetails->technician_name ?? null,
                 'installation_loc'=>$userDetails->installation_loc ?? null,
-                'segment'=>$userDetails->segment?? null,
-                'tracker_status'=>$technicalDetails->tracker_status?? null
+                'segment'=>$userDetails->segment?? null
                 // 'technical' => $technicalDetails,
                 // 'user' => $userDetails,
             
@@ -4596,9 +4596,7 @@ public function all_device_info(Request $request) {
             'message' => 'Data not found',
         ], 200);
     }
-}
-
-public function tech_reg($reg_no){
+}public function tech_reg($reg_no){
     $tech=User::where('registeration_no',$reg_no)->first();
     if($tech){
         $data=[
@@ -4689,6 +4687,7 @@ public function all_mis_info(Request $request)
 
 
     ])
+    ->orderBy('created_at','desc')
     ->get();
 
     if($user){
@@ -4762,7 +4761,10 @@ public function create_resolve_complain(Request $request)
             'message' => $validator->errors()
         ], 402);
     }
-
+  $client_id=complain::where('complain_id',$request->complain_id)
+  ->pluck('client_id')
+  ->first();
+  if($client_id){
     try {
         $resolved = [
             'complain_code' => $request->complain_id,
@@ -4773,7 +4775,21 @@ public function create_resolve_complain(Request $request)
             'representative' => $request->has('representative') ? $request->representative : 'default_value'
         ];
 
-        if ($request->status == "Resolved") {
+        if ($request->status == "Resolved" && $request->nature=="N/R") {
+            $resolved_complain = Complain_actions::create($resolved);
+            $data = complain::where('complain_id', $request->complain_id)
+                ->update(['Status' => $request->status]);
+           Technicaldetails::where('client_code',$client_id)
+           ->update(['tracker_status'=>'active']);
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'complaint resolved successfully',
+                    'data' => $resolved_complain
+                ], 200);
+            }
+        }
+         if ($request->status == "Resolved") {
             $resolved_complain = Complain_actions::create($resolved);
             $data = complain::where('complain_id', $request->complain_id)
                 ->update(['Status' => $request->status]);
@@ -4805,6 +4821,7 @@ public function create_resolve_complain(Request $request)
             'error' => $error
         ], 500);
     }
+}
 }
 
 public function NR_queue(Request $request){
@@ -5526,6 +5543,13 @@ public function all_sim_info(Request $request){
     ], 200);
 }
 
+// public function merge(Request $request){
+//    $device=Deviceinventory::get()
+//    ->map(function($devices){
+//    Technicaldetails::where()
+//    });
+
+// }
     }
  
 

@@ -10,8 +10,9 @@ class Technicaldetails extends Model
 {
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'client_code', 'id');
+        return $this->belongsTo(User::class, 'client_code', 'id');
     }
+    
     public function device()
     {
         return $this->belongsTo('App\Models\Deviceinventory', 'device_no', 'id');

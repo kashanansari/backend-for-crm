@@ -40,10 +40,11 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Redo', 'client_id', 'id');
     }
-    function technical()
+    public function technical()
     {
-        return $this->hasMany('App\Models\Technicaldetails', 'client_code', 'id');
+        return $this->hasMany(Technicaldetails::class, 'client_code', 'id');
     }
+    
     function clientcode()
     {
         return $this->hasMany('App\Models\secutitydetails', 'client_code', 'id');
@@ -52,6 +53,12 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\complain', 'client_id', 'id');
     }
+    // Assuming this model exists and is associated with the Technicaldetails model
+public function technicaldetails()
+{
+    return $this->hasMany(Technicaldetails::class);
+}
+
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
