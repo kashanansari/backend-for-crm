@@ -265,7 +265,7 @@ $data->remarks = $request->remarks;
 // $data->primaryuser_cnic = $request->primaryuser_cnic;
 $data->transmission = $request->transmission;
 $data->form_status = 'completed'; // Assuming this is a field in the 'users' table
-if($request->has('demo_duration')){
+if($request->demo_duration){
 $data->demo_duration = $request->demo_duration;
 $data->status='demo';
 }
@@ -422,7 +422,7 @@ $data->save();
         'technician_name' => 'required',
         'sim' => 'required',
         'sim_1' => 'nullable',
-        'Gps_check' => 'required',
+        // 'Gps_check' => 'nu',
         'mobilizer' => 'required',
         'webtrack_id' => 'nullable',
         'webtrack_pass' => 'nullable', // Example: minimum length of 6 characters
@@ -1803,8 +1803,8 @@ public function datalogs($search_term){
     ->orderBy('created_at','desc')
     ->get()
     ->map(function($details){
-      $details->date=$details->created_at->format('d-m-Y');
-      $details->time=$details->created_at->format('h:i A');
+      $details->date=$details->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
+      $details->time=$details->created_at->setTimezone('Asia/karachi')->format('h:i A');
       unset($details->created_at);
       unset($details->updated_at);
       return $details; 
@@ -3410,8 +3410,8 @@ public function all_data_logs(Request $request)
     }
 
     $details = $data->map(function ($datalogs) {
-        $datalogs->date = $datalogs->created_at->format('d-m-Y');
-        $datalogs->time = $datalogs->created_at->format('h:i A');
+        $datalogs->date = $datalogs->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
+        $datalogs->time = $datalogs->created_at->setTimezone('Asia/karachi')->format('h:i A');
         $datalogs->alert = $datalogs->nature;
         $datalogs->customer_name = $datalogs->customer_name;
         $datalogs->reg_no = $datalogs->reg_no;
@@ -5508,8 +5508,8 @@ public function all_sim_info(Request $request){
                     ->get()
                     ->map(function($sims){
                         if ($sims->created_at !== null) {
-                            $sims->date = $sims->created_at->format('d-m-Y');
-                            $sims->time = $sims->created_at->format('h:i A');
+                            $sims->date = $sims->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
+                            $sims->time = $sims->created_at->setTimezone('Asia/karachi')->format('h:i A');
                         }
                         // Unset created_at and updated_at if they exist
                         unset($sims->created_at);
