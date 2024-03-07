@@ -5534,20 +5534,23 @@ public function all_sim_info(Request $request){
 // }
 public function employees_count(Request $request){
     $Emp_count = Employee::count();
-    
-   
+    $user_count = User::count(); 
+
     return response()->json([
         'success'=>true,
-        'count'=>$Emp_count
+        'message'=>'Total count',
+        'emp_count'=>$Emp_count,
+        'user_count'=>$user_count
     ], 200, );
  }
- public function user_count()
- { 
- $count = User::count(); 
-return response()->json([
-    'success'=>true,
-    'count'=>$count
-], 200, ); }
+//  public function user_count()
+//  { 
+//  $count = User::count(); 
+// return response()->json([
+//     'success'=>true,
+//     'message'=>'Total Users count',
+//     'count'=>$count
+// ], 200, ); }
 
 
 
