@@ -316,13 +316,7 @@ $data->save();
         }
     }
     
-    public function show(){
-              $data = User::orderBy('created_at','desc')
-              ->paginate(20);
-
-              $count = User::count(); // Replace 'your_table_name' with the actual table name
-              return view('alluser',compact('data','count'));
-           }
+  
     //        public function record(){
     //         $data = User::all();
     //        $count= User::count();
@@ -1823,15 +1817,7 @@ return response()->json([
  public function view_employees(Request $request){
     return view('totalemployees');
  }
- public function add_employees(Request $request){
-    $Empid = Employee::latest()->first();
-    $Employeeid = $Empid ? $Empid->emp_id + 1 : 1;
-    // return view('AddEmployee',compact('Employeeid'));
-    return response()->json([
-        'success'=>true,
-        'Emp_id'=>$Employeeid
-    ], 200, );
- }
+
 
  public function create_emp(Request $request){
     // Validation rules
@@ -4890,11 +4876,7 @@ public function active_inactive(Request $request){
     'logout_date'=>$data->logout_date,
     'status'=>$data->status,
     'time_worked'=>$formattedTime,
-    // $data->emp->emp_name,
-    // $data->emp->emp_name,
-    // $data->emp->emp_name,
-    // $data->emp->emp_name,
-    // $data->emp->emp_name
+  
         ];
     });
 return response()->json([
@@ -5550,10 +5532,24 @@ public function all_sim_info(Request $request){
 //    });
 
 // }
-    }
- 
+public function employees_count(Request $request){
+    $Emp_count = Employee::count();
+    
+   
+    return response()->json([
+        'success'=>true,
+        'count'=>$Emp_count
+    ], 200, );
+ }
+ public function user_count()
+ { 
+ $count = User::count(); 
+return response()->json([
+    'success'=>true,
+    'count'=>$count
+], 200, ); }
 
 
 
-
+}
 

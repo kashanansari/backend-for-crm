@@ -146,3 +146,5 @@ Route::post('/create_update_sim_inventory', [userController::class, 'create_upda
 Route::post('/demo_removed', [userController::class, 'demo_removed'])->name('demo_removed');
 Route::post('/demo_approved', [userController::class, 'demo_approved'])->name('demo_approved');
 Route::get('/all_sim_info', [userController::class, 'all_sim_info'])->name('all_sim_info');
+Route::get('/employees_count', [userController::class, 'employees_count'])->name('employees_count');
+Route::get('/user_count', [userController::class, 'user_count'])->name('user_count');
