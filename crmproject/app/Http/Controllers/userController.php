@@ -5600,6 +5600,36 @@ public function employees_count(Request $request){
         ], 404);
     }
 }
+public function get_avialiable_sim(Request $request)
+{ 
+    $validator = Validator::make($request->all(), [
+        'search_term' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => $validator->errors()
+        ], 400);
+    }
+  $search_term=$request->search_term;
+    $data = Siminventory::where('sim_no', 'LIKE', "%$search_term%")
+                        ->where('status', 'availiable')
+                        ->get();
+
+    if ($data->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No data found'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Data found successfully',
+        'data' => $data
+    ], 200);
+}
 
 
     }

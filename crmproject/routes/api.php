@@ -149,3 +149,4 @@ Route::get('/all_sim_info', [userController::class, 'all_sim_info'])->name('all_
 Route::get('/employees_count', [userController::class, 'employees_count'])->name('employees_count');
 Route::get('/user_count', [userController::class, 'user_count'])->name('user_count');
 Route::get('/all_info', [userController::class, 'all_info'])->name('all_info');
+Route::post('/get_avialiable_sim', [userController::class, 'get_avialiable_sim'])->name('get_avialiable_sim');
