@@ -5525,13 +5525,6 @@ public function all_sim_info(Request $request){
     ], 200);
 }
 
-// public function merge(Request $request){
-//    $device=Deviceinventory::get()
-//    ->map(function($devices){
-//    Technicaldetails::where()
-//    });
-
-// }
 public function employees_count(Request $request){
     $Emp_count = Employee::count();
     $user_count = User::count(); 
@@ -5543,16 +5536,68 @@ public function employees_count(Request $request){
         'user_count'=>$user_count
     ], 200, );
  }
-//  public function user_count()
-//  { 
-//  $count = User::count(); 
-// return response()->json([
-//     'success'=>true,
-//     'message'=>'Total Users count',
-//     'count'=>$count
-// ], 200, ); }
+ public function all_info(Request $request){
+    $data = Technicaldetails::with('device.sim', 'device.technical', 'user')
+        ->get();
+
+   
+            $all_data = $data->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'client_code' => $item->client_code,
+                    // 'device_no' => $item->device_no,
+                    'vendor_name' => $item->vendor_name,
+                    'device' => $item->device_id,
+                    'IMEI_no' => $item->IMEI_no,
+                    'technician_name' => $item->technician_name,                   
+                    'tracker_status' => $item->tracker_status,
+                    'representative' => $item->representative,
+                    // 'device_id_1' => $item->device_id_1,
+                    // 'sim_1' => $item->sim_1,
+                    // 'vendor_name_1' => $item->vendor_name_1,
+                    // 'IMEI_no_1' => $item->IMEI_no_1,
+                        'device_serialno' => $item->device->device_serialno,
+                        'sim_id' => $item->device->sim_id,
+                        'imei_no' => $item->device->imei_no,
+                        'device_status' => $item->device->status,
+                        'sim_no' => $item->device->sim->sim_no,
+                        
+                    
+                        // 'id' => $item->user->id,
+                        'customer_name' => $item->user->customer_name,
+                        'father_name' => $item->user->father_name,
+                        'registeration_no'=>$item->user->registeration_no,
+                        'eng_no'=>$item->user->engine_no,
+                        'DOI'=>$item->user->date_of_installation,
+                        'contact'=>$item->user->mobileno_1,
+                        'location'=>$item->user->installation_loc,
+                      'segment'=>$item->user->installation_loc
+                    
+                ];
+            });  
+            if($all_data){
+                return response()->json([
+                    'success'=>true,
+                    'message'=>'Data found successfully',
+                    'data'=>$all_data
+                ], 200, );
+            }
+            else{
+                return response()->json([
+                    'success'=>true,
+                    'message'=>'Data not found',
+                    'data'=>null
+                ], 200, );
+            }
+    }
+    }
 
 
 
-}
+
+
+
+
+
+
 

@@ -16,4 +16,8 @@ class Siminventory extends Model
         'representative',
     ];
     protected $table='sim_inventory';
+    public function device()
+    {
+        return $this->hasOne(Deviceinventory::class, 'sim_id','id');
+    }
 }

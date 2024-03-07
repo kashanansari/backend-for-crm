@@ -17,7 +17,10 @@ class Deviceinventory extends Model
     protected $table='deviceinventory';
     public function technical()
     {
-        return $this->hasOne(Technicaldetails::class, 'device_no');
+        return $this->hasOne(Technicaldetails::class, 'device_no','id');
     }
-    
+    public function sim()
+    {
+        return $this->belongsTo('App\Models\Siminventory','sim_id','id');
+    }
 }

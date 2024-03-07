@@ -54,10 +54,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\complain', 'client_id', 'id');
     }
     // Assuming this model exists and is associated with the Technicaldetails model
-public function technicaldetails()
-{
-    return $this->hasMany(Technicaldetails::class);
-}
+// public function technicaldetails()
+// {
+//     return $this->hasMany(Technicaldetails::class);
+// }
 
     use HasApiTokens, HasFactory, Notifiable;
 
