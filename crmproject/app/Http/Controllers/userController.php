@@ -1111,6 +1111,8 @@ public function create_redo(Request $request){
      'new_device'=>'required',
      'old_sim'=>'required',
      'old_imei'=>'required',
+     'new_imei'=>'required',
+     'new_sim'=>'required',
      'eng_no'=>'required',
      'chasis_no'=>'required',
      'install_loc'=>'required',
@@ -1141,7 +1143,11 @@ $check = Technicaldetails::where('device_id', $request->old_device)->select('dev
 $new=Deviceinventory::where('device_serialno',$request->new_device)
 ->update(['status'=>'inactive']);
 $technical=Technicaldetails::where('device_id',$request->old_device)
-->update(['device_id'=>$request->new_device]);
+->update([
+    'device_id'=>$request->new_device,
+    'IMEI_no'=>$request->new_imei,
+    'sim'=>$request->new_sim,
+]);
 
     $data= new Redo();
     $data->client_id=$request->input('client_id');
@@ -1153,6 +1159,10 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
     $data->technician=$request->input('technician');
     $data->old_device=$request->input('old_device');
     $data->new_device=$request->input('new_device');
+    $data->old_sim=$request->input('old_sim');
+    $data->old_imei=$request->input('old_imei');
+    $data->new_imei=$request->input('new_imei');
+    $data->new_sim=$request->input('new_sim');
     $data->eng_no=$request->input('eng_no');
     $data->chasis_no=$request->input('chasis_no');
     $data->install_loc=$request->input('install_loc');

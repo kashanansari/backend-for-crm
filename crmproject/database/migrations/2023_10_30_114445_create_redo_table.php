@@ -34,6 +34,10 @@ return new class extends Migration
             $table->string('sales_person');
             $table->string('harness_change');
             $table->string('backupbattery_change');
+            $table->string('old_sim')->nullable();
+            $table->string('new_sim')->nullable();
+            $table->string('old_imei')->nullable();
+            $table->string('new_imei')->nullable();
             $table->string('representative')->nullable();
 
             $table->timestamps();
