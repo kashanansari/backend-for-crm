@@ -15,7 +15,7 @@ class Deviceinventory extends Model
         'status', // Add the 'status' attribute to the array
     ];
     protected $table='deviceinventory';
-    public function technical()
+    public function technicaldetails()
     {
         return $this->hasOne(Technicaldetails::class, 'device_no','id');
     }

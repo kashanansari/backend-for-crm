@@ -999,7 +999,7 @@ public function create_deviceinventory(Request $request) {
 
     $validator = Validator::make($request->all(), [
         'device_serialno' => 'required',
-        'imei_no' => 'required',
+        'imei_no' => 'required|unique',
         'vendor' => 'required',
         'representative'=>'required',
         
@@ -1109,6 +1109,8 @@ public function create_redo(Request $request){
      'technician'=>'nullable',
      'old_device'=>'required',
      'new_device'=>'required',
+     'old_sim'=>'required',
+     'old_imei'=>'required',
      'eng_no'=>'required',
      'chasis_no'=>'required',
      'install_loc'=>'required',
@@ -4512,8 +4514,8 @@ if($queue){
 public function all_redo_info(Request $request){
  $redo=Redo::all();
  $redo->map(function($redos) {
-    $redos->redo_date=$redos->created_at->format('d-m-Y');
-    $redos->redo_time=$redos->created_at->format('h:i A');
+    $redos->redo_date=$redos->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
+    $redos->redo_time=$redos->created_at->setTimezone('Asia/karachi')->format('h:i A');
     unset($redos->created_at);
     unset($redos->updated_at);
     return $redos;
@@ -5537,59 +5539,59 @@ public function employees_count(Request $request){
     ], 200, );
  }
  public function all_info(Request $request){
-    $data = Technicaldetails::with('device.sim', 'device.technical', 'user')
+    // Fetch all data from Deviceinventory
+    $data = Deviceinventory::with(['technicaldetails.user', 'sim'])
         ->get();
 
-   
-            $all_data = $data->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'client_code' => $item->client_code,
-                    // 'device_no' => $item->device_no,
-                    'vendor_name' => $item->vendor_name,
-                    'device' => $item->device_id,
-                    'IMEI_no' => $item->IMEI_no,
-                    'technician_name' => $item->technician_name,                   
-                    'tracker_status' => $item->tracker_status,
-                    'representative' => $item->representative,
-                    // 'device_id_1' => $item->device_id_1,
-                    // 'sim_1' => $item->sim_1,
-                    // 'vendor_name_1' => $item->vendor_name_1,
-                    // 'IMEI_no_1' => $item->IMEI_no_1,
-                        'device_serialno' => $item->device->device_serialno,
-                        'sim_id' => $item->device->sim_id,
-                        'imei_no' => $item->device->imei_no,
-                        'device_status' => $item->device->status,
-                        'sim_no' => $item->device->sim->sim_no,
-                        
-                    
-                        // 'id' => $item->user->id,
-                        'customer_name' => $item->user->customer_name,
-                        'father_name' => $item->user->father_name,
-                        'registeration_no'=>$item->user->registeration_no,
-                        'eng_no'=>$item->user->engine_no,
-                        'DOI'=>$item->user->date_of_installation,
-                        'contact'=>$item->user->mobileno_1,
-                        'location'=>$item->user->installation_loc,
-                      'segment'=>$item->user->installation_loc
-                    
-                ];
-            });  
-            if($all_data){
-                return response()->json([
-                    'success'=>true,
-                    'message'=>'Data found successfully',
-                    'data'=>$all_data
-                ], 200, );
-            }
-            else{
-                return response()->json([
-                    'success'=>true,
-                    'message'=>'Data not found',
-                    'data'=>null
-                ], 200, );
-            }
+    // Map the data
+    $all_data = $data->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'device_ser' => $item->device_serialno,
+            'imei_no' => $item->imei_no,
+            'vendor' => $item->vendor,
+            'device_status' => $item->status,
+            'representative' => $item->representative,
+                'sim_no' => $item->sim->sim_no,
+                'icc_id' => $item->sim->icc_id,
+                'provider' => $item->sim->provider,
+                'status' => $item->sim->status,
+                'representative' => $item->sim->representative,
+                'client_code' => $item->technicaldetails->client_code??null,
+                'IMEI_no' => $item->technicaldetails->IMEI_no??null,
+                'technician_name' => $item->technicaldetails->technician_name??null,
+                'tracker_status' => $item->technicaldetails->tracker_status??null,
+                'representative' => $item->technicaldetails->representative??null,
+                    'customer_name' => $item->technicaldetails->user->customer_name??null,
+                    'father_name' => $item->technicaldetails->user->father_name??null,
+                    'registeration_no' => $item->technicaldetails->user->registeration_no??null,
+                    'eng_no' => $item->technicaldetails->user->engine_no??null,
+                    'DOI' => $item->technicaldetails->user->date_of_installation??null,
+                    'contact' => $item->technicaldetails->user->mobileno_1??null,
+                    'location' => $item->technicaldetails->user->installation_loc??null,
+                    'segment' => $item->technicaldetails->user->segment??null,
+                // ] : null,
+            // ] : null,
+        ];
+    });  
+
+    // Check if data is found
+    if($all_data->isNotEmpty()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Data found successfully',
+            'data' => $all_data
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data not found',
+            'data' => null
+        ], 404);
     }
+}
+
+
     }
 
 
