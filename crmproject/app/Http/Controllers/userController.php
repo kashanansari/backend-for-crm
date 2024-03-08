@@ -999,7 +999,7 @@ public function create_deviceinventory(Request $request) {
 
     $validator = Validator::make($request->all(), [
         'device_serialno' => 'required',
-        'imei_no' => 'required|unique',
+        'imei_no' => 'required|unique:deviceinventory,imei_no',
         'vendor' => 'required',
         'representative'=>'required',
         
@@ -1010,6 +1010,7 @@ public function create_deviceinventory(Request $request) {
         'success'=>false,
         'message'=>$validator->errors()
        ], 402, );
+
     }
 
     $device = deviceinventory::where('device_serialno', $request->device_serialno)->first();
