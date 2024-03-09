@@ -13,16 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('new_queue', function (Blueprint $table) {
+        Schema::create('secondary_device', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('client_id');
-            $table->foreign('client_id')->references('id')->on('users');
+            $table->unsignedBigInteger('technical_id');
+            $table->foreign('technical_id')->references('id')->on('technicaldetails');
+            $table->string('secondary_device')->nullable();
             $table->string('reg_no')->nullable();
-            $table->string('date')->nullable();
-            $table->string('time')->nullable();
-            $table->string('representative')->nullable();
-            $table->string('status')->nullable();
-
+            $table->string('client_id')->nullable();
+            $table->string('primary_device')->nullable();
+            $table->string('customer_name')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('new_queue');
+        Schema::dropIfExists('secondary_device');
     }
 };

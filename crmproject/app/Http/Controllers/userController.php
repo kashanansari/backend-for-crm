@@ -1148,6 +1148,7 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
     'device_id'=>$request->new_device,
     'IMEI_no'=>$request->new_imei,
     'sim'=>$request->new_sim,
+    'tracker_status'=>'active'
 ]);
 
     $data= new Redo();
@@ -1179,6 +1180,7 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
     $update=complain::where('complain_id',$request->complain_id)->update([
         'Status'=>'Resolved'
     ]);
+
     $action=[
         'complain_code'=>$request->complain_id,
         'actions'=>'Resolved',
@@ -4177,6 +4179,9 @@ public function search_for_all(Request $request){
                           unset($removals->updated_at);
                           return $removals;
                       });
+      $renewal=Renewals::where('client_id',$user->id)
+      ->select('renewal_charges')
+      ->first();                
 
     $lastComplaint = Complain::latest()->first();
     $lastComplaintId = $lastComplaint ? $lastComplaint->complain_id + 1 : 1;
@@ -4263,7 +4268,8 @@ public function search_for_all(Request $request){
             'NR' => $NR
         ],
         'redo' => $redo,
-        'datalogs' => $datalogs
+        'datalogs' => $datalogs,
+        'renewal_charges'=>$renewal,
     ], 200);
 }
 public function complain_box(Request $request){
@@ -4523,7 +4529,8 @@ if($queue){
   }
 
 public function all_redo_info(Request $request){
- $redo=Redo::all();
+ $redo=Redo::orderBy('created_at','desc')
+->get();
  $redo->map(function($redos) {
     $redos->redo_date=$redos->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
     $redos->redo_time=$redos->created_at->setTimezone('Asia/karachi')->format('h:i A');

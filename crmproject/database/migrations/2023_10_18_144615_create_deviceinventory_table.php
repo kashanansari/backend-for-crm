@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('device_serialno');
             $table->string('imei_no');
             $table->string('status');
+            $table->string('secondary_device_status');
             $table->string('vendor');
             $table->string('devciesim_no');
-
             $table->timestamps();
         });
     }

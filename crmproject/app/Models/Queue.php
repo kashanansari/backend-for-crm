@@ -18,6 +18,6 @@ class Queue extends Model
         'status'
     ];
 
-    protected $table='Queue';
+    protected $table='new_queue';
 
 }
