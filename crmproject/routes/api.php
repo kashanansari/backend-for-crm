@@ -150,3 +150,4 @@ Route::get('/employees_count', [userController::class, 'employees_count'])->name
 Route::get('/user_count', [userController::class, 'user_count'])->name('user_count');
 Route::get('/all_info', [userController::class, 'all_info'])->name('all_info');
 Route::post('/get_avialiable_sim', [userController::class, 'get_avialiable_sim'])->name('get_avialiable_sim');
+Route::get('/all_removal_transfer_info', [userController::class, 'all_removal_transfer_info'])->name('all_removal_transfer_info');

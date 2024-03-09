@@ -26,7 +26,7 @@ use App\Models\SMS;
 use App\Models\Queue;
 use App\Models\Siminventory;
 use GuzzleHttp\Client;
-
+use App\Models\Secondarydetails;
 
 
 use Illuminate\Http\Response;
@@ -1154,11 +1154,16 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
 if($request->old_device===$request->new_device){
 Siminventory::where('sim_no',$request->old_sim)
 ->update(['status'=>'availiable']);
-$sim_id=Siminventory::where('sim_no',$request->new_sim)
-->update(['status'=>'installed']);
-Deviceinventory::where('device_serialno',$request->new_device)
-->update(['sim_id '=>$sim_id->id]);
-
+$sim_id = Siminventory::where('sim_no', $request->new_sim)
+    ->select('id')
+    ->first(); // Retrieve the first matching record
+if ($sim_id) {
+    $sim_id = $sim_id->id; // Access the 'id' property
+    Siminventory::where('sim_no', $request->new_sim)
+        ->update(['status' => 'installed']);
+    Deviceinventory::where('device_serialno', $request->new_device)
+        ->update(['sim_id' => $sim_id]);
+}
 }
     $data= new Redo();
     $data->client_id=$request->input('client_id');
@@ -1216,6 +1221,8 @@ Deviceinventory::where('device_serialno',$request->new_device)
 //    return redirect()->route('cc');
 
 }
+
+
 public function create_inventory(Request $request){
     $request->validate([
         'device_serialno' => 'required|unique:deviceinventory',
@@ -1479,6 +1486,7 @@ public function create_removal_transfer(Request $request){
         $user->year = $data->new_year;
         $user->color = $data->new_color;
         $user->engine_type = $request->eng_type;
+        $user->status="active";
         $user->update();
     }
     $technical=Technicaldetails::where('client_code',$data->client_id)
@@ -1805,7 +1813,6 @@ else{
 public function datalogs($search_term){
     $datalogs = Datalogs::where('reg_no', $search_term)
     ->orWhere('customer_name','LIKE',"%$search_term%")
-    ->orderBy('created_at','desc')
     ->get()
     ->map(function($details){
       $details->date=$details->created_at->setTimezone('Asia/karachi')->format('d-m-Y');
@@ -5297,8 +5304,14 @@ public function seach_secondary_device(Request $request){
 }
 public function create_another_device(Request $request) {
     $validator = Validator::make($request->all(), [
-        'client_id' => 'required',
-        'device_id_1' => 'required|exists:deviceinventory,device_serialno'
+        'client_id' => 'required|exists:users,id',
+        'primary_device' => 'required|exists:deviceinventory,device_serialno',
+        'technical_id' => 'required|exists:technicaldetails,id',
+        'secondary_device' => 'required|exists:deviceinventory,device_serialno',
+        'reg_no' => 'required|exists:users,registeration_no',
+        'customer_name' => 'required',
+
+
     ]);
 
     if ($validator->fails()) {
@@ -5308,20 +5321,29 @@ public function create_another_device(Request $request) {
         ], 402);
     }
 
-    $technical = Technicaldetails::where('client_code', $request->client_id)->first();
+    $data=[
+     'client_id'=>$request->client_id,
+      'primary_device'=>$request->primary_device,
+      'technical_id '=>$request->technical_id ,
+      'secondary_device'=>$request->secondary_device,
+      'reg_no'=>$request->reg_no,
+      'customer_name'=>$request->customer_name,
 
-    // Check if the first device already exists
-    if ($technical->device_id_1 !== null) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Already have 1 device installed'
-        ], 400);
-    }
+    ];
 
-    // Check if the device is inactive
-    $device = Deviceinventory::where('device_serialno', $request->device_id_1)
-                              ->where('status', 'active')
-                              ->first();
+    // $technical = Technicaldetails::where('client_code', $request->client_id)->first();
+
+    // // Check if the first device already exists
+    // if ($technical->device_id_1 !== null) {
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => 'Already have 1 device installed'
+    //     ], 400);
+    // }
+
+    // // Check if the device is inactive
+    $device = Deviceinventory::where('device_serialno', $request->secondary_device)
+    ->update(['status'=>'inactive']);
 
     if (!$device) {
         return response()->json([
@@ -5329,12 +5351,7 @@ public function create_another_device(Request $request) {
             'message' => 'Device cannot be installed or is not inactive'
         ], 401);
     }
-
-    // Update device status to inactive and associate it with the technical details
-    Deviceinventory::where('device_serialno', $request->device_id_1)
-                    ->update(['status' => 'inactive']);
-    $technical->device_id_1 = $request->device_id_1;
-    $technical->save();
+    $secondary=Secondarydetails::create($data);
 
     return response()->json([
         'success' => true,
@@ -5636,7 +5653,23 @@ public function get_avialiable_sim(Request $request)
         'data' => $data
     ], 200);
 }
-
+public function all_removal_transfer_info(Request $request){
+    $transfer=Transfer::get();
+if($transfer){
+    return response()->json([
+        'success'=>true,
+        'message'=>'Data found succsesfully',
+        'data'=>$transfer
+    ], 200, );
+}
+else{
+    return response()->json([
+        'success'=>false,
+        'message'=>'Data not found',
+        'data'=>null
+    ], 200, );
+}
+}
 
     }
 
