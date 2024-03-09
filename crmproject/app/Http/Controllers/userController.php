@@ -340,16 +340,17 @@ $data->save();
         $data_1 = Technicaldetails::where('client_code', $data->id)->first();
         $data_2 = secutitydetails::where('client_code', $data->id)->first();
         $device=Deviceinventory::where('id',$data_1->device_no )->first();
-        // $vas = explode(', ', $data->vas_options);
-
+                $renewals=Renewals::where('client_id',$data->id)
+                ->select('renewal_charges')
+                ->first();
    return response()->json([
     'success'=>true,
     'message'=>'Data found successfully',
     'user'=>$data,
     'technical'=>$data_1,
     'security'=>$data_2,
-    'device_information'=>$device
-
+    'device_information'=>$device,
+    'renewal_charges'=>$renewals
    ], 200, );
     }
 
@@ -1150,7 +1151,15 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
     'sim'=>$request->new_sim,
     'tracker_status'=>'active'
 ]);
+if($request->old_device===$request->new_device){
+Siminventory::where('sim_no',$request->old_sim)
+->update(['status'=>'availiable']);
+$sim_id=Siminventory::where('sim_no',$request->new_sim)
+->update(['status'=>'installed']);
+Deviceinventory::where('device_serialno',$request->new_device)
+->update(['sim_id '=>$sim_id->id]);
 
+}
     $data= new Redo();
     $data->client_id=$request->input('client_id');
     $data->complain_id=$request->input('complain_id');
@@ -1189,18 +1198,7 @@ $technical=Technicaldetails::where('device_id',$request->old_device)
         'representative'=>$request->representative,
     ];
     Complain_actions::create($action);
-    // if($update){
-    // $update->Status='Resolved';
-    // $update->update();
-    
-    // Complain_actions::create([
-    //     'complain_code'=>$request->complain_id,
-    //     'actions'=>'Resolved',
-    //     'remarks'=>$request->remarks,
-    //     'nature'=>$update->nature_of_complain,
-    //     'representative'=>$request->representative,
-
-    // ]);
+   
     return response()->json([
         'scuccess'=>true,
         'message'=>'Redo created successfully',
