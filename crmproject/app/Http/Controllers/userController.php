@@ -5287,7 +5287,7 @@ public function seach_secondary_device(Request $request){
     ->first();
     if($user){
         $technical=Technicaldetails::where('client_code',$user->id)
-        ->select('device_id','IMEi_no')        
+        ->select('device_id','IMEi_no','id as technical_id')        
         ->first();
         return response()->json([
             'success'=>true,
