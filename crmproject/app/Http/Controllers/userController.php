@@ -1472,7 +1472,10 @@ public function create_removal_transfer(Request $request){
  $data->save();
  if($data){
     // User::where('id',$request->client_id)->update(['engine_type'=>$request->eng_type]);
-    Technicaldetails::where('client_code',$request->client_id)->update(['device_id'=>$data->new_device]);
+    Technicaldetails::where('client_code',$request->client_id)->update([
+        'device_id'=>$data->new_device,
+        'tracker_status'=>'active'
+]);
     Deviceinventory::where('device_serialno',$data->new_device)->update(['status'=>'inactive']);
     // Deviceinventory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
     $user=User::find($data->client_id);
@@ -5311,7 +5314,6 @@ public function create_another_device(Request $request) {
         'reg_no' => 'required|exists:users,registeration_no',
         'customer_name' => 'required',
 
-
     ]);
 
     if ($validator->fails()) {
@@ -5324,7 +5326,7 @@ public function create_another_device(Request $request) {
     $data=[
      'client_id'=>$request->client_id,
       'primary_device'=>$request->primary_device,
-      'technical_id '=>$request->technical_id ,
+      'technical_id'=>$request->technical_id ,
       'secondary_device'=>$request->secondary_device,
       'reg_no'=>$request->reg_no,
       'customer_name'=>$request->customer_name,
