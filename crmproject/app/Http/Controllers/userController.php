@@ -5282,7 +5282,8 @@ public function seach_secondary_device(Request $request){
         ], 200, );
     }
     $user=User::where('registeration_no',$request->search_term)
-    ->select('customer_name','engine_no','id')
+    ->select('customer_name','engine_no','id',
+    'registeration_no')
     ->first();
     if($user){
         $technical=Technicaldetails::where('client_code',$user->id)
@@ -5357,7 +5358,8 @@ public function create_another_device(Request $request) {
 
     return response()->json([
         'success' => true,
-        'message' => 'Another device added successfully'
+        'message' => 'Another device added successfully',
+        'data'=>$secondary
     ], 200);
 }
 public function sim_inventory_info(Request $request){
