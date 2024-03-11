@@ -338,6 +338,9 @@ $data->save();
             ], 200, );
         }
         $data_1 = Technicaldetails::where('client_code', $data->id)->first();
+        $secondary=Secondarydetails::where('technical_id',$data_1->id)
+        ->select('secondary_device')
+        ->first();
         $data_2 = secutitydetails::where('client_code', $data->id)->first();
         $device=Deviceinventory::where('id',$data_1->device_no )->first();
                 $renewals=Renewals::where('client_id',$data->id)
@@ -350,7 +353,8 @@ $data->save();
     'technical'=>$data_1,
     'security'=>$data_2,
     'device_information'=>$device,
-    'renewal_charges'=>$renewals
+    'renewal_charges'=>$renewals,
+    'secondary_device'=>$secondary
    ], 200, );
     }
 
@@ -1418,7 +1422,8 @@ public function create_removal_transfer(Request $request){
         'new_cc' => 'required',
         'new_color' => 'required',
         'new_trans' => 'required',
-        // 'new_mob' => 'nullable',
+        'old_imei'=>'required',
+        'new_imei'=>'required',
         'remarks' => 'required',
         'customer_name' => 'required',
         'old_year' => 'required',
@@ -1431,7 +1436,6 @@ public function create_removal_transfer(Request $request){
         'mobilizer' => 'required',
         'eng_type' => 'required',
     ]);
-
     if ($validator->fails()) {
         return response()->json([
             'success'=>false,
@@ -1476,8 +1480,16 @@ public function create_removal_transfer(Request $request){
         'device_id'=>$data->new_device,
         'tracker_status'=>'active'
 ]);
-    Deviceinventory::where('device_serialno',$data->new_device)->update(['status'=>'inactive']);
-    // Deviceinventory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
+$device_details = Deviceinventory::where('device_serialno', $data->new_device)
+->select('sim_id', 'imei_no')
+->first();
+
+if ($device_details) {
+$device_details->update(['status' => 'inactive']);
+}
+
+    $sim_new=Siminventory::where('id',$device_details->sim_id)->select('sim_no')->first();
+    Deviceinventory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
     $user=User::find($data->client_id);
     if($user){
         $user->registeration_no = $data->new_reg;
@@ -1496,7 +1508,9 @@ public function create_removal_transfer(Request $request){
     ->first();
     if($technical){
         $technical->device_id=$data->new_device;
-        $technical->mobilizer=$request->mobilizer;
+        $technical->device_id=$data->new_device;
+        $technical->IMEI_no=$device_details->imei_no;
+        $technical->sim=$sim_new;
         $technical->update();
 
     }
@@ -4177,6 +4191,9 @@ public function search_for_all(Request $request){
     }
 
     $technical = Technicaldetails::where('client_code', $user->id)->first();
+    $secondary_device=Secondarydetails::where('technical_id',$technical->id)
+    ->select('secondary_device')
+    ->first();
     $security = secutitydetails::where('client_code', $user->id)->first();
     $removal = Removal::where('client_id', $user->id)
                       ->get()
@@ -4263,6 +4280,7 @@ public function search_for_all(Request $request){
         'user' => $user,
         'technical' => $technical,
         'security' => $security,
+        'secondary_device'=>$secondary_device
     ];
 
     return response()->json([
@@ -4572,7 +4590,7 @@ public function all_device_info(Request $request) {
             $simDetails = Siminventory::where('id', $simId)->select('sim_no')
             ->first();
 
-            $technicalDetails = $device->technical()->first(); // Get first technical detail for the device
+            $technicalDetails = $device->technicaldetails()->first(); // Get first technical detail for the device
             $userDetails = $technicalDetails ? $technicalDetails->user : null; // Get user details associated with the technical detail
             $simNo = $simDetails ? $simDetails->sim_no : null;
             $combinedData[] = [
@@ -4610,7 +4628,8 @@ public function all_device_info(Request $request) {
             'message' => 'Data not found',
         ], 200);
     }
-}public function tech_reg($reg_no){
+}
+public function tech_reg($reg_no){
     $tech=User::where('registeration_no',$reg_no)->first();
     if($tech){
         $data=[
