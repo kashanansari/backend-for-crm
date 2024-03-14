@@ -468,6 +468,7 @@ $data->save();
   }
   
  $device->update(['status' => 'inactive']);
+ $device->update(['is_primary'=>'yes']);
 if ($client_value && $device) {
     $value->client_code = $client_value->id;
     $value->device_no=$device->id;
@@ -1303,38 +1304,77 @@ public function removal_search(Request $request){
             'errors' => $validator->errors(),
         ], 422);
     }
-    $regNo = $request->search_term;
+    $device= $request->search_term;
 
-     $user = User::where('registeration_no', $regNo)
-    //  ->orWhere('customer_name','LIKE',"%$regNo%")
-     ->orWhere('mobileno_1','LIKE',"%$regNo%")
-     ->orWhere('cnic','LIKE',"%$regNo%")
-     ->OrderBy('created_at','desc')
-     ->first();
-     if (!$user) {
-        // return redirect()->back()->with('error', 'Data not found.');
-        return response()->json([
-            'success'=>false,
-            'message'=>'Data not found',
-            'data'=>null
-        ], 400, );
-    }
-
-     $device=Technicaldetails::where('client_code',$user->id)->select('device_id','technician_name')->first();
-     $lastComplaint = Removal::latest()->first();
-     $lastComplaintId = $lastComplaint ? $lastComplaint->id + 1 : 1;
-
-     if ($user) {
-         // If a user is found, you can pass the user data to the view
-        //  return view('removal', compact('user','lastComplaintId','device'));
+       $device=Deviceinventory::where('device_serialno',$device)
+       ->first();
+       if($device && $device->is_primary=="yes"){
+        $technician_name=Technicaldetails::where('device_no',$device->id)->select('technician_name','client_code')->first();
+        $user=User::where('id',$technician_name->client_code)
+        ->first();
+        $removal=Removal::latest()->first();
+        $removal_id=$removal?$removal->id+1:1;
+        $data=[
+            'removal_id'=>$removal_id,
+            'device'=>$device,
+            'technician_name'=>$technician_name->technician_name,
+            'user'=>$user
+        ];
         return response()->json([
             'success'=>true,
-            'message'=>'Data found successfully',
-            'user'=>$user,
-            'removal_id'=>$lastComplaintId,
-            'device'=>$device
+            'message'=>' Primary data found successfully',
+            'data'=>$data 
         ], 200, );
-     }
+       }
+       if($device && $device->is_secondary=="yes"){
+        $details=Secondarydetails::where('secondary_device',$device->device_serialno)->select('technical_id','client_id')->first();
+        $technician_name=Technicaldetails::where('id',$details->technical_id)->select('device_id','technician_name')->first();
+        $user=User::where('id',$details->client_id)->first();
+        $removal=Removal::latest()->first();
+        $removal_id=$removal?$removal->id+1:1;
+        $data=[
+            'removal_id'=>$removal_id,
+            'device'=>$device,
+            'technician_name'=>$technician_name,
+            'user'=>$user
+        ];
+
+        return response()->json([
+            'success'=>true,
+            'message'=>'Secondary data found successfully',
+            'data'=>$data 
+        ], 200, );
+       }
+
+    //  $user = User::where('registeration_no', $regNo)
+    //  ->orWhere('mobileno_1','LIKE',"%$regNo%")
+    //  ->orWhere('cnic','LIKE',"%$regNo%")
+    //  ->OrderBy('created_at','desc')
+    //  ->first();
+    //  if (!$user) {
+    //     // return redirect()->back()->with('error', 'Data not found.');
+    //     return response()->json([
+    //         'success'=>false,
+    //         'message'=>'Data not found',
+    //         'data'=>null
+    //     ], 400, );
+    // }
+
+    //  $device=Technicaldetails::where('client_code',$user->id)->select('device_id','technician_name')->first();
+    //  $lastComplaint = Removal::latest()->first();
+    //  $lastComplaintId = $lastComplaint ? $lastComplaint->id + 1 : 1;
+
+    //  if ($user) {
+    //      // If a user is found, you can pass the user data to the view
+    //     //  return view('removal', compact('user','lastComplaintId','device'));
+    //     return response()->json([
+    //         'success'=>true,
+    //         'message'=>'Data found successfully',
+    //         'user'=>$user,
+    //         'removal_id'=>$lastComplaintId,
+    //         'device'=>$device
+    //     ], 200, );
+    //  }
 }
 
 public function removal_transfer(Request $request){
@@ -1360,7 +1400,6 @@ public function removalate(Request $request)
      $user = User::where('registeration_no', $regNo)
      ->first();
      if (!$user) {
-        // return redirect()->back()->with('error', 'This user desnot exist or might be removed.');
         return response()->json([
             'success'=>false,
             'message'=>'This user doesnot exsist',
@@ -1378,21 +1417,24 @@ public function removalate(Request $request)
 
      }
      $device=Removal::where('client_id',$user->id)->select('device')->first();
+  $device_id=Deviceinventory::where('device_serialno',$device->device)->select('id')->first();
      $technical =Technicaldetails::where('client_code',$user->id)->select('mobilizer')->first();
 
      if ($device && $technical) {
+     $devices=[
+        'device'=>$device->device,
+        'device_id'=>$device_id->id
 
-        //  return view('removaltransfer', compact('user','device','technical'))->with('message','Found');
+     ];
         return response()->json([
             'success'=>true,
             'message'=>'Data found successfully',
             'user'=>$user,
-            'device'=>$device,
+            'device'=>$devices,
             'technical'=>$technical
         ], 200, );
      }
      else{
-        // return redirect()->back()->with('error', 'This device is is not removed yet!');
         return response()->json([
             'success'=>true,
             'message'=>'Data not found ',
@@ -1464,7 +1506,7 @@ public function create_removal_transfer(Request $request){
     $data->new_cc =$request->input('new_cc');
     $data->new_color =$request->input('new_color');
     $data->new_trans =$request->input('new_trans');
-    // $data->new_mob =$request->input('new_mob');
+    $data->new_inst_date =$request->input('new_inst_date');
     $data->remarks =$request->input('remarks');
     $data->customer_name =$request->input('customer_name');
     $data->old_year =$request->input('old_year');
@@ -1475,18 +1517,19 @@ public function create_removal_transfer(Request $request){
     $data->status='transfered';
  $data->save();
  if($data){
-    // User::where('id',$request->client_id)->update(['engine_type'=>$request->eng_type]);
-    Technicaldetails::where('client_code',$request->client_id)->update([
-        'device_id'=>$data->new_device,
-        'tracker_status'=>'active'
-]);
-$device_details = Deviceinventory::where('device_serialno', $data->new_device)
-->select('sim_id', 'imei_no')
-->first();
+    $device_details = Deviceinventory::where('device_serialno', $data->new_device)
+    ->select('sim_id', 'imei_no','id')
+    ->first();
+    
+    if ($device_details) {
+    $device_details->update(['status' => 'inactive']);
+    }    Technicaldetails::where('client_code',$request->client_id)->update([
 
-if ($device_details) {
-$device_details->update(['status' => 'inactive']);
-}
+        'device_id'=>$data->new_device,
+        'tracker_status'=>'active',
+        'device_no'=>$device_details->id
+]);
+
 
     $sim_new=Siminventory::where('id',$device_details->sim_id)->select('sim_no')->first();
     Deviceinventory::where('device_serialno',$data->old_device)->update(['status'=>'active']);
@@ -4191,9 +4234,14 @@ public function search_for_all(Request $request){
     }
 
     $technical = Technicaldetails::where('client_code', $user->id)->first();
-    $secondary_device=Secondarydetails::where('technical_id',$technical->id)
-    ->select('secondary_device')
-    ->first();
+    $secondary_device = Secondarydetails::where('technical_id', $technical->id)->first();
+    $secondary_vendor = null; // Initialize secondary vendor variable
+
+    if ($secondary_device) {
+        $secondary_vendor = Deviceinventory::where('device_serialno', $secondary_device->secondary_device)
+            ->select('vendor')
+            ->first();
+    }
     $security = secutitydetails::where('client_code', $user->id)->first();
     $removal = Removal::where('client_id', $user->id)
                       ->get()
@@ -4256,7 +4304,8 @@ public function search_for_all(Request $request){
 
     $NR = Complain::where('client_id',$user->id)
     ->where('nature_of_complain', 'N/R')
-        ->select('complain_id', 'customer_name', 'reg_no', 'nature_of_complain', 'remarks', 'Status', 'created_at', 'emp_name')
+        ->select('complain_id', 'customer_name', 'reg_no', 'nature_of_complain', 'remarks', 'Status', 'created_at', 'emp_name',
+        'last_location')
         ->get()
         ->map(function ($NRS) {
             $NRS->date_time = $NRS->created_at->format('d-m-Y h:i A');
@@ -4276,12 +4325,13 @@ public function search_for_all(Request $request){
             return $NRS;
         });
 
-    $value = [
-        'user' => $user,
-        'technical' => $technical,
-        'security' => $security,
-        'secondary_device'=>$secondary_device
-    ];
+        $value = [
+            'user' => $user,
+            'technical' => $technical,
+            'security' => $security,
+            'secondary_device' => $secondary_device,
+            'secondary_vendor' => $secondary_vendor ? $secondary_vendor->vendor : null // Include secondary vendor name if available
+        ];
 
     return response()->json([
         'success' => true,
@@ -4609,7 +4659,9 @@ public function all_device_info(Request $request) {
                 'date_of_installation'=>$userDetails->date_of_installation ?? null,
                 'technician'=>$technicalDetails->technician_name ?? null,
                 'installation_loc'=>$userDetails->installation_loc ?? null,
-                'segment'=>$userDetails->segment?? null
+                'segment'=>$userDetails->segment?? null,
+                'primary'=>$device->is_primary?? null,
+                'secondary'=>$device->is_secondary?? null
                 // 'technical' => $technicalDetails,
                 // 'user' => $userDetails,
             
@@ -5353,20 +5405,11 @@ public function create_another_device(Request $request) {
 
     ];
 
-    // $technical = Technicaldetails::where('client_code', $request->client_id)->first();
-
-    // // Check if the first device already exists
-    // if ($technical->device_id_1 !== null) {
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => 'Already have 1 device installed'
-    //     ], 400);
-    // }
-
-    // // Check if the device is inactive
+ 
     $device = Deviceinventory::where('device_serialno', $request->secondary_device)
     ->update(['status'=>'inactive']);
-
+    $device->is_secondary="yes";
+    $device->save();
     if (!$device) {
         return response()->json([
             'success' => false,
@@ -5608,7 +5651,7 @@ public function employees_count(Request $request){
             'vendor' => $item->vendor,
             'device_status' => $item->status,
             'representative' => $item->representative,
-                'sim_no' => $item->sim->sim_no,
+                'sim_no' => $item->sim->sim_no??null,
                 'icc_id' => $item->sim->icc_id,
                 'provider' => $item->sim->provider,
                 'status' => $item->sim->status,
@@ -5677,7 +5720,12 @@ public function get_avialiable_sim(Request $request)
     ], 200);
 }
 public function all_removal_transfer_info(Request $request){
-    $transfer=Transfer::get();
+    $transfer=Transfer::get()
+    ->map(function($data){
+        $data->new_inst_date->format('d-m-Y');
+        return $data;
+    });
+
 if($transfer){
     return response()->json([
         'success'=>true,

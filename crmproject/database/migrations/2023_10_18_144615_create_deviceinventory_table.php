@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('secondary_device_status');
             $table->string('vendor');
             $table->string('devciesim_no');
+            $table->string('is_primary')->nullable();
+            $table->string('is_secondary')->nullable();
             $table->timestamps();
         });
     }
