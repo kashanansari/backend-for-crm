@@ -835,7 +835,7 @@ return response()->json([
         'data'=>null]
         , 420);
     }
-
+    try{
         $data = new Removal();
         $data->id = $request->input('id');
         $data->client_id = $request->input('client_id');
@@ -855,29 +855,44 @@ return response()->json([
         $data->status = 'Removed';
         $data->representative=$request->representative;
         $data->save();
+        $primary = Deviceinventory::where('device_serialno', $request->device)
+        ->where('is_primary', 'yes')
+        ->first();
+        if($primary){    
         Technicaldetails::where('client_code',$request->client_id)
         ->update(['tracker_status'=>'Removed']);
-        $check = Deviceinventory::where('device_serialno', $request->device)->first();
         $user= User::where('id',$request->client_id)
                  ->update(['status'=>'Removed']);
-        if ($check) {
-            $check->update(['status' => 'active']);
+        
+            $primary->update(['status' => 'active']);
         } 
-        else {
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Device not found in inventory', 
-                'data' => null
-            ], 404);
+        $secondary = Deviceinventory::where('device_serialno', $request->device)
+        ->where('is_secondary', 'yes')
+        ->first();
+      
+        if($secondary){
+       $secondary->update(['status' => 'active']);
+       Secondarydetails::where('secondary_device',$secondary->device_serialno)
+       ->update(['secondary_status'=>'Removed']);
         }
         
-
         return response()->json([
             'success'=>true,
             'message' => 'Removal created successfully',
         'data'=>$data
     ], 200);
+}
+catch(\Exception $e){
+    return response()->json([
+        'success'=>false,
+        'message'=>'Removal not created',
+        'data'=>null
+    ], 400, );
+}
+     
+        
+
+       
     }
 
     public function action_complain(Request $request){
@@ -1317,7 +1332,7 @@ public function removal_search(Request $request){
         $data=[
             'removal_id'=>$removal_id,
             'device'=>$device,
-            'technician_name'=>$technician_name->technician_name,
+            // 'technician_name'=>$technician_name->technician_name,
             'user'=>$user
         ];
         return response()->json([
@@ -1335,7 +1350,7 @@ public function removal_search(Request $request){
         $data=[
             'removal_id'=>$removal_id,
             'device'=>$device,
-            'technician_name'=>$technician_name,
+            // 'technician_name'=>$technician_name,
             'user'=>$user
         ];
 
@@ -1345,6 +1360,11 @@ public function removal_search(Request $request){
             'data'=>$data 
         ], 200, );
        }
+       return response()->json([
+        'success'=>true,
+        'message'=>'Data not found',
+        'data'=>null 
+    ], 400, );
 
     //  $user = User::where('registeration_no', $regNo)
     //  ->orWhere('mobileno_1','LIKE',"%$regNo%")
@@ -5402,6 +5422,7 @@ public function create_another_device(Request $request) {
       'secondary_device'=>$request->secondary_device,
       'reg_no'=>$request->reg_no,
       'customer_name'=>$request->customer_name,
+      'secondary_status'=>"active"
 
     ];
 
