@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\DatalogsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,3 +152,8 @@ Route::get('/user_count', [userController::class, 'user_count'])->name('user_cou
 Route::get('/all_info', [userController::class, 'all_info'])->name('all_info');
 Route::post('/get_avialiable_sim', [userController::class, 'get_avialiable_sim'])->name('get_avialiable_sim');
 Route::get('/all_removal_transfer_info', [userController::class, 'all_removal_transfer_info'])->name('all_removal_transfer_info');
+Route::get('/traits', [userController::class, 'traits'])->name('traits');
+Route::get('/export', [DatalogsController::class, 'export'])->name('export');
+Route::get('/https', [userController::class, 'https'])->name('https');
+Route::get('/joined', [userController::class, 'joined'])->name('joined');
+Route::post('/serach_user', [userController::class, 'serach_user'])->name('serach_user');

@@ -36,19 +36,24 @@ use Spatie\Backup\BackupDestination\BackupDestinationFactory;
 
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-
+use App\Traits\dateTraits;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
 use DB;
 // use Auth;
 use Illuminate\Support\Facades\Hash;
 use DateTime;
 use PDF;
+use Illuminate\Http\Client\RequestException;
+
 // use Illuminate\Support\Facades\Auth;
 
 class userController extends Controller
 {
+    use dateTraits;
     //
 
     public function view(){
@@ -339,7 +344,7 @@ $data->save();
         }
         $data_1 = Technicaldetails::where('client_code', $data->id)->first();
         $secondary=Secondarydetails::where('technical_id',$data_1->id)
-        ->select('secondary_device')
+        ->select('secondary_device','secondary_status')
         ->first();
         $data_2 = secutitydetails::where('client_code', $data->id)->first();
         $device=Deviceinventory::where('id',$data_1->device_no )->first();
@@ -872,8 +877,8 @@ return response()->json([
       
         if($secondary){
        $secondary->update(['status' => 'active']);
-       Secondarydetails::where('secondary_device',$secondary->device_serialno)
-       ->update(['secondary_status'=>'Removed']);
+       $secondary_status = Secondarydetails::where('secondary_device', $secondary->device_serialno)
+       ->update(['secondary_status' => 'Removed']); // Fix here     
         }
         
         return response()->json([
@@ -1238,8 +1243,6 @@ if ($sim_id) {
         'data'=>null
     ], 400, );
    }
-//    return redirect()->route('cc');
-
 }
 
 
@@ -5405,7 +5408,6 @@ public function create_another_device(Request $request) {
         'secondary_device' => 'required|exists:deviceinventory,device_serialno',
         'reg_no' => 'required|exists:users,registeration_no',
         'customer_name' => 'required',
-
     ]);
 
     if ($validator->fails()) {
@@ -5415,43 +5417,52 @@ public function create_another_device(Request $request) {
         ], 402);
     }
 
-    $data=[
-     'client_id'=>$request->client_id,
-      'primary_device'=>$request->primary_device,
-      'technical_id'=>$request->technical_id ,
-      'secondary_device'=>$request->secondary_device,
-      'reg_no'=>$request->reg_no,
-      'customer_name'=>$request->customer_name,
-      'secondary_status'=>"active"
+    $exists = Secondarydetails::where('secondary_device', $request->secondary_device)->first();
 
-    ];
+    if ($exists) {
+        $exists->client_id = $request->client_id;
+        $exists->primary_device = $request->primary_device;
+        $exists->technical_id = $request->technical_id;
+        $exists->reg_no = $request->reg_no;
+        $exists->customer_name = $request->customer_name;
+        $exists->secondary_status = "active";
 
- 
-    $device = Deviceinventory::where('device_serialno', $request->secondary_device)
-    ->update(['status'=>'inactive']);
-    $device->is_secondary="yes";
-    $device->save();
-    if (!$device) {
+        // Update status of the secondary device
+        $device = Deviceinventory::where('device_serialno', $request->secondary_device)->first();
+        $device->status = 'inactive';
+        $device->is_secondary = 'yes';
+        $device->save();
+
+        $exists->save();
+
         return response()->json([
-            'success' => false,
-            'message' => 'Device cannot be installed or is not inactive'
-        ], 401);
-    }
-    $secondary=Secondarydetails::create($data);
+            'success' => true,
+            'message' => 'Another device added successfully',
+            'data' => $exists
+        ], 200);
+    } else {
+        // If the record doesn't exist, create a new one
+        $data = [
+            'client_id' => $request->client_id,
+            'primary_device' => $request->primary_device,
+            'technical_id' => $request->technical_id,
+            'secondary_device' => $request->secondary_device,
+            'reg_no' => $request->reg_no,
+            'customer_name' => $request->customer_name,
+            'secondary_status' => "active"
+        ];
+        $device = Deviceinventory::where('device_serialno', $request->secondary_device)->first();
+        $device->status = 'inactive';
+        $device->is_secondary = 'yes';
+        $device->save();
+        $secondary = Secondarydetails::create($data);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Another device added successfully',
-        'data'=>$secondary
-    ], 200);
-}
-public function sim_inventory_info(Request $request){
-    $sim=Siminventory::all();
-    return response()->json([
-        'success'=>true,
-        'message'=>'Data found successfullyy',
-        'data'=>$sim
-    ], 200, );
+        return response()->json([
+            'success' => true,
+            'message' => 'Another device added successfully',
+            'data' => $secondary
+        ], 200);
+    }
 }
 public function get_all_active_devices(Request $request)
 {
@@ -5659,12 +5670,13 @@ public function employees_count(Request $request){
     ], 200, );
  }
  public function all_info(Request $request){
-    // Fetch all data from Deviceinventory
     $data = Deviceinventory::with(['technicaldetails.user', 'sim'])
         ->get();
 
     // Map the data
     $all_data = $data->map(function ($item) {
+        $secondary_details = Secondarydetails::where('secondary_device', $item->device_serialno)->first();
+
         return [
             'id' => $item->id,
             'device_ser' => $item->device_serialno,
@@ -5672,26 +5684,29 @@ public function employees_count(Request $request){
             'vendor' => $item->vendor,
             'device_status' => $item->status,
             'representative' => $item->representative,
-                'sim_no' => $item->sim->sim_no??null,
-                'icc_id' => $item->sim->icc_id,
-                'provider' => $item->sim->provider,
-                'status' => $item->sim->status,
-                'representative' => $item->sim->representative,
-                'client_code' => $item->technicaldetails->client_code??null,
-                'IMEI_no' => $item->technicaldetails->IMEI_no??null,
-                'technician_name' => $item->technicaldetails->technician_name??null,
-                'tracker_status' => $item->technicaldetails->tracker_status??null,
-                'representative' => $item->technicaldetails->representative??null,
-                    'customer_name' => $item->technicaldetails->user->customer_name??null,
-                    'father_name' => $item->technicaldetails->user->father_name??null,
-                    'registeration_no' => $item->technicaldetails->user->registeration_no??null,
-                    'eng_no' => $item->technicaldetails->user->engine_no??null,
-                    'DOI' => $item->technicaldetails->user->date_of_installation??null,
-                    'contact' => $item->technicaldetails->user->mobileno_1??null,
-                    'location' => $item->technicaldetails->user->installation_loc??null,
-                    'segment' => $item->technicaldetails->user->segment??null,
-                // ] : null,
-            // ] : null,
+            'sim_no' => $item->sim->sim_no ?? null,
+            'icc_id' => $item->sim->icc_id,
+            'provider' => $item->sim->provider,
+            'status' => $item->sim->status,
+            'representative' => $item->sim->representative,
+            'client_code' => $item->technicaldetails->client_code ?? null,
+            'IMEI_no' => $item->technicaldetails->IMEI_no ?? null,
+            'technician_name' => $item->technicaldetails->technician_name ?? null,
+            'tracker_status' => $item->technicaldetails->tracker_status ?? null,
+            'representative' => $item->technicaldetails->representative ?? null,
+            'customer_name' => $item->technicaldetails->user->customer_name ?? null,
+            'father_name' => $item->technicaldetails->user->father_name ?? null,
+            'registeration_no' => $item->technicaldetails->user->registeration_no ?? null,
+            'eng_no' => $item->technicaldetails->user->engine_no ?? null,
+            'DOI' => $item->technicaldetails->user->date_of_installation ?? null,
+            'contact' => $item->technicaldetails->user->mobileno_1 ?? null,
+            'location' => $item->technicaldetails->user->installation_loc ?? null,
+            'segment' => $item->technicaldetails->user->segment ?? null,
+            'secondary_device' => $secondary_details->secondary_device ?? null,
+            'reg_no' => $secondary_details->reg_no ?? null,
+            'client_id' => $secondary_details->client_id ?? null,
+            'primary_device' => $secondary_details->primary_device ?? null,
+            'secondary_status' => $secondary_details->secondary_status ?? null,
         ];
     });  
 
@@ -5762,8 +5777,106 @@ else{
     ], 200, );
 }
 }
+public function traits(Request $request)
+{
+    $collect=collect(['one','two','three']);
+    if($collect->contains("one")){
+    $date=$this->date_format();
+    $time=$date['time'];
+    return response()->json([
+        'success'=>true,
+        'time'=>$time,
+        'collect'=>$collect
+    ], 200, );
+}
 
     }
+    public function joined(Request $request){
+       $user= User::join('secondary_device','users.id','=','secondary_device.client_id')
+        ->get()
+        ->map(function($data){
+            $data->date=$data->created_at->format('d-m-Y');
+            unset($data->created_at);
+            unset($data->updated_at);
+            return $data;
+        });
+        if($user){
+            return response()->json([
+                'success'=>'Data found successfully',
+                'data'=>$user
+            ], 200, );
+        }
+    }
+
+public function serach_user(Request $request){
+$validator=Validator::make($request->all(),[
+  'search_term'=>'required'
+]);
+if($validator->fails()){
+    return response()->json([
+        'success'=>true,
+        'message'=>$validator->errors()
+    ], 200, );
+}
+$reg_no=$request->search_term;
+$user=User::where('registeration_no',$reg_no)
+->first();
+if(!$user){
+    return response()->json([
+        'success'=>false,
+        'message'=>'Data not found',
+        'data'=>null
+    ], 200, );
+}
+try{
+$technical=Technicaldetails::where('client_code',$user->id)
+->first();
+$security=secutitydetails::where('client_code',$user->id)
+->first();
+$renewals=Renewals::where('client_id',$user->id)
+->first();
+$data=[
+   'user'=>$user,
+   'technical'=>$technical??null,
+   'security'=>$security??null,
+   'renewal_charges'=>$renewals->renewal_charges??null
+];
+return response()->json([
+    'success'=>true,
+    'message'=>'Data found successfully',
+    'data'=>$data
+], 200, );
+
+
+    } 
+    catch(\Exception $e){
+        return response()->json([
+            'success'=>false,
+            'message'=>$e->getMessage()
+        ], 200, );
+    }
+}
+
+
+public function https()
+{
+    try {
+        $response = Http::withoutVerifying()->get('https://test.magmaconsultingcorporation.com/api/all_device_info');
+
+        if ($response->successful()) {
+            return response()->json(['data' => $response->json()], 200);
+        } else {
+            // Handle unsuccessful response (e.g., 4xx or 5xx error)
+            return response()->json(['message' => 'Failed to retrieve data', 'status' => $response->status()], $response->status());
+        }
+    } catch (RequestException $e) {
+        // Handle request exception
+        return response()->json(['message' => 'Request failed: ' . $e->getMessage()], 500);
+    } catch (\Exception $e) {
+        // Handle other exceptions
+        return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
 
 
 
@@ -5771,6 +5884,4 @@ else{
 
 
 
-
-
-
+}
