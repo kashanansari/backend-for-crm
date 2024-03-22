@@ -157,3 +157,4 @@ Route::get('/export', [DatalogsController::class, 'export'])->name('export');
 Route::get('/https', [userController::class, 'https'])->name('https');
 Route::get('/joined', [userController::class, 'joined'])->name('joined');
 Route::post('/serach_user', [userController::class, 'serach_user'])->name('serach_user');
+Route::put('/update_user', [userController::class, 'update_user'])->name('update_user');

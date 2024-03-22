@@ -590,104 +590,7 @@ return response()->json([
 
 }
 
-  public function update_details(Request $request,$id){
-    $customer=User::find($id);
-     if($customer){
-        $customer->id=$request->input('client_id');
-        $customer->customer_name=$request->input('customer_name');
-        $customer->father_name=$request->input('father_name');
-        $customer->address=$request->input('address');
-        $customer->telephone_residence=$request->input('telephone_residence');
-        $customer->mobileno_1=$request->input('mobileno_1');
-        $customer->mobileno_2=$request->input('mobileno_2');
-        $customer->mobileno_3=$request->input('mobileno_3');
-        $customer->mobileno_4=$request->input('mobileno_4');
-        $customer->ntn=$request->input('ntn');
-        $customer->cnic=$request->input('cnic');
-        $customer->primaryuser_name=$request->input('primaryuser_name');
-        $customer->primaryuser_con1=$request->input('primaryuser_con1');
-        $customer->primaryuser_con2=$request->input('primaryuser_con2');
-        $customer->primaryuser_cnic=$request->input('primaryuser_cnic');
-        $customer->seconadryuser_name=$request->input('seconadryuser_name');
-        $customer->secondaryuser_con1=$request->input('secondaryuser_con1');
-        $customer->secondaryuser_con2=$request->input('secondaryuser_con2');
-        $customer->relationship=$request->input('relationship');
-        // $customer->registeration_no=$request->input('registeration_no');
-        // $customer->chasis_no=$request->input('chasis_no');
-        // $customer->engine_no=$request->input('engine_no');
-        // $customer->engine_type=$request->input('engine_type');
-        // $customer->CC=$request->input('CC');
-        // $customer->make=$request->input('make');
-        // $customer->model=$request->input('model');
-        // $customer->year=$request->input('year');
-        // $customer->transmission=$request->input('transmission');
-        // $customer->color=$request->input('color');
-        $customer->insurance_partner=$request->input('insurance_partner');
-
-        $customer->vas=$request->input('vas');
-        $vasOptions = $request->input('vas_options', []);
-        $customer->vas_options = implode(',', $vasOptions);
-
-        $customer->segment=$request->input('segment');
-        $customer->demo_duration=$request->input('demo_duration');
-        $customer->tracker_charges=$request->input('tracker_charges');
-        $customer->date_of_installation=$request->input('date_of_installation');
-        $customer->int_comission=$request->input('int_comission');
-        $customer->ext_comission=$request->input('ext_comission');
-        $customer->discount=$request->input('discount');
-        $customer->campaign_point=$request->input('campaign_point');
-        $customer->dealership=$request->input('dealership');
-        $customer->dealer_name=$request->input('dealer_name');
-        $customer->sales_person=$request->input('sales_person');
-        $customer->installation_loc=$request->input('installation_loc');
-        $customer->conatct_person=$request->input('conatct_person');
-        $customer->remarks=$request->input('remarks');
-        $customer->update();
-
-    }
-    $technical=Technicaldetails::where('client_code',$id)->first();
-    // $device=Deviceinventory::where('device_serialno',$request->input('device_id'))->select('id')->first();
-    if($technical){
-        // $technical->device_no=$device->id;
-        $technical->vendor_name=$request->input('vendor_name');
-        $technical->device_id=$request->input('device_id');
-        $technical->IMEI_no=$request->input('IMEI_no');
-        $technical->Gsm_no=$request->input('Gsm_no');
-        $technical->Tavl_mang_id=$request->input('Tavl_mang_id');
-        $technical->technician_name=$request->input('technician_name');
-        $technical->sim=$request->input('sim');
-        $technical->Gps_check=$request->input('Gps_check');
-        $technical->mobilizer=$request->input('mobilizer');
-        $technical->operational_status=$request->input('operational_status');
-        $technical->webtrack_id=$request->input('webtrack_id');
-        $technical->webtrack_pass=Hash::make($request->input('webtrack_pass'));
-        $technical->ignition_alerts=$request->input('ignition_alerts');
-        $technical->overspeed_alerts=$request->input('overspeed_alerts');
-        $technical->geo_fence_alerts=$request->input('geo_fence_alerts');
-        $technical->additional_contact=$request->input('additional_contact');
-        $technical->contact_1=$request->input('contact_1');
-        $technical->contact_2=$request->input('contact_2');
-        $technical->contact_3=$request->input('contact_3');
-        $technical->tracker_status='active';
-        $technical->update();
-        $device=Deviceinventory::where('device_serialno',$technical->device_id)->update(['status'=>'inactive']);
-    }
-    $security=secutitydetails::where('client_code',$id)->first();
-    if($security){
-        $security->customer_email=$request->input('customer_email');
-        $security->emergency_pass=$request->input('emergency_pass');
-        $security->emergency_person=$request->input('emergency_person');
-        $security->security_ques=$request->input('security_ques');
-        $security->security_ans=$request->input('security_ans');
-        $security->password=Hash::make($request->input('password'));
-        $security->emergency_person_contact=$request->input('emergency_person_contact');
-        $security->update();
-    }
-    // $customer->update();
-    // $technical->update();
-    // $security->update();
-    return redirect()->route('show');
-}
+ 
     public function complainform(){
 
         $lastComplaint = complain::latest()->first();
@@ -5858,30 +5761,118 @@ return response()->json([
 }
 
 
-public function https()
-{
-    try {
-        $response = Http::withoutVerifying()->get('https://test.magmaconsultingcorporation.com/api/all_device_info');
-
-        if ($response->successful()) {
-            return response()->json(['data' => $response->json()], 200);
-        } else {
-            // Handle unsuccessful response (e.g., 4xx or 5xx error)
-            return response()->json(['message' => 'Failed to retrieve data', 'status' => $response->status()], $response->status());
-        }
-    } catch (RequestException $e) {
-        // Handle request exception
-        return response()->json(['message' => 'Request failed: ' . $e->getMessage()], 500);
-    } catch (\Exception $e) {
-        // Handle other exceptions
-        return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
+public function update_user(Request $request){
+    $validator=Validator::make($request->all(),[
+        'client_id'=>'required|exists:users,id'
+    ]);
+    if($validator->fails()){
+        return response()->json([
+            'success'=>false,
+            'message'=>$validator->errors()
+        ], 402, );
     }
+    $client_id=$request->client_id;
+    $customer=User::where('id',$client_id)
+    ->first();
+    if(!$customer){
+        return response()->json([
+            'success'=>false,
+            'message'=>'Data not found',
+            'data'=>null
+        ], 200, );
+    }
+    try{
+    
+        
+        $customer->customer_name=$request->input('customer_name');
+        $customer->father_name=$request->input('father_name');
+        $customer->address=$request->input('address');
+        $customer->telephone_residence=$request->input('telephone_residence');
+        $customer->mobileno_1=$request->input('mobileno_1');
+        $customer->mobileno_2=$request->input('mobileno_2');
+        $customer->mobileno_3=$request->input('mobileno_3');
+        $customer->mobileno_4=$request->input('mobileno_4');
+        $customer->ntn=$request->input('ntn');
+        $customer->cnic=$request->input('cnic');
+        $customer->seconadryuser_name=$request->input('seconadryuser_name');
+        $customer->secondaryuser_con1=$request->input('secondaryuser_con1');
+        $customer->secondaryuser_con2=$request->input('secondaryuser_con2');
+        $customer->relationship=$request->input('relationship');
+        $customer->registeration_no=$request->input('registeration_no');
+        $customer->chasis_no=$request->input('chasis_no');
+        $customer->engine_no=$request->input('engine_no');
+        $customer->engine_type=$request->input('engine_type');
+        $customer->CC=$request->input('CC');
+        $customer->make=$request->input('make');
+        $customer->model=$request->input('model');
+        $customer->year=$request->input('year');
+        $customer->transmission=$request->input('transmission');
+        $customer->color=$request->input('color');
+        $customer->insurance_partner=$request->input('insurance_partner');
+        $customer->vas=$request->input('vas');
+        $customer->segment=$request->input('segment');
+        $customer->demo_duration=$request->input('demo_duration');
+        $customer->tracker_charges=$request->input('tracker_charges');
+        $customer->date_of_installation=$request->input('date_of_installation');
+        $customer->int_comission=$request->input('int_comission');
+        $customer->ext_comission=$request->input('ext_comission');
+        $customer->discount=$request->input('discount');
+        $customer->campaign_point=$request->input('campaign_point');
+        $customer->dealership=$request->input('dealership');
+        $customer->dealer_name=$request->input('dealer_name');
+        $customer->sales_person=$request->input('sales_person');
+        $customer->installation_loc=$request->input('installation_loc');
+        $customer->conatct_person=$request->input('conatct_person');
+        $customer->remarks=$request->input('remarks');
+        $customer->update();
+    
+    $technical=Technicaldetails::where('client_code',$client_id)->first();
+    if($technical){
+        $technical->technician_name=$request->input('technician_name');
+        $technical->webtrack_id=$request->input('webtrack_id');
+        $technical->webtrack_pass=Hash::make($request->input('webtrack_pass'));
+        $technical->additional_contact=$request->input('additional_contact');
+        $technical->contact_1=$request->input('contact_1');
+        $technical->contact_2=$request->input('contact_2');
+        $technical->contact_3=$request->input('contact_3');
+        $technical->tracker_position=$request->input('tracker_position');
+        $technical->tracker_status='active';
+        $technical->technical_status='completed';
+        $technical->operational_status='completed';
+        $technical->update();
+      
+    }
+    $security=secutitydetails::where('client_code',$client_id)->first();
+    if($security){
+        $security->customer_email=$request->input('customer_email');
+        $security->emergency_pass=$request->input('emergency_pass');
+        $security->emergency_person=$request->input('emergency_person');
+        $security->security_ques=$request->input('security_ques');
+        $security->security_ans=$request->input('security_ans');
+        $security->password=$request->input('password');
+        $security->emergency_person_contact=$request->input('emergency_person_contact');
+        $technical->security_status='completed';
+
+        $security->update();
+    }
+    return response()->json([
+        'success'=>true,
+        'messsage'=>'All data updated successfully',
+    ], 400, );
+}
+
+catch(\Exception $e){
+    return response()->json([
+        "success"=>false,
+        'message'=>"Updation error",
+        'error'=>$e->getMessage()
+    ], 500, );
 }
 
 
 
-
-
+}
 
 
 }
+
